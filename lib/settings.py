@@ -10,6 +10,7 @@ class Settings:
         # use elb url, output from cloudformation template
         self.opsman_url = os.environ['OPS_MANAGER_URL']
         self.opsman_user = 'admin'
+        # todo: password charset validation?
         self.opsman_password = os.environ['OPS_MANAGER_ADMIN_PASSWORD']
 
     def get_fully_qualified_domain(self):
@@ -17,7 +18,7 @@ class Settings:
 
 
 def get_om_with_auth(settings: Settings):
-    return "om -k --target {url} --username {username} --password {password}".format(
+    return "om -k --target {url} --username '{username}' --password '{password}'".format(
         url=settings.opsman_url,
         username=settings.opsman_user,
         password=settings.opsman_password

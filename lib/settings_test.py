@@ -28,6 +28,6 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(self.settings.opsman_user, 'admin')
 
     def test_get_om_with_auth(self):
-        expected_om_command = "om -k --target https://some-random-ec2-domain.example.com --username admin --password monkey123"
+        expected_om_command = "om -k --target https://some-random-ec2-domain.example.com --username 'admin' --password 'monkey123'"
         om_command = settings.get_om_with_auth(self.settings)
         self.assertEqual(om_command, expected_om_command)

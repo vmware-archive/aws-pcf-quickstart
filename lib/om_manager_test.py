@@ -10,6 +10,8 @@ from settings import Settings
 
 class TestOmManager(unittest.TestCase):
     def setUp(self):
+        om_manager.debug_mode = False
+
         self.settings = Mock(Settings)
         self.settings.opsman_url = 'https://cf.example.com'
         self.settings.opsman_user = 'admin'
@@ -26,7 +28,7 @@ class TestOmManager(unittest.TestCase):
         p.communicate.return_value = self.to_bytes("out: foo"), self.to_bytes("error: bar")
         om_manager.config_opsman_auth(self.settings)
         mock_popen.assert_called_with(
-            "om -k --target https://cf.example.com configure-authentication --username admin --password monkey-123 --decryption-passphrase monkey-123",
+            "om -k --target https://cf.example.com configure-authentication --username 'admin' --password 'monkey-123' --decryption-passphrase 'monkey-123'",
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
         )
 
@@ -89,3 +91,17 @@ class TestOmManager(unittest.TestCase):
 
         self.assertEqual(mock_popen.call_count, 1)
         self.assertEqual(returncode, 1)
+
+
+    @patch('subprocess.Popen')
+    @patch('builtins.print')
+    def test_debug_flag_toggles_print(self, mock_print, mock_popen):
+        om_manager.debug_mode = True
+
+        om_manager.config_opsman_auth(self.settings)
+
+        self.assertEqual(mock_popen.call_count, 0)
+
+        self.assertEqual(mock_print.call_count, 2)
+        self.assertEqual(mock_print.call_args_list[0][0][0], "Debug mode. Would have run command")
+

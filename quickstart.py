@@ -10,14 +10,14 @@ sys.path.insert(1, os.path.join(PATH, 'lib'))
 
 from lib import settings, om_manager
 
+# todo: cli flag...?
+om_manager.debug_mode = True
 
 @click.group()
 @click.pass_context
 def cli(ctx):
     my_settings = settings.Settings()
     ctx.obj['settings'] = my_settings
-    # ctx.obj['gcp'] = gcp.GCP(my_settings, vars_file, state_file, 'terraforming-gcp', 'overrides')
-    pass
 
 
 @cli.command('configure-opsman-auth')
