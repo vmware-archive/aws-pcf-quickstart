@@ -1,0 +1,7 @@
+{
+  "availability_zones": [
+  {% for zone in zones %}
+    {"name": "{{zone}}"}{% if not loop.last%},{%endif%}
+  {% endfor %}
+  ]
+}
