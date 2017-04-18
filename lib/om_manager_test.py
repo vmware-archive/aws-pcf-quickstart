@@ -16,6 +16,7 @@ class TestOmManager(unittest.TestCase):
         self.settings.opsman_url = 'https://cf.example.com'
         self.settings.opsman_user = 'admin'
         self.settings.opsman_password = 'monkey-123'
+        self.settings.debug = False
 
     def to_bytes(self, str: str):
         return bytearray(str, "utf-8")
@@ -96,7 +97,7 @@ class TestOmManager(unittest.TestCase):
     @patch('subprocess.Popen')
     @patch('builtins.print')
     def test_debug_flag_toggles_print(self, mock_print, mock_popen):
-        om_manager.debug_mode = True
+        self.settings.debug = True
 
         om_manager.config_opsman_auth(self.settings)
 

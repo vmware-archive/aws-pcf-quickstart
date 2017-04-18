@@ -19,6 +19,7 @@ om_manager.debug_mode = True
 def cli(ctx, debug):
     my_settings = settings.Settings()
     ctx.obj['settings'] = my_settings
+    my_settings.debug = debug
 
 
 @cli.command('configure-opsman-auth')

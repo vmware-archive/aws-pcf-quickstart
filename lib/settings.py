@@ -25,6 +25,7 @@ class Settings:
         self.opsman_user = 'admin'
         # todo: password charset validation?
         self.opsman_password = os.environ['OPS_MANAGER_ADMIN_PASSWORD']
+        self.debug = False
 
     def get_fully_qualified_domain(self):
         return self.dns_suffix

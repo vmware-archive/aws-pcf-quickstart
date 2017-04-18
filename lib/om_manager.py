@@ -5,7 +5,6 @@ from settings import Settings
 
 # todo: spin up a class, don't use package level vars
 max_retries = 5
-debug_mode = False
 
 
 def config_opsman_auth(my_settings: Settings, attempt=0):
@@ -13,12 +12,13 @@ def config_opsman_auth(my_settings: Settings, attempt=0):
         my_settings.opsman_url, my_settings.opsman_user, my_settings.opsman_password,
         my_settings.opsman_password
     )
-    out, err, returncode = run_command(cmd)
+    out, err, returncode = run_command(cmd, my_settings.debug)
+    if out != "":
+        print(out)
+    if err != "":
+        print(err)
+
     if returncode != 0:
-        if out != "":
-            print(out)
-        if err != "":
-            print(err)
         if is_recoverable_error(out) and attempt < max_retries:
             print("Retrying, {}".format(attempt))
             time.sleep(attempt ** 3)
@@ -27,7 +27,7 @@ def config_opsman_auth(my_settings: Settings, attempt=0):
     return returncode
 
 
-def run_command(cmd: str):
+def run_command(cmd: str, debug_mode):
     if debug_mode:
         print("Debug mode. Would have run command")
         print("    {}".format(cmd))
