@@ -31,7 +31,6 @@ def run_command(cmd: str):
     if debug_mode:
         print("Debug mode. Would have run command")
         print("    {}".format(cmd))
-        # todo: not in love with this.... big assumptions by about calller
         return "", "", 0
     else:
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)

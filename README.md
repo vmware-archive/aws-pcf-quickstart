@@ -1,4 +1,3 @@
-
 # Scratch
 
 Random notes while iterating
@@ -27,7 +26,13 @@ user	0m15.970s
 sys	0m32.127s
 ```
 
+todo: script to `scp` over all our code
+
 
 # Questions
 * How are we doing DNS?
 * How are we doing certs?
+* How do we install pip / python3 / om / pivnet on ops manager vm?
+* How are we reporting and elevating errors back to the user?
+    - Before ops manager is ready
+    - While it running

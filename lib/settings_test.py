@@ -1,19 +1,34 @@
 import os
 import unittest
 
+from mock import patch, mock_open
+
 import settings
 
 
 class TestSettings(unittest.TestCase):
     def setUp(self):
-        os.environ['ERT_SQL_DB_USERNAME'] = 'db-admin'
-        os.environ['ERT_SQL_DB_PASSWORD'] = 'abc123'
+        my_mock_open = mock_open(read_data="""
+{"Stacks": [{
+      "Outputs": [
+        {
+          "OutputValue": "db-admin",
+          "OutputKey": "PcfRdsUsername"
+        },{
+          "OutputValue": "abc123",
+          "OutputKey": "PcfRdsPassword"
+        }
+      ]
+}]}
+""")
+
         os.environ['DNS_SUFFIX'] = 'example.com'
         os.environ['OPS_MANAGER_VERSION'] = '99.0.1'
         os.environ['OPS_MANAGER_URL'] = 'https://some-random-ec2-domain.example.com'
         os.environ['OPS_MANAGER_ADMIN_PASSWORD'] = 'monkey123'
 
-        self.settings = settings.Settings()
+        with patch('settings.open', my_mock_open):
+            self.settings = settings.Settings()
 
     def test_parses_environment(self):
         self.assertEqual(self.settings.ert_sql_db_username, 'db-admin')

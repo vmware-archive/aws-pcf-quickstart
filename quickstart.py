@@ -11,7 +11,7 @@ sys.path.insert(1, os.path.join(PATH, 'lib'))
 from lib import settings, om_manager
 
 # todo: cli flag...?
-om_manager.debug_mode = True
+om_manager.debug_mode = False
 
 @click.group()
 @click.pass_context
