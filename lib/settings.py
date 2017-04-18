@@ -3,8 +3,12 @@ import json
 
 output_file = "/tmp/pcf-stack.json"
 
+
 class Settings:
     def __init__(self):
+        self.debug = False
+        self.opsman_user = 'admin'
+
         with open(output_file) as output_json:
             stack_output = json.load(output_json)
             stacks = stack_output.get("Stacks")
@@ -14,41 +18,37 @@ class Settings:
             if not self.stack:
                 raise ValueError('{} should conform to {"Stacks":[{....}]}')
 
+        self.parse_environ()
+        self.parse_stack()
 
+    def parse_stack(self):
         self.ert_sql_db_password = self.find_output("PcfRdsPassword")
         self.ert_sql_db_username = self.find_output("PcfRdsUsername")
-
-        self.dns_suffix = os.environ['DNS_SUFFIX']
-        self.ops_manager_version = os.environ['OPS_MANAGER_VERSION']
-        # use elb url, output from cloudformation template
-        self.opsman_url = os.environ['OPS_MANAGER_URL']
-        self.opsman_user = 'admin'
-        # todo: password charset validation?
-        self.opsman_password = os.environ['OPS_MANAGER_ADMIN_PASSWORD']
-        self.debug = False
-        self.access_key_id = self.find_output("PcfIamUserAccessKey")
-        self.key_pair_name = self.find_parameter("01NATKeyPair")
-
-
-        self.secret_access_key = self.find_output("PcfIamUserSecretAccessKey")
+        self.pcf_iam_access_key_id = self.find_output("PcfIamUserAccessKey")
+        self.pcf_iam_secret_access_key = self.find_output("PcfIamUserSecretAccessKey")
         self.vpc_id = self.find_output("PcfVpc")
         self.security_group = self.find_output("PcfVmsSecurityGroupId")
-
-        self.ssh_private_key = os.environ['SSH_PRIVATE_KEY']
-        self.region = os.environ["REGION"]
-
-        "encrypted": false
-
         self.zones = []
         for potential_zone in ["PcfPrivateSubnetAvailabilityZone", "PcfPrivateSubnet2AvailabilityZone"]:
             zone = self.find_output(potential_zone)
             if zone:
                 self.zones.append(zone)
+        self.key_pair_name = self.find_parameter("01NATKeyPair")
+
+    def parse_environ(self):
+        self.dns_suffix = os.environ['DNS_SUFFIX']
+        self.ops_manager_version = os.environ['OPS_MANAGER_VERSION']
+        # use elb url, output from cloudformation template
+        self.opsman_url = os.environ['OPS_MANAGER_URL']
+        # todo: password charset validation?
+        self.opsman_password = os.environ['OPS_MANAGER_ADMIN_PASSWORD']
+        self.ssh_private_key = os.environ['SSH_PRIVATE_KEY']
+        self.region = os.environ["REGION"]
 
     def get_fully_qualified_domain(self):
         return self.dns_suffix
 
-    def find_output(self, name:str):
+    def find_output(self, name: str):
         for output in self.stack.get("Outputs"):
             key = output.get("OutputKey", None)
             if key == name:

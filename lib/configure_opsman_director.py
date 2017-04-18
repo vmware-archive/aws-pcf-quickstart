@@ -14,8 +14,8 @@ def configure_opsman_director(my_settings: Settings):
 
     template_ctx = {
         "zones": my_settings.zones,
-        "access_key_id": my_settings.access_key_id,
-        "secret_access_key": my_settings.secret_access_key,
+        "access_key_id": my_settings.pcf_iam_access_key_id,
+        "secret_access_key": my_settings.pcf_iam_secret_access_key,
         "vpc_id": my_settings.vpc_id,
         "security_group": my_settings.security_group,
         "key_pair_name": my_settings.key_pair_name,
