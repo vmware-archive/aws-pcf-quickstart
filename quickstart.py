@@ -11,11 +11,12 @@ sys.path.insert(1, os.path.join(PATH, 'lib'))
 from lib import settings, om_manager
 
 # todo: cli flag...?
-om_manager.debug_mode = False
+om_manager.debug_mode = True
 
 @click.group()
+@click.option('--debug/--no-debug', default=False)
 @click.pass_context
-def cli(ctx):
+def cli(ctx, debug):
     my_settings = settings.Settings()
     ctx.obj['settings'] = my_settings
 
