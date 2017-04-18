@@ -1,0 +1,1650 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Cloudformation template for configuring Pivotal Cloud Foundry on AWS",
+  "Parameters": {
+    "01NATKeyPair": {
+      "Type": "AWS::EC2::KeyPair::KeyName",
+      "Description": "Select the SSH keypair to use for the NAT vm"
+    },
+    "02NATInstanceType": {
+      "Type": "String",
+      "AllowedValues": [
+        "t2.micro",
+        "t2.small",
+        "t2.medium",
+        "m3.large",
+        "c4.large",
+        "m3.xlarge",
+        "c4.xlarge",
+        "c4.8xlarge"
+      ],
+      "ConstraintDescription": "Instance Type must be of a valid EC2 type",
+      "Default": "t2.medium",
+      "Description": "Select the Instance Type to use for the NAT vm"
+    },
+    "03OpsManagerIngress": {
+      "Type": "String",
+      "Default": "0.0.0.0/0",
+      "Description": "CIDR range allowed to connect to Ops Manager instance"
+    },
+    "04RdsDBName": {
+      "Type": "String",
+      "MinLength": "4",
+      "Default": "bosh",
+      "Description": "BOSH database name"
+    },
+    "05RdsUsername": {
+      "Type": "String",
+      "Description": "BOSH database username"
+    },
+    "06RdsPassword": {
+      "Type": "String",
+      "NoEcho": "true",
+      "MinLength": "8",
+      "Description": "BOSH database password"
+    },
+    "07SSLCertificateARN": {
+      "Type": "String",
+      "Description": "ARN for pre-uploaded SSL certificate"
+    },
+    "08OpsManagerTemplate": {
+      "Type": "String",
+      "Default": "https://s3.amazonaws.com/quickstart-testing/ops-manager.json",
+      "Description": "S3 Location for OpsManager CloudFormation Template"
+    },
+    "09ElbPrefix": {
+      "Type": "String",
+      "Default": "",
+      "Description": "Prefix for the name of the ELBs generated. NOTE: Leave empty to use default prefix of AWS::StackName"
+    },
+    "10AllowHttpOnElb": {
+      "Type": "String",
+      "Default": "true",
+      "AllowedValues": ["true", "false"],
+      "Description": "Allow HTTP traffic on PCF-ELB port 80. Default: true."
+    }
+  },
+  "Conditions": {
+    "ElbPrefixProvided": {
+      "Fn::Not": [
+        {
+          "Fn::Equals" : [{"Ref" : "09ElbPrefix" }, ""]
+        }
+      ]
+    },
+    "AllowHTTPTrafficOnELB": {
+      "Fn::Equals" : [{"Ref" : "10AllowHttpOnElb" }, "true"]
+    }
+  },
+  "Resources": {
+    "OpsManStack": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "Parameters": {
+          "01NATKeyPair": {"Ref": "01NATKeyPair"},
+          "02NATInstanceType": {"Ref": "02NATInstanceType"},
+          "03OpsManagerIngress": {"Ref": "03OpsManagerIngress"},
+          "04RdsDBName": {"Ref": "04RdsDBName"},
+          "05RdsUsername": {"Ref": "05RdsUsername"},
+          "06RdsPassword": {"Ref": "06RdsPassword"}
+        },
+        "TemplateURL": {"Ref": "08OpsManagerTemplate"}
+      }
+    },
+    "PcfElbSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": { "Fn::GetAtt": [ "OpsManStack", "Outputs.PcfVpc" ] },
+        "GroupDescription": "ELB Security Group",
+        "SecurityGroupIngress": [
+          {
+             "CidrIp": "0.0.0.0/0",
+             "FromPort": "80",
+             "IpProtocol": "tcp",
+             "ToPort": "80"
+          },
+          {
+             "CidrIp": "0.0.0.0/0",
+             "FromPort": "443",
+             "IpProtocol": "tcp",
+             "ToPort": "443"
+          },
+          {
+             "CidrIp": "0.0.0.0/0",
+             "FromPort": "4443",
+             "IpProtocol": "tcp",
+             "ToPort": "4443"
+          }
+        ]
+      }
+    },
+    "PcfElb": {
+      "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+      "DependsOn": [
+        "PcfElbSecurityGroup",
+        "OpsManStack"
+      ],
+      "Properties": {
+        "CrossZone": true,
+        "HealthCheck": {
+          "HealthyThreshold": "6",
+          "Interval": "5",
+          "Target": "TCP:80",
+          "Timeout": "3",
+          "UnhealthyThreshold": "3"
+        },
+        "ConnectionSettings": {
+          "IdleTimeout": 3600
+        },
+        "LoadBalancerName": { "Fn::Join" : [
+          "",
+          [ { "Fn::If" : [
+              "ElbPrefixProvided",
+              { "Ref" : "09ElbPrefix" },
+              { "Ref" : "AWS::StackName" }
+            ]},
+           "-pcf-elb"
+          ]
+        ] },
+        "Listeners": { "Fn::If" : [
+          "AllowHTTPTrafficOnELB",
+          [
+            {
+              "InstancePort": "80",
+              "LoadBalancerPort": "80",
+              "Protocol": "http",
+              "SSLCertificateId": {"Ref": "07SSLCertificateARN"}
+            },
+            {
+              "InstancePort": "80",
+              "LoadBalancerPort": "443",
+              "Protocol": "https",
+              "SSLCertificateId": {"Ref": "07SSLCertificateARN"}
+            },
+            {
+              "InstancePort": "80",
+              "LoadBalancerPort": "4443",
+              "Protocol": "ssl",
+              "SSLCertificateId": {"Ref": "07SSLCertificateARN"}
+            }
+          ],
+          [
+            {
+              "InstancePort": "80",
+              "LoadBalancerPort": "443",
+              "Protocol": "https",
+              "SSLCertificateId": {"Ref": "07SSLCertificateARN"}
+            },
+            {
+              "InstancePort": "80",
+              "LoadBalancerPort": "4443",
+              "Protocol": "ssl",
+              "SSLCertificateId": {"Ref": "07SSLCertificateARN"}
+            }
+          ]
+        ]},
+        "Scheme": "internet-facing",
+        "SecurityGroups": [
+          {
+            "Ref": "PcfElbSecurityGroup"
+          }
+        ],
+        "Subnets": [
+          { "Fn::GetAtt": [ "OpsManStack", "Outputs.PcfPublicSubnetId" ] },
+          { "Fn::GetAtt": [ "OpsManStack", "Outputs.PcfPublicSubnetId2" ] }
+        ]
+      }
+    },
+    "PcfElbSshSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": { "Fn::GetAtt": [ "OpsManStack", "Outputs.PcfVpc" ] },
+        "GroupDescription": "ELB Security Group",
+        "SecurityGroupIngress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "2222",
+            "IpProtocol": "tcp",
+            "ToPort": "2222"
+          }
+        ]
+      }
+    },
+    "PcfElbSsh": {
+      "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+      "DependsOn": [
+        "PcfElbSshSecurityGroup",
+        "OpsManStack"
+      ],
+      "Properties": {
+        "CrossZone": true,
+        "HealthCheck": {
+          "HealthyThreshold": "6",
+          "Interval": "5",
+          "Target": "TCP:2222",
+          "Timeout": "3",
+          "UnhealthyThreshold": "3"
+        },
+        "ConnectionSettings": {
+          "IdleTimeout": 3600
+        },
+        "LoadBalancerName": { "Fn::Join" : [
+          "",
+          [ { "Fn::If" : [
+              "ElbPrefixProvided",
+              { "Ref" : "09ElbPrefix" },
+              { "Ref" : "AWS::StackName" }
+            ]},
+            "-pcf-ssh-elb"
+          ]
+        ] },
+        "Listeners": [
+          {
+            "InstancePort": "2222",
+            "LoadBalancerPort": "2222",
+            "Protocol": "tcp"
+          }
+        ],
+        "Scheme": "internet-facing",
+        "SecurityGroups": [
+          {
+            "Ref": "PcfElbSshSecurityGroup"
+          }
+        ],
+        "Subnets": [
+          { "Fn::GetAtt": [ "OpsManStack", "Outputs.PcfPublicSubnetId" ] },
+          { "Fn::GetAtt": [ "OpsManStack", "Outputs.PcfPublicSubnetId2" ] }
+        ]
+      }
+    },
+    "PcfElbTcpSecurityGroup1": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": { "Fn::GetAtt": [ "OpsManStack", "Outputs.PcfVpc" ] },
+        "GroupDescription": "ELB Security Group",
+        "SecurityGroupIngress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1024",
+            "IpProtocol": "tcp",
+            "ToPort": "1024"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1025",
+            "IpProtocol": "tcp",
+            "ToPort": "1025"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1026",
+            "IpProtocol": "tcp",
+            "ToPort": "1026"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1027",
+            "IpProtocol": "tcp",
+            "ToPort": "1027"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1028",
+            "IpProtocol": "tcp",
+            "ToPort": "1028"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1029",
+            "IpProtocol": "tcp",
+            "ToPort": "1029"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1030",
+            "IpProtocol": "tcp",
+            "ToPort": "1030"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1031",
+            "IpProtocol": "tcp",
+            "ToPort": "1031"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1032",
+            "IpProtocol": "tcp",
+            "ToPort": "1032"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1033",
+            "IpProtocol": "tcp",
+            "ToPort": "1033"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1034",
+            "IpProtocol": "tcp",
+            "ToPort": "1034"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1035",
+            "IpProtocol": "tcp",
+            "ToPort": "1035"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1036",
+            "IpProtocol": "tcp",
+            "ToPort": "1036"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1037",
+            "IpProtocol": "tcp",
+            "ToPort": "1037"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1038",
+            "IpProtocol": "tcp",
+            "ToPort": "1038"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1039",
+            "IpProtocol": "tcp",
+            "ToPort": "1039"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1040",
+            "IpProtocol": "tcp",
+            "ToPort": "1040"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1041",
+            "IpProtocol": "tcp",
+            "ToPort": "1041"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1042",
+            "IpProtocol": "tcp",
+            "ToPort": "1042"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1043",
+            "IpProtocol": "tcp",
+            "ToPort": "1043"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1044",
+            "IpProtocol": "tcp",
+            "ToPort": "1044"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1045",
+            "IpProtocol": "tcp",
+            "ToPort": "1045"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1046",
+            "IpProtocol": "tcp",
+            "ToPort": "1046"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1047",
+            "IpProtocol": "tcp",
+            "ToPort": "1047"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1048",
+            "IpProtocol": "tcp",
+            "ToPort": "1048"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1049",
+            "IpProtocol": "tcp",
+            "ToPort": "1049"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1050",
+            "IpProtocol": "tcp",
+            "ToPort": "1050"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1051",
+            "IpProtocol": "tcp",
+            "ToPort": "1051"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1052",
+            "IpProtocol": "tcp",
+            "ToPort": "1052"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1053",
+            "IpProtocol": "tcp",
+            "ToPort": "1053"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1054",
+            "IpProtocol": "tcp",
+            "ToPort": "1054"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1055",
+            "IpProtocol": "tcp",
+            "ToPort": "1055"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1056",
+            "IpProtocol": "tcp",
+            "ToPort": "1056"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1057",
+            "IpProtocol": "tcp",
+            "ToPort": "1057"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1058",
+            "IpProtocol": "tcp",
+            "ToPort": "1058"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1059",
+            "IpProtocol": "tcp",
+            "ToPort": "1059"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1060",
+            "IpProtocol": "tcp",
+            "ToPort": "1060"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1061",
+            "IpProtocol": "tcp",
+            "ToPort": "1061"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1062",
+            "IpProtocol": "tcp",
+            "ToPort": "1062"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1063",
+            "IpProtocol": "tcp",
+            "ToPort": "1063"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1064",
+            "IpProtocol": "tcp",
+            "ToPort": "1064"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1065",
+            "IpProtocol": "tcp",
+            "ToPort": "1065"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1066",
+            "IpProtocol": "tcp",
+            "ToPort": "1066"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1067",
+            "IpProtocol": "tcp",
+            "ToPort": "1067"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1068",
+            "IpProtocol": "tcp",
+            "ToPort": "1068"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1069",
+            "IpProtocol": "tcp",
+            "ToPort": "1069"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1070",
+            "IpProtocol": "tcp",
+            "ToPort": "1070"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1071",
+            "IpProtocol": "tcp",
+            "ToPort": "1071"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1072",
+            "IpProtocol": "tcp",
+            "ToPort": "1072"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1073",
+            "IpProtocol": "tcp",
+            "ToPort": "1073"
+          }
+        ]
+      }
+    },
+    "PcfElbTcpSecurityGroup2": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": { "Fn::GetAtt": [ "OpsManStack", "Outputs.PcfVpc" ] },
+        "GroupDescription": "ELB Security Group",
+        "SecurityGroupIngress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1074",
+            "IpProtocol": "tcp",
+            "ToPort": "1074"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1075",
+            "IpProtocol": "tcp",
+            "ToPort": "1075"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1076",
+            "IpProtocol": "tcp",
+            "ToPort": "1076"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1077",
+            "IpProtocol": "tcp",
+            "ToPort": "1077"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1078",
+            "IpProtocol": "tcp",
+            "ToPort": "1078"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1079",
+            "IpProtocol": "tcp",
+            "ToPort": "1079"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1080",
+            "IpProtocol": "tcp",
+            "ToPort": "1080"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1081",
+            "IpProtocol": "tcp",
+            "ToPort": "1081"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1082",
+            "IpProtocol": "tcp",
+            "ToPort": "1082"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1083",
+            "IpProtocol": "tcp",
+            "ToPort": "1083"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1084",
+            "IpProtocol": "tcp",
+            "ToPort": "1084"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1085",
+            "IpProtocol": "tcp",
+            "ToPort": "1085"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1086",
+            "IpProtocol": "tcp",
+            "ToPort": "1086"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1087",
+            "IpProtocol": "tcp",
+            "ToPort": "1087"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1088",
+            "IpProtocol": "tcp",
+            "ToPort": "1088"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1089",
+            "IpProtocol": "tcp",
+            "ToPort": "1089"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1090",
+            "IpProtocol": "tcp",
+            "ToPort": "1090"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1091",
+            "IpProtocol": "tcp",
+            "ToPort": "1091"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1092",
+            "IpProtocol": "tcp",
+            "ToPort": "1092"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1093",
+            "IpProtocol": "tcp",
+            "ToPort": "1093"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1094",
+            "IpProtocol": "tcp",
+            "ToPort": "1094"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1095",
+            "IpProtocol": "tcp",
+            "ToPort": "1095"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1096",
+            "IpProtocol": "tcp",
+            "ToPort": "1096"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1097",
+            "IpProtocol": "tcp",
+            "ToPort": "1097"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1098",
+            "IpProtocol": "tcp",
+            "ToPort": "1098"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1099",
+            "IpProtocol": "tcp",
+            "ToPort": "1099"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1100",
+            "IpProtocol": "tcp",
+            "ToPort": "1100"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1101",
+            "IpProtocol": "tcp",
+            "ToPort": "1101"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1102",
+            "IpProtocol": "tcp",
+            "ToPort": "1102"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1103",
+            "IpProtocol": "tcp",
+            "ToPort": "1103"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1104",
+            "IpProtocol": "tcp",
+            "ToPort": "1104"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1105",
+            "IpProtocol": "tcp",
+            "ToPort": "1105"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1106",
+            "IpProtocol": "tcp",
+            "ToPort": "1106"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1107",
+            "IpProtocol": "tcp",
+            "ToPort": "1107"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1108",
+            "IpProtocol": "tcp",
+            "ToPort": "1108"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1109",
+            "IpProtocol": "tcp",
+            "ToPort": "1109"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1110",
+            "IpProtocol": "tcp",
+            "ToPort": "1110"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1111",
+            "IpProtocol": "tcp",
+            "ToPort": "1111"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1112",
+            "IpProtocol": "tcp",
+            "ToPort": "1112"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1113",
+            "IpProtocol": "tcp",
+            "ToPort": "1113"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1114",
+            "IpProtocol": "tcp",
+            "ToPort": "1114"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1115",
+            "IpProtocol": "tcp",
+            "ToPort": "1115"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1116",
+            "IpProtocol": "tcp",
+            "ToPort": "1116"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1117",
+            "IpProtocol": "tcp",
+            "ToPort": "1117"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1118",
+            "IpProtocol": "tcp",
+            "ToPort": "1118"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1119",
+            "IpProtocol": "tcp",
+            "ToPort": "1119"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1120",
+            "IpProtocol": "tcp",
+            "ToPort": "1120"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1121",
+            "IpProtocol": "tcp",
+            "ToPort": "1121"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1122",
+            "IpProtocol": "tcp",
+            "ToPort": "1122"
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "1123",
+            "IpProtocol": "tcp",
+            "ToPort": "1123"
+          }
+        ]
+      }
+    },
+    "PcfElbTcp": {
+      "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+      "DependsOn": [
+        "PcfElbTcpSecurityGroup1",
+        "PcfElbTcpSecurityGroup2",
+        "OpsManStack"
+      ],
+      "Properties": {
+        "CrossZone": true,
+        "HealthCheck": {
+          "HealthyThreshold": "6",
+          "Interval": "5",
+          "Target": "TCP:80",
+          "Timeout": "3",
+          "UnhealthyThreshold": "3"
+        },
+        "ConnectionSettings": {
+          "IdleTimeout": 3600
+        },
+        "LoadBalancerName": { "Fn::Join" : [
+          "",
+          [ { "Fn::If" : [
+              "ElbPrefixProvided",
+              { "Ref" : "09ElbPrefix" },
+              { "Ref" : "AWS::StackName" }
+            ]},
+            "-pcf-tcp-elb"
+          ]
+        ] },
+        "Listeners": [
+          {
+            "InstancePort": "1024",
+            "LoadBalancerPort": "1024",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1025",
+            "LoadBalancerPort": "1025",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1026",
+            "LoadBalancerPort": "1026",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1027",
+            "LoadBalancerPort": "1027",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1028",
+            "LoadBalancerPort": "1028",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1029",
+            "LoadBalancerPort": "1029",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1030",
+            "LoadBalancerPort": "1030",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1031",
+            "LoadBalancerPort": "1031",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1032",
+            "LoadBalancerPort": "1032",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1033",
+            "LoadBalancerPort": "1033",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1034",
+            "LoadBalancerPort": "1034",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1035",
+            "LoadBalancerPort": "1035",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1036",
+            "LoadBalancerPort": "1036",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1037",
+            "LoadBalancerPort": "1037",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1038",
+            "LoadBalancerPort": "1038",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1039",
+            "LoadBalancerPort": "1039",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1040",
+            "LoadBalancerPort": "1040",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1041",
+            "LoadBalancerPort": "1041",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1042",
+            "LoadBalancerPort": "1042",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1043",
+            "LoadBalancerPort": "1043",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1044",
+            "LoadBalancerPort": "1044",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1045",
+            "LoadBalancerPort": "1045",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1046",
+            "LoadBalancerPort": "1046",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1047",
+            "LoadBalancerPort": "1047",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1048",
+            "LoadBalancerPort": "1048",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1049",
+            "LoadBalancerPort": "1049",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1050",
+            "LoadBalancerPort": "1050",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1051",
+            "LoadBalancerPort": "1051",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1052",
+            "LoadBalancerPort": "1052",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1053",
+            "LoadBalancerPort": "1053",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1054",
+            "LoadBalancerPort": "1054",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1055",
+            "LoadBalancerPort": "1055",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1056",
+            "LoadBalancerPort": "1056",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1057",
+            "LoadBalancerPort": "1057",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1058",
+            "LoadBalancerPort": "1058",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1059",
+            "LoadBalancerPort": "1059",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1060",
+            "LoadBalancerPort": "1060",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1061",
+            "LoadBalancerPort": "1061",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1062",
+            "LoadBalancerPort": "1062",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1063",
+            "LoadBalancerPort": "1063",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1064",
+            "LoadBalancerPort": "1064",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1065",
+            "LoadBalancerPort": "1065",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1066",
+            "LoadBalancerPort": "1066",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1067",
+            "LoadBalancerPort": "1067",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1068",
+            "LoadBalancerPort": "1068",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1069",
+            "LoadBalancerPort": "1069",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1070",
+            "LoadBalancerPort": "1070",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1071",
+            "LoadBalancerPort": "1071",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1072",
+            "LoadBalancerPort": "1072",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1073",
+            "LoadBalancerPort": "1073",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1074",
+            "LoadBalancerPort": "1074",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1075",
+            "LoadBalancerPort": "1075",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1076",
+            "LoadBalancerPort": "1076",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1077",
+            "LoadBalancerPort": "1077",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1078",
+            "LoadBalancerPort": "1078",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1079",
+            "LoadBalancerPort": "1079",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1080",
+            "LoadBalancerPort": "1080",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1081",
+            "LoadBalancerPort": "1081",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1082",
+            "LoadBalancerPort": "1082",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1083",
+            "LoadBalancerPort": "1083",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1084",
+            "LoadBalancerPort": "1084",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1085",
+            "LoadBalancerPort": "1085",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1086",
+            "LoadBalancerPort": "1086",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1087",
+            "LoadBalancerPort": "1087",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1088",
+            "LoadBalancerPort": "1088",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1089",
+            "LoadBalancerPort": "1089",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1090",
+            "LoadBalancerPort": "1090",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1091",
+            "LoadBalancerPort": "1091",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1092",
+            "LoadBalancerPort": "1092",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1093",
+            "LoadBalancerPort": "1093",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1094",
+            "LoadBalancerPort": "1094",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1095",
+            "LoadBalancerPort": "1095",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1096",
+            "LoadBalancerPort": "1096",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1097",
+            "LoadBalancerPort": "1097",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1098",
+            "LoadBalancerPort": "1098",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1099",
+            "LoadBalancerPort": "1099",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1100",
+            "LoadBalancerPort": "1100",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1101",
+            "LoadBalancerPort": "1101",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1102",
+            "LoadBalancerPort": "1102",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1103",
+            "LoadBalancerPort": "1103",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1104",
+            "LoadBalancerPort": "1104",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1105",
+            "LoadBalancerPort": "1105",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1106",
+            "LoadBalancerPort": "1106",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1107",
+            "LoadBalancerPort": "1107",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1108",
+            "LoadBalancerPort": "1108",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1109",
+            "LoadBalancerPort": "1109",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1110",
+            "LoadBalancerPort": "1110",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1111",
+            "LoadBalancerPort": "1111",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1112",
+            "LoadBalancerPort": "1112",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1113",
+            "LoadBalancerPort": "1113",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1114",
+            "LoadBalancerPort": "1114",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1115",
+            "LoadBalancerPort": "1115",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1116",
+            "LoadBalancerPort": "1116",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1117",
+            "LoadBalancerPort": "1117",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1118",
+            "LoadBalancerPort": "1118",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1119",
+            "LoadBalancerPort": "1119",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1120",
+            "LoadBalancerPort": "1120",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1121",
+            "LoadBalancerPort": "1121",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1122",
+            "LoadBalancerPort": "1122",
+            "Protocol": "tcp"
+          },
+          {
+            "InstancePort": "1123",
+            "LoadBalancerPort": "1123",
+            "Protocol": "tcp"
+          }
+        ],
+        "Scheme": "internet-facing",
+        "SecurityGroups": [
+          {
+            "Ref": "PcfElbTcpSecurityGroup1"
+          },
+          {
+            "Ref": "PcfElbTcpSecurityGroup2"
+          }
+        ],
+        "Subnets": [
+          { "Fn::GetAtt": [ "OpsManStack", "Outputs.PcfPublicSubnetId" ] },
+          { "Fn::GetAtt": [ "OpsManStack", "Outputs.PcfPublicSubnetId2" ] }
+        ]
+      }
+    },
+    "PcfErtS3BucketIamPolicy": {
+      "DependsOn": [
+        "OpsManStack"
+      ],
+      "Type" : "AWS::IAM::Policy",
+      "Properties" : {
+        "PolicyName" : "PcfErtPolicy",
+        "PolicyDocument" : {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "ElasticRuntimeS3Permissions",
+              "Effect": "Allow",
+              "Action": ["s3:*"],
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {"Ref": "PcfElasticRuntimeS3BuildpacksBucket"}
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {"Ref": "PcfElasticRuntimeS3BuildpacksBucket"},
+                      "/*"
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {"Ref": "PcfElasticRuntimeS3DropletsBucket"}
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {"Ref": "PcfElasticRuntimeS3DropletsBucket"},
+                      "/*"
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {"Ref": "PcfElasticRuntimeS3PackagesBucket"}
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {"Ref": "PcfElasticRuntimeS3PackagesBucket"},
+                      "/*"
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {"Ref": "PcfElasticRuntimeS3ResourcesBucket"}
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:s3:::",
+                      {"Ref": "PcfElasticRuntimeS3ResourcesBucket"},
+                      "/*"
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "Users" : [ {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfIamUserName" ]} ]
+      }
+    },
+    "PcfElasticRuntimeS3BuildpacksBucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "PCF Elastic Runtime S3 Buildpacks Bucket"
+          }
+        ]
+      }
+    },
+    "PcfElasticRuntimeS3DropletsBucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "PCF Elastic Runtime S3 Droplets Bucket"
+          }
+        ]
+      }
+    },
+    "PcfElasticRuntimeS3PackagesBucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "PCF Elastic Runtime S3 Packages Bucket"
+          }
+        ]
+      }
+    },
+    "PcfElasticRuntimeS3ResourcesBucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "PCF Elastic Runtime S3 Resources Bucket"
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "PcfElbDnsName": {
+      "Value": { "Fn::GetAtt": [ "PcfElb", "DNSName"]}
+    },
+    "PcfElbSshDnsName": {
+      "Value": { "Fn::GetAtt": [ "PcfElbSsh", "DNSName"]}
+    },
+    "PcfElbTcpDnsName": {
+      "Value": { "Fn::GetAtt": [ "PcfElbTcp", "DNSName"]}
+    },
+    "PcfVpc": {
+      "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfVpc" ]}
+    },
+    "PcfIamUserName": {
+      "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfIamUserName" ]}
+    },
+    "PcfIamUserAccessKey": {
+      "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfIamUserAccessKey" ]}
+    },
+    "PcfIamUserSecretAccessKey": {
+      "Value": { "Fn::GetAtt": [ "OpsManStack", "Outputs.PcfIamUserSecretAccessKey" ]}
+    },
+    "PcfOpsManagerS3Bucket": {
+      "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfOpsManagerS3Bucket" ]}
+    },
+    "PcfElasticRuntimeS3BuildpacksBucket": {
+      "Value": {"Ref": "PcfElasticRuntimeS3BuildpacksBucket"}
+    },
+    "PcfElasticRuntimeS3DropletsBucket": {
+      "Value": {"Ref": "PcfElasticRuntimeS3DropletsBucket"}
+    },
+    "PcfElasticRuntimeS3PackagesBucket": {
+      "Value": {"Ref": "PcfElasticRuntimeS3PackagesBucket"}
+    },
+    "PcfElasticRuntimeS3ResourcesBucket": {
+      "Value": {"Ref": "PcfElasticRuntimeS3ResourcesBucket"}
+    },
+    "PcfVmsSecurityGroupId": {
+      "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfVmsSecurityGroupId" ]}
+    },
+    "PcfOpsManagerSecurityGroupId": {
+      "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfOpsManagerSecurityGroupId" ]}
+    },
+    "PcfPrivateSubnetId": {
+      "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfPrivateSubnetId" ]}
+    },
+    "PcfPrivateSubnet2Id": {
+      "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfPrivateSubnet2Id" ]}
+    },
+    "PcfPrivateSubnetAvailabilityZone": {
+      "Value": { "Fn::GetAtt" : [ "OpsManStack", "Outputs.PcfPrivateSubnetAvailabilityZone" ] }
+    },
+    "PcfPrivateSubnet2AvailabilityZone": {
+      "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfPrivateSubnet2AvailabilityZone" ]}
+    },
+    "PcfPublicSubnetId": {
+      "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfPublicSubnetId" ]}
+    },
+    "PcfPublicSubnetId2": {
+      "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfPublicSubnetId2" ]}
+    },
+    "PcfPublicSubnetAvailabilityZone": {
+      "Value": { "Fn::GetAtt" : [ "OpsManStack", "Outputs.PcfPublicSubnetAvailabilityZone" ] }
+    },
+    "PcfPublicSubnetAvailabilityZone2": {
+      "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfPublicSubnetAvailabilityZone2" ]}
+    },
+    "PcfRdsAddress": {
+      "Value": { "Fn::GetAtt": [ "OpsManStack", "Outputs.PcfRdsAddress" ]}
+    },
+    "PcfRdsPort": {
+      "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfRdsPort" ]}
+    },
+    "PcfRdsUsername": {
+      "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfRdsUsername" ]}
+    },
+    "PcfRdsPassword": {
+      "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfRdsPassword" ]}
+    },
+    "PcfRdsDBName": {
+      "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfRdsDBName" ]}
+    }
+  }
+}
