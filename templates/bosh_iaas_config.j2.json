@@ -1,0 +1,10 @@
+{
+  "access_key_id": "my-access-key",
+  "secret_access_key": "my-secret-key",
+  "vpc_id": "vpc-123456",
+  "security_group": "sg-123456",
+  "key_pair_name": "some-key-pair-name",
+  "ssh_private_key": "my-private-key",
+  "region": "us-west-1",
+  "encrypted": false
+}

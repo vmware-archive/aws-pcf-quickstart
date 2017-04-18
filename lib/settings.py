@@ -26,6 +26,24 @@ class Settings:
         # todo: password charset validation?
         self.opsman_password = os.environ['OPS_MANAGER_ADMIN_PASSWORD']
         self.debug = False
+        self.access_key_id = self.find_output("PcfIamUserAccessKey")
+        self.key_pair_name = self.find_parameter("01NATKeyPair")
+
+
+        self.secret_access_key = self.find_output("PcfIamUserSecretAccessKey")
+        self.vpc_id = self.find_output("PcfVpc")
+        self.security_group = self.find_output("PcfVmsSecurityGroupId")
+
+        self.ssh_private_key = os.environ['SSH_PRIVATE_KEY']
+        self.region = os.environ["REGION"]
+
+        "encrypted": false
+
+        self.zones = []
+        for potential_zone in ["PcfPrivateSubnetAvailabilityZone", "PcfPrivateSubnet2AvailabilityZone"]:
+            zone = self.find_output(potential_zone)
+            if zone:
+                self.zones.append(zone)
 
     def get_fully_qualified_domain(self):
         return self.dns_suffix
@@ -35,6 +53,13 @@ class Settings:
             key = output.get("OutputKey", None)
             if key == name:
                 return output.get("OutputValue")
+        return None
+
+    def find_parameter(self, name: str):
+        for parameter in self.stack.get("Parameters"):
+            key = parameter.get("ParameterKey", None)
+            if key == name:
+                return parameter.get("ParameterValue")
 
         return None
 

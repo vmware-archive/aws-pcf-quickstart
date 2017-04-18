@@ -8,10 +8,7 @@ import click
 PATH = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, os.path.join(PATH, 'lib'))
 
-from lib import settings, om_manager
-
-# todo: cli flag...?
-om_manager.debug_mode = True
+from lib import settings, om_manager, configure_opsman_director
 
 @click.group()
 @click.option('--debug/--no-debug', default=False)
@@ -26,6 +23,12 @@ def cli(ctx, debug):
 @click.pass_context
 def config_opsman_auth_cmd(ctx):
     sys.exit(time_cmd(om_manager.config_opsman_auth, ctx.obj['settings']))
+
+@cli.command('configure-opsman-director')
+@click.pass_context
+def config_bosh(ctx):
+    sys.exit(time_cmd(configure_opsman_director.configure_opsman_director, ctx.obj['settings']))
+
 
 
 def time_cmd(cmd, *args):
