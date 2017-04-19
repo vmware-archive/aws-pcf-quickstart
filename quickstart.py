@@ -10,6 +10,7 @@ sys.path.insert(1, os.path.join(PATH, 'lib'))
 
 from lib import settings, om_manager, configure_opsman_director
 
+
 @click.group()
 @click.option('--debug/--no-debug', default=False)
 @click.pass_context
@@ -24,11 +25,17 @@ def cli(ctx, debug):
 def config_opsman_auth_cmd(ctx):
     sys.exit(time_cmd(om_manager.config_opsman_auth, ctx.obj['settings']))
 
+
 @cli.command('configure-opsman-director')
 @click.pass_context
 def config_bosh(ctx):
     sys.exit(time_cmd(configure_opsman_director.configure_opsman_director, ctx.obj['settings']))
 
+
+@cli.command('apply-changes')
+@click.pass_context
+def apply_changes(ctx):
+    sys.exit(time_cmd(om_manager.apply_changes, ctx.obj['settings']))
 
 
 def time_cmd(cmd, *args):

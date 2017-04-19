@@ -19,42 +19,52 @@ def configure_opsman_director(my_settings: Settings):
         "vpc_id": my_settings.vpc_id,
         "security_group": my_settings.security_group,
         "key_pair_name": my_settings.key_pair_name,
-        "ssh_private_key": my_settings.ssh_private_key,
+        "ssh_private_key": my_settings.ssh_private_key.replace("\n", "\\n"),
         "region": my_settings.region,
-        "encrypted": "false"
+        "encrypted": "false",
+        "vpc_private_subnet_id": my_settings.vpc_private_subnet_id,
+        "vpc_private_subnet_az": my_settings.vpc_private_subnet_az,
+        "vpc_private_subnet_id2": my_settings.vpc_private_subnet_id2,
+        "vpc_private_subnet_az2": my_settings.vpc_private_subnet_az2,
+        "singleton_availability_zone": my_settings.vpc_private_subnet_az
+
     }
     with open("templates/bosh_az_config.j2.json", 'r') as f:
         az_template = Template(f.read())
-    # with open("templates/gcp_network_config.j2.json", 'r') as f:
-    #     network_template = Template(f.read())
-    # with open("templates/gcp_iaas_config.j2.json", 'r') as f:
-    #     iaas_template = Template(f.read())
-    # with open("templates/gcp_network_assignment.j2.json", 'r') as f:
-    #     network_assignment_template = Template(f.read())
-    #
-    az_config = az_template.render(template_ctx).replace("\n", "").replace("|", "\\n")
-    # network_config = network_template.render(template_ctx).replace("\n", "").replace("|", "\\n")
-    # network_assignment_config = network_assignment_template.render(template_ctx).replace("\n", "").replace("|", "\\n")
-    # iaas_config = iaas_template.render(template_ctx)
-    #
+    with open("templates/bosh_network_config.j2.json", 'r') as f:
+        network_template = Template(f.read())
+    with open("templates/bosh_iaas_config.j2.json", 'r') as f:
+        iaas_template = Template(f.read())
+    with open("templates/bosh_network_assignment.j2.json", 'r') as f:
+        network_assignment_template = Template(f.read())
+
+    az_config = az_template.render(template_ctx).replace("\n", "")
+    network_config = network_template.render(template_ctx).replace("\n", "")
+    network_assignment_config = network_assignment_template.render(template_ctx).replace("\n", "")
+    iaas_config = iaas_template.render(template_ctx).replace("\n", "")
+
     commands = []
-    # commands.append("{om_with_auth} configure-bosh --iaas-configuration '{iaas_config}'".format(
-    #     om_with_auth=settings.get_om_with_auth(my_settings), iaas_config=iaas_config
-    # ))
-    # commands.append("{om_with_auth} configure-bosh --director-configuration '{director_config}'".format(
-    #     om_with_auth=settings.get_om_with_auth(my_settings), director_config=director_config
-    # ))
+    commands.append("{om_with_auth} configure-bosh --iaas-configuration '{iaas_config}'".format(
+        om_with_auth=settings.get_om_with_auth(my_settings), iaas_config=iaas_config
+    ))
+    commands.append("{om_with_auth} configure-bosh --director-configuration '{director_config}'".format(
+        om_with_auth=settings.get_om_with_auth(my_settings), director_config=director_config
+    ))
     commands.append("{om_with_auth} configure-bosh --az-configuration '{az_config}'".format(
         om_with_auth=settings.get_om_with_auth(my_settings), az_config=az_config
     ))
-    # commands.append("{om_with_auth} configure-bosh --networks-configuration '{network_config}'".format(
-    #     om_with_auth=settings.get_om_with_auth(my_settings), network_config=network_config
-    # ))
-    # commands.append("{om_with_auth} configure-bosh --network-assignment '{network_assignment}'".format(
-    #     om_with_auth=settings.get_om_with_auth(my_settings), network_assignment=network_assignment_config
-    # ))
+    commands.append("{om_with_auth} configure-bosh --networks-configuration '{network_config}'".format(
+        om_with_auth=settings.get_om_with_auth(my_settings), network_config=network_config
+    ))
+    commands.append("{om_with_auth} configure-bosh --network-assignment '{network_assignment}'".format(
+        om_with_auth=settings.get_om_with_auth(my_settings), network_assignment=network_assignment_config
+    ))
     for cmd in commands:
-        exit_code = om_manager.run_command(cmd, my_settings.debug)
+        out, err, exit_code = om_manager.run_command(cmd, my_settings.debug)
+        if out != "":
+            print(out)
+        if err != "":
+            print(err)
         if exit_code != 0:
             return exit_code
 

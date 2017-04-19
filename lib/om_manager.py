@@ -1,18 +1,22 @@
 import subprocess
 import time
 
-from settings import Settings
+import settings
 
 # todo: spin up a class, don't use package level vars
 max_retries = 5
 
 
-def config_opsman_auth(my_settings: Settings, attempt=0):
+def config_opsman_auth(my_settings: settings.Settings):
     cmd = "om -k --target {0} configure-authentication --username '{1}' --password '{2}' --decryption-passphrase '{3}'".format(
         my_settings.opsman_url, my_settings.opsman_user, my_settings.opsman_password,
         my_settings.opsman_password
     )
-    out, err, returncode = run_command(cmd, my_settings.debug)
+    return exponential_backoff(my_settings.debug, cmd)
+
+
+def exponential_backoff(debug, cmd, attempt=0):
+    out, err, returncode = run_command(cmd, debug)
     if out != "":
         print(out)
     if err != "":
@@ -22,7 +26,7 @@ def config_opsman_auth(my_settings: Settings, attempt=0):
         if is_recoverable_error(out) and attempt < max_retries:
             print("Retrying, {}".format(attempt))
             time.sleep(attempt ** 3)
-            config_opsman_auth(my_settings, attempt + 1)
+            returncode = exponential_backoff(debug, cmd, attempt + 1)
 
     return returncode
 
@@ -38,6 +42,13 @@ def run_command(cmd: str, debug_mode):
         out = out_bytes.decode("utf-8").strip()
         err = err_bytes.decode("utf-8").strip()
         return out, err, p.returncode
+
+
+def apply_changes(my_settings: settings.Settings):
+    cmd = "{get_om_with_auth} apply-changes".format(
+        get_om_with_auth=settings.get_om_with_auth(my_settings)
+    )
+    return exponential_backoff(my_settings.debug, cmd)
 
 
 def is_recoverable_error(err: str):

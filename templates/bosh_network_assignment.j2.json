@@ -1,0 +1,4 @@
+{
+  "singleton_availability_zone": "{{singleton_availability_zone}}",
+  "network": "ert-network"
+}

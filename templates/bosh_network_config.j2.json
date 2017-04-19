@@ -1,0 +1,54 @@
+{
+  "icmp_checks_enabled": false,
+  "networks": [
+    {
+      "name": "ert-network",
+      "subnets": [
+        {
+          "iaas_identifier": "{{vpc_private_subnet_id}}",
+          "cidr": "10.0.16.0/20",
+          "reserved_ip_ranges": "10.0.16.1-10.0.16.9,10.0.29.0-10.0.31.255",
+          "dns": "10.0.0.2",
+          "gateway": "10.0.16.1",
+          "availability_zones": [
+            "{{vpc_private_subnet_az}}"
+          ]
+        },{
+          "iaas_identifier": "{{vpc_private_subnet_id2}}",
+          "cidr": "10.0.32.0/20",
+          "reserved_ip_ranges": "10.0.32.1-10.0.32.9,10.0.45.0-10.0.47.255",
+          "dns": "10.0.0.2",
+          "gateway": "10.0.32.1",
+          "availability_zones": [
+            "{{vpc_private_subnet_az2}}"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "services-network",
+      "service_network": true,
+      "subnets": [
+        {
+          "iaas_identifier": "{{vpc_private_subnet_id}}",
+          "cidr": "10.0.16.0/20",
+          "reserved_ip_ranges": "10.0.16.0-10.0.28.255",
+          "dns": "10.0.0.2",
+          "gateway": "10.0.16.1",
+          "availability_zones": [
+            "{{vpc_private_subnet_az}}"
+          ]
+        },{
+          "iaas_identifier": "{{vpc_private_subnet_id2}}",
+          "cidr": "10.0.32.0/20",
+          "reserved_ip_ranges": "10.0.32.0-10.0.44.255",
+          "dns": "10.0.0.2",
+          "gateway": "10.0.32.1",
+          "availability_zones": [
+            "{{vpc_private_subnet_az2}}"
+          ]
+        }
+      ]
+    }
+  ]
+}

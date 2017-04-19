@@ -34,6 +34,11 @@ class Settings:
             if zone:
                 self.zones.append(zone)
         self.key_pair_name = self.find_parameter("01NATKeyPair")
+        self.vpc_private_subnet_id = self.find_output("PcfPrivateSubnetId")
+        self.vpc_private_subnet_id2 = self.find_output("PcfPrivateSubnet2Id")
+        self.vpc_private_subnet_az = self.find_output("PcfPrivateSubnetAvailabilityZone")
+        self.vpc_private_subnet_az2 = self.find_output("PcfPrivateSubnet2AvailabilityZone")
+
 
     def parse_environ(self):
         self.dns_suffix = os.environ['DNS_SUFFIX']
@@ -44,6 +49,7 @@ class Settings:
         self.opsman_password = os.environ['OPS_MANAGER_ADMIN_PASSWORD']
         self.ssh_private_key = os.environ['SSH_PRIVATE_KEY']
         self.region = os.environ["REGION"]
+
 
     def get_fully_qualified_domain(self):
         return self.dns_suffix
