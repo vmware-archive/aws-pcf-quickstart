@@ -22,6 +22,9 @@ class Settings:
         self.parse_stack()
 
     def parse_stack(self):
+        self.key_pair_name = self.find_parameter("01NATKeyPair")
+        self.pivnet_token = self.find_parameter("11PivnetToken")
+
         self.ert_sql_db_password = self.find_output("PcfRdsPassword")
         self.ert_sql_db_username = self.find_output("PcfRdsUsername")
         self.pcf_iam_access_key_id = self.find_output("PcfIamUserAccessKey")
@@ -33,7 +36,6 @@ class Settings:
             zone = self.find_output(potential_zone)
             if zone:
                 self.zones.append(zone)
-        self.key_pair_name = self.find_parameter("01NATKeyPair")
         self.vpc_private_subnet_id = self.find_output("PcfPrivateSubnetId")
         self.vpc_private_subnet_id2 = self.find_output("PcfPrivateSubnet2Id")
         self.vpc_private_subnet_az = self.find_output("PcfPrivateSubnetAvailabilityZone")

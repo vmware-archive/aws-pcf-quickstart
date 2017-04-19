@@ -8,7 +8,7 @@ import click
 PATH = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, os.path.join(PATH, 'lib'))
 
-from lib import settings, om_manager, configure_opsman_director
+from lib import settings, om_manager, configure_opsman_director, download_tiles
 
 
 @click.group()
@@ -36,6 +36,12 @@ def config_bosh(ctx):
 @click.pass_context
 def apply_changes(ctx):
     sys.exit(time_cmd(om_manager.apply_changes, ctx.obj['settings']))
+
+
+@cli.command('download-tiles')
+@click.pass_context
+def apply_changes(ctx):
+    sys.exit(time_cmd(download_tiles.download_tiles, ctx.obj['settings']))
 
 
 def time_cmd(cmd, *args):

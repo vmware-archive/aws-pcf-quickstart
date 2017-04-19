@@ -36,4 +36,8 @@ todo: script to `scp` over all our code
 * How are we reporting and elevating errors back to the user?
     - Before ops manager is ready
     - While it running
+* How CI system outputs the versions of tiles (for pivnet thing)
 
+# Changes to cloud-formation template:
+
+* 11PivnetToken
