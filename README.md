@@ -36,7 +36,11 @@ todo: script to `scp` over all our code
 * How are we reporting and elevating errors back to the user?
     - Before ops manager is ready
     - While it running
-* How CI system outputs the versions of tiles (for pivnet thing)
+* How CI system outputs the versions of tiles (ERT, others)
+    - Some config file outside of formation script?
+    - Don't really want user to input, but want some tested / vetted version close to latest
+* How will we grab the tile out of s3 bucket? Nervous about making it public. Also, bucket is in Jeenal's account. Some other place
+
 
 # Changes to cloud-formation template:
 

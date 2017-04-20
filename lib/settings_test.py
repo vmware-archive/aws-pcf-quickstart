@@ -52,6 +52,10 @@ class TestSettings(unittest.TestCase):
         os.environ['OPS_MANAGER_ADMIN_PASSWORD'] = 'monkey123'
         os.environ["SSH_PRIVATE_KEY"] = "my-key-value-asdf-1234"
         os.environ["REGION"] = "canada-1"
+        os.environ["ERT_VERSION"] = "1.2.3"
+        os.environ["TILE_BUCKET_S3_NAME"] = "my-bucket"
+        os.environ["TILE_BUCKET_S3_ACCESS_KEY"] = "my-access-key"
+        os.environ["TILE_BUCKET_S3_SECRET_ACCESS_KEY"] = "my-access-secret"
 
         with patch('settings.open', my_mock_open):
             self.settings = settings.Settings()

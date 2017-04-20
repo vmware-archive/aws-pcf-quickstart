@@ -43,6 +43,12 @@ def apply_changes(ctx):
 def apply_changes(ctx):
     sys.exit(time_cmd(download_tiles.download_tiles, ctx.obj['settings']))
 
+@cli.command('upload-assets')
+@click.argument('path')
+@click.pass_context
+def upload_assets(ctx, path):
+    sys.exit(time_cmd(om_manager.upload_assets, ctx.obj['settings'], path))
+
 
 def time_cmd(cmd, *args):
     cmd_name = cmd.__name__

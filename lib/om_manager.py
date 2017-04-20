@@ -1,5 +1,9 @@
 import subprocess
+from subprocess import Popen, PIPE, call
+import json
 import time
+import os
+
 
 import settings
 
@@ -58,3 +62,36 @@ def is_recoverable_error(err: str):
         if clean_err.endswith(recoverable_error):
             return True
     return False
+
+
+def stage_product(product_name: str, my_settings: settings.Settings):
+    cmd = "{om_with_auth} curl --path /api/v0/available_products".format(
+        om_with_auth=settings.get_om_with_auth(my_settings)
+    )
+    p = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True)
+    out, err = p.communicate()
+    if p.returncode != 0:
+        print("Failed to query api")
+        return p.returncode
+
+    products = json.loads(out.decode())
+    cf_version = [x['product_version'] for x in products if x['name'] == product_name][0]
+
+    # ok to call multiple times, no-op when already staged
+    cmd = "{om_with_auth} stage-product -p {product_name} -v {version}".format(
+        om_with_auth=settings.get_om_with_auth(my_settings),
+        product_name=product_name,
+        version=cf_version
+    )
+    return call(cmd, shell=True)
+
+
+def upload_assets(my_settings: settings.Settings, path: str):
+    for tile in os.listdir(path):
+        if tile.endswith(".pivotal"):
+            print("uploading product {0}".format(tile))
+
+            cmd = "{om_with_auth} upload-product -p '{path}'".format(
+                om_with_auth=settings.get_om_with_auth(my_settings), path=os.path.join(path, tile))
+
+            return exponential_backoff(my_settings.debug, cmd)
