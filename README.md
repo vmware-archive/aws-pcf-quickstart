@@ -45,3 +45,5 @@ todo: script to `scp` over all our code
 # Changes to cloud-formation template:
 
 * 11PivnetToken
+* 12AdminEmail (used for mysql backups, for example)
+* Didn't make change, but want: output load the 3 balancer names so we don't have to recreate logic

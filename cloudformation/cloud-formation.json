@@ -66,6 +66,10 @@
     "11PivnetToken": {
       "Type": "String",
       "Description": "Using the Pivnet CLI requires a valid Pivotal Network API token. See https://network.pivotal.io/docs/api#how-to-authenticate"
+    },
+    "12AdminEmail": {
+      "Type": "String",
+      "Description": "Admin email used by mysql monitor, for example"
     }
   },
   "Conditions": {

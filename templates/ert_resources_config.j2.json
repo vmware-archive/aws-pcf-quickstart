@@ -1,0 +1,5 @@
+{
+  "router": {"elb_names": ["{{router_lb_name}}-pcf-elb"]},
+  "diego_brain": {"elb_names": ["{{router_lb_name}}-pcf-ssh-elb"]},
+  "tcp_router": {"elb_names": ["{{router_lb_name}}-pcf-tcp-elb"]}
+}

@@ -22,8 +22,11 @@ class Settings:
         self.parse_stack()
 
     def parse_stack(self):
+        self.stack_name = self.stack.get('StackName')
         self.key_pair_name = self.find_parameter("01NATKeyPair")
         self.pivnet_token = self.find_parameter("11PivnetToken")
+        self.admin_email = self.find_parameter("12AdminEmail")
+        self.elb_prefix = self.find_parameter("09ElbPrefix")
 
         self.ert_sql_db_password = self.find_output("PcfRdsPassword")
         self.ert_sql_db_username = self.find_output("PcfRdsUsername")
@@ -40,6 +43,13 @@ class Settings:
         self.vpc_private_subnet_id2 = self.find_output("PcfPrivateSubnet2Id")
         self.vpc_private_subnet_az = self.find_output("PcfPrivateSubnetAvailabilityZone")
         self.vpc_private_subnet_az2 = self.find_output("PcfPrivateSubnet2AvailabilityZone")
+        self.pcf_rds_address = self.find_output("PcfRdsAddress")
+        self.pcf_rds_username = self.find_output("PcfRdsUsername")
+        self.pcf_rds_password = self.find_output("PcfRdsPassword")
+        self.pcf_elastic_runtime_s3_buildpacks_bucket = self.find_output("PcfElasticRuntimeS3BuildpacksBucket")
+        self.pcf_elastic_runtime_s3_droplets_bucket = self.find_output("PcfElasticRuntimeS3DropletsBucket")
+        self.pcf_elastic_runtime_s3_packages_bucket = self.find_output("PcfElasticRuntimeS3PackagesBucket")
+        self.pcf_elastic_runtime_s3_resources_bucket = self.find_output("PcfElasticRuntimeS3ResourcesBucket")
 
 
     def parse_environ(self):
@@ -57,7 +67,6 @@ class Settings:
         self.tile_bucket_s3_name = os.environ['TILE_BUCKET_S3_NAME']
         self.tile_bucket_s3_access_key = os.environ['TILE_BUCKET_S3_ACCESS_KEY']
         self.tile_bucket_s3_secret_access_key = os.environ['TILE_BUCKET_S3_SECRET_ACCESS_KEY']
-
 
     def get_fully_qualified_domain(self):
         return self.dns_suffix

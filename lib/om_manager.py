@@ -1,14 +1,17 @@
-import subprocess
-from subprocess import Popen, PIPE, call
 import json
-import time
 import os
-
+import subprocess
+import time
+from subprocess import Popen, PIPE
 
 import settings
 
 # todo: spin up a class, don't use package level vars
 max_retries = 5
+
+
+def format_om_json_str(om_json: str):
+    return json.dumps(json.loads(om_json))
 
 
 def config_opsman_auth(my_settings: settings.Settings):
@@ -83,7 +86,14 @@ def stage_product(product_name: str, my_settings: settings.Settings):
         product_name=product_name,
         version=cf_version
     )
-    return call(cmd, shell=True)
+    return exponential_backoff(my_settings.debug, cmd)
+
+
+def upload_stemcell(my_settings: settings.Settings, path: str):
+    cmd = "{om_with_auth} upload-stemcell -s '{path}'".format(
+        om_with_auth=settings.get_om_with_auth(my_settings), path=path
+    )
+    return exponential_backoff(my_settings.debug, cmd)
 
 
 def upload_assets(my_settings: settings.Settings, path: str):
