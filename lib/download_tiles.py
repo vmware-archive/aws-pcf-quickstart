@@ -31,8 +31,11 @@ def download_tiles(my_settings: settings.Settings):
 def download_ert(s3, my_settings: settings.Settings):
     # todo: what sorts of errors does this guy give back?
 
-    file_name = "cf-{}.pivotal".format(my_settings.ert_version)
-    sha256_file_name = "cf-{}.sha256.txt".format(my_settings.ert_version)
+    # file_name = "cf-{}.pivotal".format(my_settings.ert_version)
+    # sha256_file_name = "cf-{}.sha256.txt".format(my_settings.ert_version)
+
+    file_name = "aws-services-1.2.0.147.pivotal"
+    sha256_file_name = "aws-services-1.2.0.147.sha256.txt"
 
     dest_dir = "/tmp/{}".format(file_name)
     sha_dir = "/tmp/{}".format(sha256_file_name)

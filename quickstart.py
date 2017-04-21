@@ -8,7 +8,7 @@ import click
 PATH = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, os.path.join(PATH, 'lib'))
 
-from lib import settings, om_manager, configure_opsman_director, download_tiles
+from lib import settings, om_manager, configure_opsman_director, download_tiles, configure_ert
 
 
 @click.group()
@@ -48,6 +48,12 @@ def apply_changes(ctx):
 @click.pass_context
 def upload_assets(ctx, path):
     sys.exit(time_cmd(om_manager.upload_assets, ctx.obj['settings'], path))
+
+@cli.command('configure-ert')
+@click.pass_context
+def config_ert(ctx):
+    sys.exit(time_cmd(configure_ert.configure_ert, ctx.obj['settings']))
+
 
 
 def time_cmd(cmd, *args):
