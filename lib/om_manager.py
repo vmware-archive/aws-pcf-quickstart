@@ -91,7 +91,11 @@ def upload_assets(my_settings: settings.Settings, path: str):
         if tile.endswith(".pivotal"):
             print("uploading product {0}".format(tile))
 
-            cmd = "{om_with_auth} upload-product -p '{path}'".format(
+            cmd = "{om_with_auth} -r 3600 upload-product -p '{path}'".format(
                 om_with_auth=settings.get_om_with_auth(my_settings), path=os.path.join(path, tile))
 
-            return exponential_backoff(my_settings.debug, cmd)
+            exit_code = exponential_backoff(my_settings.debug, cmd)
+            if exit_code != 0:
+                return exit_code
+
+    return 0

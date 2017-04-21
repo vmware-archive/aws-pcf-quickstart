@@ -1,67 +1,63 @@
+import tempfile
 import unittest
 
 import boto3
-import botocore.session
-from botocore.stub import Stubber, ANY
-from mock import Mock
+from mock import Mock, patch, mock_open
 
 import download_tiles
-import io
-
 from settings import Settings
+
+
+class TestProgressPercentage(unittest.TestCase):
+    @patch('builtins.print')
+    def test_prints_percent(self, mock_print):
+        p = download_tiles.ProgressPercentage('my-file-name')
+        p(0)
+        p(5 * 1024 * 1024)
+        p(5 * 1024 * 1024)
+
+        self.assertEqual(mock_print.call_count, 0)
+
+        p(5 * 1024 * 1024)
+
+        self.assertEqual(mock_print.call_count, 1)
+        self.assertEqual(mock_print.call_args_list[0][0][0], "my-file-name --> 15.0 MB transferred")
 
 
 class TestDownloadTiles(unittest.TestCase):
     def setUp(self):
         self.settings = Mock(Settings)
-        # self.settings.zones = ["zone1"]
-        # self.settings.pcf_iam_access_key_id = "access_id"
-        # self.settings.pcf_iam_secret_access_key = "secret_key"
-        # self.settings.vpc_id = "vpc-123"
-        # self.settings.security_group = "sec-123"
-        # self.settings.key_pair_name = "mytestkeypair"
-        # self.settings.ssh_private_key = "private key"
-        # self.settings.region = "region-123"
-        # self.settings.vpc_private_subnet_id = "subnet1"
-        # self.settings.vpc_private_subnet_az = "east1"
-        # self.settings.vpc_private_subnet_id2 = "subnet2"
-        # self.settings.vpc_private_subnet_az2 = "east2"
-        # self.settings.opsman_url = "https://example123.com"
-        # self.settings.opsman_password = "monkey123"
-        # self.settings.opsman_user = "testuser"
-        # self.settings.debug = False
-        self.settings.tile_bucket_s3_name='my-bucket'
-        self.settings.tile_bucket_s3_access_key='my-access-key'
-        self.settings.tile_bucket_s3_secret_access_key='my-access-secret'
-        self.settings.ert_version='1.99.1'
+        self.settings.tile_bucket_s3_name = 'my-bucket'
+        self.settings.tile_bucket_s3_access_key = 'my-access-key'
+        self.settings.tile_bucket_s3_secret_access_key = 'my-access-secret'
+        self.settings.ert_version = '1.99.1'
 
+    @patch("download_tiles.verify_sha256")
+    def test_download_tile(self, mock_verify):
+        client = boto3.client('s3')
+        mock_s3 = Mock(client)
 
-    def x_test_download_ert(self):
-        s3 = boto3.client('s3')
-        stubber = Stubber(s3)
-        stubber.add_client_error(
-            'download_fileobj', service_error_code='Forbidden', http_status_code=403
+        my_mock_open = mock_open(read_data="")
+        with patch('download_tiles.open', my_mock_open):
+            with patch('download_tiles.ProgressPercentage') as mock_callback:
+                download_tiles.download_tile(
+                    'my-tile.pivotal', self.settings, mock_s3, 'my-tile.sum'
+                )
+
+        self.assertEqual(mock_s3.download_file.call_count, 2)
+        mock_s3.download_file.assert_called_with(
+            "my-bucket", "my-tile.pivotal", "/tmp/my-tile.pivotal",
+            Callback=mock_callback()
         )
-        stubber.activate()
 
-        download_tiles.download_ert(s3, self.settings)
+    def test_verify_sha256(self):
+        with tempfile.NamedTemporaryFile(delete=False) as f:
+            f.write(b"Hello World!\n")
+            print(f.name)
 
-
-    def test_why_mock_does_not_work(self):
-        # s3 = boto3.client('s3')
-        s3 = botocore.session.get_session().create_client('s3')
-
-        stubber = Stubber(s3)
-
-        stubber.add_client_error(
-            'download_fileobj', service_error_code='403', service_message='Forbidden', http_status_code=403,
-            service_error_meta=None, expected_params=ANY
-        )
-        stubber.activate()
-
-        output = io.StringIO()
-        s3.download_fileobj('foo', 'bar', output)
-
+        sha256 = '03ba204e50d126e4674c005e04d82e84c21366780af1f43bd54a37816b6ab340'
+        returncode = download_tiles.verify_sha256(f.name, sha256)
+        self.assertEqual(returncode, 0)
 
     def test_error_handling_on_auth_failure(self):
         pass

@@ -46,6 +46,7 @@ class Settings:
         self.dns_suffix = os.environ['DNS_SUFFIX']
         self.ops_manager_version = os.environ['OPS_MANAGER_VERSION']
         self.ert_version = os.environ['ERT_VERSION']
+        self.aws_broker_version = os.environ['AWS_BROKER_VERSION']
         # use elb url, output from cloudformation template
         self.opsman_url = os.environ['OPS_MANAGER_URL']
         # todo: password charset validation?

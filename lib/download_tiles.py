@@ -10,13 +10,14 @@ class ProgressPercentage(object):
         self._filename = filename
         self._seen_so_far = 0
         self._lock = threading.Lock()
+        self.last_print = 0
+
     def __call__(self, bytes_amount):
         with self._lock:
-            self._seen_so_far += bytes_amount
-            # sys.stdout.write(
-            #     "\r%s --> %s bytes transferred \n" % (
-            #         self._filename, self._seen_so_far))
-            sys.stdout.flush()
+            self._seen_so_far += bytes_amount / (1024 * 1024)
+            if self._seen_so_far >= (self.last_print + 15):
+                self.last_print = self._seen_so_far
+                print("{} --> {} MB transferred".format(self._filename, self._seen_so_far))
 
 
 def download_tiles(my_settings: settings.Settings):
@@ -25,28 +26,31 @@ def download_tiles(my_settings: settings.Settings):
         aws_access_key_id=my_settings.tile_bucket_s3_access_key,
         aws_secret_access_key=my_settings.tile_bucket_s3_secret_access_key
     )
-    return download_ert(s3, my_settings)
+    return download_ert(s3, my_settings) and download_aws_broker(s3, my_settings)
 
 
 def download_ert(s3, my_settings: settings.Settings):
-    # todo: what sorts of errors does this guy give back?
+    file_name = "cf-{}.pivotal".format(my_settings.ert_version)
+    sha256_file_name = "cf-{}.sha256.txt".format(my_settings.ert_version)
 
-    # file_name = "cf-{}.pivotal".format(my_settings.ert_version)
-    # sha256_file_name = "cf-{}.sha256.txt".format(my_settings.ert_version)
+    return download_tile(file_name, my_settings, s3, sha256_file_name)
 
-    file_name = "aws-services-1.2.0.147.pivotal"
-    sha256_file_name = "aws-services-1.2.0.147.sha256.txt"
 
-    dest_dir = "/tmp/{}".format(file_name)
-    sha_dir = "/tmp/{}".format(sha256_file_name)
+def download_aws_broker(s3, my_settings: settings.Settings):
+    file_name = "aws-services-{}.pivotal".format(my_settings.aws_broker_version)
+    sha256_file_name = "aws-services-{}.sha256.txt".format(my_settings.aws_broker_version)
 
-    s3.download_file(my_settings.tile_bucket_s3_name, sha256_file_name, sha_dir,
-                              Callback=ProgressPercentage(sha_dir))
-    s3.download_file(my_settings.tile_bucket_s3_name, file_name, dest_dir, Callback=ProgressPercentage(dest_dir))
+    return download_tile(file_name, my_settings, s3, sha256_file_name)
 
-    with open(sha_dir, 'r') as f:
+
+def download_tile(filename, my_settings, s3, sha256_filename):
+    dest_filename = "/tmp/{}".format(filename)
+    dest_sha256_filename = "/tmp/{}".format(sha256_filename)
+    s3.download_file(my_settings.tile_bucket_s3_name, sha256_filename, dest_sha256_filename, Callback=ProgressPercentage(dest_sha256_filename))
+    s3.download_file(my_settings.tile_bucket_s3_name, filename, dest_filename, Callback=ProgressPercentage(dest_filename))
+    with open(dest_sha256_filename, 'r') as f:
         sha_256 = f.read()
-    return verify_sha256(dest_dir, sha_256)
+    return verify_sha256(dest_filename, sha_256)
 
 
 def verify_sha256(filename, sha256):
@@ -56,17 +60,16 @@ def verify_sha256(filename, sha256):
     else:
         return 1
 
-def generate_sha256(filename):
 
-    BUF_SIZE = 65536  # lets read stuff in 64kb chunks!
+def generate_sha256(filename):
+    buf_size = 65536
     sha256 = hashlib.sha256()
 
     with open(filename, 'rb') as f:
-        while True:
-            data = f.read(BUF_SIZE)
-            if not data:
-                break
+        data = f.read(buf_size)
+        while data:
             sha256.update(data)
+            data = f.read(buf_size)
 
     sha = sha256.hexdigest()
     print("SHA256: {0}".format(sha))
