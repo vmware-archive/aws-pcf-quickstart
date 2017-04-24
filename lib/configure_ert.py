@@ -1,30 +1,34 @@
 from subprocess import call
 
 from jinja2 import Template
+
 import om_manager
 import settings
-import util
 from settings import Settings
 
 
 def configure_ert(my_settings: Settings):
-    # exit_code = om_manager.stage_product("cf", my_settings)
-    # if exit_code != 0:
-    #     print("Failed to stage ERT")
-    #     return exit_code
-    #
-    # exit_code = configure_tile_az(my_settings, 'cf')
-    # if exit_code != 0:
-    #     print("Failed to configure az ERT")
-    #     return exit_code
-    #
-    #
-    # exit_code = configure_ert_config(my_settings)
-    # if exit_code != 0:
-    #     print("Failed to configure ERT")
-    #     return exit_code
+    exit_code = om_manager.stage_product("cf", my_settings)
+    if exit_code != 0:
+        print("Failed to stage ERT")
+        return exit_code
 
-    return configure_ert_resources(my_settings)
+    exit_code = configure_tile_az(my_settings, 'cf')
+    if exit_code != 0:
+        print("Failed to configure az ERT")
+        return exit_code
+
+    exit_code = configure_ert_config(my_settings)
+    if exit_code != 0:
+        print("Failed to configure ERT")
+        return exit_code
+
+    exit_code = configure_ert_resources(my_settings)
+    if exit_code != 0:
+        print("Failed to configure ERT")
+        return exit_code
+
+    return create_required_databases(my_settings)
 
 
 def configure_ert_resources(my_settings: Settings):
@@ -79,6 +83,17 @@ def configure_tile_az(my_settings: Settings, tile_name: str):
         om_with_auth=settings.get_om_with_auth(my_settings),
         tile_name=tile_name,
         az_config=az_config
+    )
+
+    return om_manager.exponential_backoff(my_settings.debug, cmd)
+
+
+def create_required_databases(my_settings: Settings):
+    cmd = "mysql -h {hostname} --user={username} --port={port} --password={password} < templates/required_dbs.sql".format(
+        hostname=my_settings.pcf_rds_address,
+        username=my_settings.pcf_rds_username,
+        port=my_settings.pcf_rds_port,
+        password=my_settings.pcf_rds_password
     )
 
     return om_manager.exponential_backoff(my_settings.debug, cmd)

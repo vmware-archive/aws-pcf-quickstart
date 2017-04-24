@@ -2,7 +2,7 @@
 
 *.pyc
 vendor
-local_dev.sh
+*_dev.sh
 env
 bin
 tmp

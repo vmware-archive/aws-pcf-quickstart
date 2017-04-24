@@ -26,7 +26,10 @@ user	0m15.970s
 sys	0m32.127s
 ```
 
-todo: script to `scp` over all our code
+Iterating on ops manager vm
+```bash
+rsync -avzh --exclude=env --exclude=.git --exclude=.idea . ubuntu@ec2-....compute-1.amazonaws.com:~/quickstart
+```
 
 
 # Questions

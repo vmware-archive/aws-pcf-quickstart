@@ -46,6 +46,7 @@ class Settings:
         self.pcf_rds_address = self.find_output("PcfRdsAddress")
         self.pcf_rds_username = self.find_output("PcfRdsUsername")
         self.pcf_rds_password = self.find_output("PcfRdsPassword")
+        self.pcf_rds_port = self.find_output("PcfRdsPort")
         self.pcf_elastic_runtime_s3_buildpacks_bucket = self.find_output("PcfElasticRuntimeS3BuildpacksBucket")
         self.pcf_elastic_runtime_s3_droplets_bucket = self.find_output("PcfElasticRuntimeS3DropletsBucket")
         self.pcf_elastic_runtime_s3_packages_bucket = self.find_output("PcfElasticRuntimeS3PackagesBucket")
