@@ -2,6 +2,9 @@
   ".properties.networking_point_of_entry": {
     "value": "external_non_ssl"
   },
+  ".properties.logger_endpoint_port": {
+    "value": "4443"
+  },
   ".properties.tcp_routing": {
     "value": "enable"
   },
