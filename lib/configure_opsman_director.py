@@ -1,12 +1,8 @@
-import json
-from subprocess import call
-
 from jinja2 import Template
 
-import settings
-
-from settings import Settings
 import om_manager
+import settings
+from settings import Settings
 
 
 def configure_opsman_director(my_settings: Settings):

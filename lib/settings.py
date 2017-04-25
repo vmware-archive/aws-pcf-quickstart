@@ -1,5 +1,6 @@
-import os
 import json
+
+import os
 
 output_file = "/tmp/pcf-stack.json"
 

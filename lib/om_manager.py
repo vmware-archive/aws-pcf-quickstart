@@ -1,8 +1,9 @@
 import json
-import os
 import subprocess
 import time
 from subprocess import Popen, PIPE
+
+import os
 
 import settings
 
@@ -19,10 +20,10 @@ def config_opsman_auth(my_settings: settings.Settings):
         my_settings.opsman_url, my_settings.opsman_user, my_settings.opsman_password,
         my_settings.opsman_password
     )
-    return exponential_backoff(my_settings.debug, cmd)
+    return exponential_backoff(cmd, my_settings.debug)
 
 
-def exponential_backoff(debug, cmd, attempt=0):
+def exponential_backoff(cmd, debug, attempt=0):
     out, err, returncode = run_command(cmd, debug)
     if out != "":
         print(out)
@@ -33,7 +34,7 @@ def exponential_backoff(debug, cmd, attempt=0):
         if is_recoverable_error(out) and attempt < max_retries:
             print("Retrying, {}".format(attempt))
             time.sleep(attempt ** 3)
-            returncode = exponential_backoff(debug, cmd, attempt + 1)
+            returncode = exponential_backoff(cmd, debug, attempt + 1)
 
     return returncode
 
@@ -55,7 +56,7 @@ def apply_changes(my_settings: settings.Settings):
     cmd = "{get_om_with_auth} apply-changes".format(
         get_om_with_auth=settings.get_om_with_auth(my_settings)
     )
-    return exponential_backoff(my_settings.debug, cmd)
+    return exponential_backoff(cmd, my_settings.debug)
 
 
 def curl_get(my_settings: settings.Settings, path: str):
@@ -101,14 +102,14 @@ def stage_product(product_name: str, my_settings: settings.Settings):
         product_name=product_name,
         version=cf_version
     )
-    return exponential_backoff(my_settings.debug, cmd)
+    return exponential_backoff(cmd, my_settings.debug)
 
 
 def upload_stemcell(my_settings: settings.Settings, path: str):
     cmd = "{om_with_auth} upload-stemcell -s '{path}'".format(
         om_with_auth=settings.get_om_with_auth(my_settings), path=path
     )
-    return exponential_backoff(my_settings.debug, cmd)
+    return exponential_backoff(cmd, my_settings.debug)
 
 
 def upload_assets(my_settings: settings.Settings, path: str):
@@ -119,7 +120,7 @@ def upload_assets(my_settings: settings.Settings, path: str):
             cmd = "{om_with_auth} -r 3600 upload-product -p '{path}'".format(
                 om_with_auth=settings.get_om_with_auth(my_settings), path=os.path.join(path, tile))
 
-            exit_code = exponential_backoff(my_settings.debug, cmd)
+            exit_code = exponential_backoff(cmd, my_settings.debug)
             if exit_code != 0:
                 return exit_code
 

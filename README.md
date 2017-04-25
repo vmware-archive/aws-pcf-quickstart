@@ -43,6 +43,7 @@ rsync -avzh --exclude=env --exclude=.git --exclude=.idea . ubuntu@ec2-....comput
     - Some config file outside of formation script?
     - Don't really want user to input, but want some tested / vetted version close to latest
 * How will we grab the tile out of s3 bucket? Nervous about making it public. Also, bucket is in Jeenal's account. Some other place
+* boto3.client - work out some failure modes and retry secenarios
 
 
 # Changes to cloud-formation template:

@@ -1,8 +1,7 @@
-from subprocess import call
+import json
 
 from jinja2 import Template
 
-import json
 import om_manager
 import settings
 from settings import Settings
@@ -50,7 +49,7 @@ def configure_ert_resources(my_settings: Settings):
         om_with_auth=settings.get_om_with_auth(my_settings),
         ert_resources=ert_resource_config
     )
-    return call(cmd, shell=True)
+    return om_manager.exponential_backoff(cmd, my_settings.debug)
 
 
 def configure_ert_config(my_settings: Settings):
@@ -74,7 +73,7 @@ def configure_ert_config(my_settings: Settings):
         om_with_auth=settings.get_om_with_auth(my_settings),
         ert_config=ert_config
     )
-    return om_manager.exponential_backoff(my_settings.debug, cmd)
+    return om_manager.exponential_backoff(cmd, my_settings.debug)
 
 
 def configure_tile_az(my_settings: Settings, tile_name: str):
@@ -91,7 +90,7 @@ def configure_tile_az(my_settings: Settings, tile_name: str):
         az_config=az_config
     )
 
-    return om_manager.exponential_backoff(my_settings.debug, cmd)
+    return om_manager.exponential_backoff(cmd, my_settings.debug)
 
 
 def create_required_databases(my_settings: Settings):
@@ -102,7 +101,7 @@ def create_required_databases(my_settings: Settings):
         password=my_settings.pcf_rds_password
     )
 
-    return om_manager.exponential_backoff(my_settings.debug, cmd)
+    return om_manager.exponential_backoff(cmd, my_settings.debug)
 
 
 def modify_vm_types(my_settings: Settings):

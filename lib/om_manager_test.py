@@ -33,6 +33,27 @@ class TestOmManager(unittest.TestCase):
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
         )
 
+    @patch('settings.get_om_with_auth')
+    @patch('om_manager.run_command')
+    def test_curl_get(self, mock_run_command, mock_get_om_with_auth):
+        mock_get_om_with_auth.return_value = "om plus some auth"
+        om_manager.curl_get(self.settings, "/api/foo")
+
+        mock_run_command.assert_called_with(
+            "om plus some auth curl --path /api/foo", False
+        )
+
+    @patch('settings.get_om_with_auth')
+    @patch('om_manager.run_command')
+    def test_curl_payload(self, mock_run_command, mock_get_om_with_auth):
+        mock_get_om_with_auth.return_value = "om plus some auth"
+
+        om_manager.curl_payload(self.settings, "/api/foo", '{"foo": "bar"}', "PUT")
+
+        mock_run_command.assert_called_with(
+            "om plus some auth curl --path /api/foo --request PUT --data '{\"foo\": \"bar\"}'", False
+        )
+
     @patch('subprocess.Popen')
     @patch('builtins.print')
     def test_prints_error(self, mock_print, mock_popen):
@@ -93,7 +114,6 @@ class TestOmManager(unittest.TestCase):
         self.assertEqual(mock_popen.call_count, 1)
         self.assertEqual(returncode, 1)
 
-
     @patch('subprocess.Popen')
     @patch('builtins.print')
     def test_debug_flag_toggles_print(self, mock_print, mock_popen):
@@ -105,4 +125,3 @@ class TestOmManager(unittest.TestCase):
 
         self.assertEqual(mock_print.call_count, 2)
         self.assertEqual(mock_print.call_args_list[0][0][0], "Debug mode. Would have run command")
-

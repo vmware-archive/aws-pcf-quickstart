@@ -1,6 +1,6 @@
-import os
 import unittest
 
+import os
 from mock import patch, mock_open
 
 import settings

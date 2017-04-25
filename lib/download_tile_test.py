@@ -1,7 +1,7 @@
-import tempfile
 import unittest
 
 import boto3
+import tempfile
 from mock import Mock, patch, mock_open
 
 import download_tiles
@@ -30,7 +30,28 @@ class TestDownloadTiles(unittest.TestCase):
         self.settings.tile_bucket_s3_name = 'my-bucket'
         self.settings.tile_bucket_s3_access_key = 'my-access-key'
         self.settings.tile_bucket_s3_secret_access_key = 'my-access-secret'
+        self.settings.tile_bucket_region = 'canada-1'
+        self.settings.aws_broker_version = 'canada-1'
         self.settings.ert_version = '1.99.1'
+
+    @patch('boto3.client')
+    @patch('download_tiles.download_tile')
+    def test_download_tiles_aborts_on_failure(self, mock_download_tile, mock_client):
+        mock_download_tile.return_value = 127
+
+        returncode = download_tiles.download_tiles(self.settings)
+
+        self.assertEqual(mock_download_tile.call_count, 1)
+        self.assertEqual(returncode, 127)
+
+    @patch('boto3.client')
+    @patch('download_tiles.download_tile')
+    def test_download_tiles(self, mock_download_tile, mock_client):
+        mock_download_tile.return_value = 0
+        returncode = download_tiles.download_tiles(self.settings)
+
+        self.assertEqual(mock_download_tile.call_count, 3)
+        self.assertEqual(returncode, 0)
 
     @patch("download_tiles.verify_sha256")
     def test_download_tile(self, mock_verify):
@@ -41,7 +62,7 @@ class TestDownloadTiles(unittest.TestCase):
         with patch('download_tiles.open', my_mock_open):
             with patch('download_tiles.ProgressPercentage') as mock_callback:
                 download_tiles.download_tile(
-                    'my-tile.pivotal', self.settings, mock_s3, 'my-tile.sum'
+                    'my-tile.pivotal', self.settings, mock_s3
                 )
 
         self.assertEqual(mock_s3.download_file.call_count, 2)
@@ -58,6 +79,3 @@ class TestDownloadTiles(unittest.TestCase):
         sha256 = '03ba204e50d126e4674c005e04d82e84c21366780af1f43bd54a37816b6ab340'
         returncode = download_tiles.verify_sha256(f.name, sha256)
         self.assertEqual(returncode, 0)
-
-    def test_error_handling_on_auth_failure(self):
-        pass

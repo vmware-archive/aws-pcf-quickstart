@@ -1,7 +1,7 @@
-import hashlib
 import threading
 
 import boto3
+import hashlib
 
 import settings
 
@@ -28,28 +28,16 @@ def download_tiles(my_settings: settings.Settings):
         aws_secret_access_key=my_settings.tile_bucket_s3_secret_access_key
     )
     for filename in [
-        # "cf-{}.pivotal".format(my_settings.ert_version),
+        "cf-{}.pivotal".format(my_settings.ert_version),
         "aws-services-{}.pivotal".format(my_settings.aws_broker_version),
         "light-bosh-stemcell-3363.15-aws-xen-hvm-ubuntu-trusty-go_agent.tgz"
     ]:
-        download_tile(filename, my_settings, s3)
+        returncode = download_tile(filename, my_settings, s3)
+        if returncode != 0:
+            return returncode
 
     return 0
-    # return download_ert(s3, my_settings) and download_aws_broker(s3, my_settings)
 
-
-# def download_ert(s3, my_settings: settings.Settings):
-#     filename = "cf-{}.pivotal".format(my_settings.ert_version)
-#     sha256_filename = "cf-{}.sha256.txt".format(my_settings.ert_version)
-#
-#     return download_tile(filename, my_settings, s3, sha256_filename)
-#
-#
-# def download_aws_broker(s3, my_settings: settings.Settings):
-#     filename = "aws-services-{}.pivotal".format(my_settings.aws_broker_version)
-#     sha256_filename = "aws-services-{}.sha256.txt".format(my_settings.aws_broker_version)
-#
-#     return download_tile(filename, my_settings, s3, sha256_filename)
 
 def download_tile(filename, my_settings, s3):
     sha256_filename = filename + '.sha256'
