@@ -43,17 +43,25 @@ def apply_changes(ctx):
 def apply_changes(ctx):
     sys.exit(time_cmd(download_tiles.download_tiles, ctx.obj['settings']))
 
+
 @cli.command('upload-assets')
 @click.argument('path')
 @click.pass_context
 def upload_assets(ctx, path):
     sys.exit(time_cmd(om_manager.upload_assets, ctx.obj['settings'], path))
 
+
 @cli.command('configure-ert')
 @click.pass_context
 def config_ert(ctx):
     sys.exit(time_cmd(configure_ert.configure_ert, ctx.obj['settings']))
 
+
+@cli.command('curl')
+@click.argument('path')
+@click.pass_context
+def curl(ctx, path):
+    sys.exit(time_cmd(om_manager.curl_get, ctx.obj['settings'], path))
 
 
 def time_cmd(cmd, *args):

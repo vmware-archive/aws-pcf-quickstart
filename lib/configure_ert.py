@@ -2,6 +2,7 @@ from subprocess import call
 
 from jinja2 import Template
 
+import json
 import om_manager
 import settings
 from settings import Settings
@@ -21,6 +22,11 @@ def configure_ert(my_settings: Settings):
     exit_code = configure_ert_config(my_settings)
     if exit_code != 0:
         print("Failed to configure ERT")
+        return exit_code
+
+    exit_code = modify_vm_types(my_settings)
+    if exit_code != 0:
+        print("Failed to modify VM types for ERT")
         return exit_code
 
     exit_code = configure_ert_resources(my_settings)
@@ -97,3 +103,40 @@ def create_required_databases(my_settings: Settings):
     )
 
     return om_manager.exponential_backoff(my_settings.debug, cmd)
+
+
+def modify_vm_types(my_settings: Settings):
+    path = '/api/v0/vm_types'
+    output, err, return_code = om_manager.curl_get(my_settings, path)
+
+    if return_code != 0:
+        if output != "":
+            print(output)
+        if err != "":
+            print(err)
+        return return_code
+
+    response_json = json.loads(output)
+    m4_exists = False
+
+    for vm_type in response_json["vm_types"]:
+        if vm_type["name"].startswith("m3"):
+            response_json["vm_types"].remove(vm_type)
+        elif vm_type["name"].startswith("m4"):
+            m4_exists = True
+
+    if not m4_exists:
+        with open("templates/ert_vm_types.json") as template:
+            additional_types = json.load(template)
+            for a in additional_types:
+                response_json["vm_types"].append(a)
+
+    output, err, return_code = om_manager.curl_payload(my_settings, path, json.dumps(response_json), 'PUT')
+
+    if return_code != 0:
+        if output != "":
+            print(output)
+        if err != "":
+            print(err)
+
+    return return_code

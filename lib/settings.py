@@ -52,7 +52,6 @@ class Settings:
         self.pcf_elastic_runtime_s3_packages_bucket = self.find_output("PcfElasticRuntimeS3PackagesBucket")
         self.pcf_elastic_runtime_s3_resources_bucket = self.find_output("PcfElasticRuntimeS3ResourcesBucket")
 
-
     def parse_environ(self):
         self.dns_suffix = os.environ['DNS_SUFFIX']
         self.ops_manager_version = os.environ['OPS_MANAGER_VERSION']

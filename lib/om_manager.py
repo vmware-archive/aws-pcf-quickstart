@@ -58,6 +58,21 @@ def apply_changes(my_settings: settings.Settings):
     return exponential_backoff(my_settings.debug, cmd)
 
 
+def curl_get(my_settings: settings.Settings, path: str):
+    cmd = "{get_om_with_auth} curl --path {path}".format(
+        get_om_with_auth=settings.get_om_with_auth(my_settings), path=path
+    )
+    return run_command(cmd, my_settings.debug)
+
+
+def curl_payload(my_settings: settings.Settings, path: str, data: str, method: str):
+    cmd = "{get_om_with_auth} curl --path {path} --request {method} --data '{data}'".format(
+        get_om_with_auth=settings.get_om_with_auth(my_settings), path=path,
+        method=method, data=data
+    )
+    return run_command(cmd, my_settings.debug)
+
+
 def is_recoverable_error(err: str):
     recoverable_errors = ["i/o timeout", "connection refused"]
     clean_err = err
