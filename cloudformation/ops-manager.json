@@ -737,10 +737,10 @@
       "Condition": "CreateRDS",
       "Properties": {
         "AllocatedStorage": "100",
-        "DBInstanceClass": "db.m3.large",
+        "DBInstanceClass": "db.m4.large",
         "Engine": "MySQL",
         "EngineVersion": "5.6.22",
-        "MultiAZ": "False",
+        "MultiAZ": "True",
         "DBName": {"Ref": "04RdsDBName"},
         "Iops": "1000",
         "MasterUsername": {"Ref": "05RdsUsername"},
