@@ -41,6 +41,7 @@
       "Type": "String",
       "NoEcho": "true",
       "MinLength": "8",
+      "AllowedPattern": "[\\w-_]*",
       "Description": "BOSH database password"
     },
     "07SSLCertificateARN": {

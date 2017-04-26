@@ -6,3 +6,6 @@ vendor
 env
 bin
 tmp
+
+packages/*
+!packages/.gitkeep
