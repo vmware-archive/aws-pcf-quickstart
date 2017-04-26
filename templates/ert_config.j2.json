@@ -136,6 +136,9 @@
   ".properties.system_blobstore": {
     "value": "external"
   },
+  ".properties.system_blobstore.external.endpoint": {
+    "value": "https://{{s3_endpoint}}"
+  },
   ".properties.system_blobstore.external.buildpacks_bucket": {
     "value": "{{pcf_elastic_runtime_s3_buildpacks_bucket}}"
   },

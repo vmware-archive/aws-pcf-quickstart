@@ -10,7 +10,7 @@ pip download --no-deps --dest ./vendor pip
 On ops manager vm
 ```
 apt-get upgrade
-apt-get install python3-pip
+apt-get install python3-pip python3-dev
 # get om on path somehow...
 # get pivnet cli on machine somehow
 ```

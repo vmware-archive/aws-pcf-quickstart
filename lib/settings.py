@@ -1,4 +1,5 @@
 import json
+import re
 
 import os
 
@@ -24,6 +25,7 @@ class Settings:
 
     def parse_stack(self):
         self.stack_name = self.stack.get('StackName')
+        self.stack_id = self.stack.get('StackId')
         self.key_pair_name = self.find_parameter("01NATKeyPair")
         self.pivnet_token = self.find_parameter("11PivnetToken")
         self.admin_email = self.find_parameter("12AdminEmail")
@@ -86,6 +88,20 @@ class Settings:
                 return parameter.get("ParameterValue")
 
         return None
+
+    def get_stack_region(self):
+        match = re.match(r'arn:aws:cloudformation:([-\w]*):.*', self.stack_id)
+        if match is None:
+            raise ValueError("StackId format does not match expecations")
+        region = match.group(1)
+        return region
+
+    def get_s3_endpoint(self):
+        stack_region = self.get_stack_region()
+        if stack_region == "us-east-1":
+            return "s3.amazonaws.com"
+        else:
+            return "s3-{}.amazonaws.com".format(stack_region)
 
 
 def get_om_with_auth(settings: Settings):

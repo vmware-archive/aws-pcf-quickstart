@@ -65,6 +65,7 @@ def configure_ert_config(my_settings: Settings):
         "pcf_elastic_runtime_s3_resources_bucket": my_settings.pcf_elastic_runtime_s3_resources_bucket,
         "pcf_iam_access_key_id": my_settings.pcf_iam_access_key_id,
         "pcf_iam_secret_access_key": my_settings.pcf_iam_secret_access_key,
+        "s3_endpoint": my_settings.get_s3_endpoint()
     }
     with open("templates/ert_config.j2.json", 'r') as f:
         ert_template = Template(f.read())

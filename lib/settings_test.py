@@ -1,3 +1,4 @@
+import json
 import unittest
 
 import os
@@ -8,8 +9,9 @@ import settings
 
 class TestSettings(unittest.TestCase):
     def setUp(self):
-        my_mock_open = mock_open(read_data="""
+        self.pcf_json = """
 {"Stacks": [{
+      "StackId": "arn:aws:cloudformation:us-west-2:277693604504:stack/pcf-try-again/36ac83b0-2a08-11e7-9a53-500c314110fd",
       "Outputs": [
         {
           "OutputValue": "db-admin",
@@ -44,7 +46,8 @@ class TestSettings(unittest.TestCase):
         }
       ]
 }]}
-""")
+"""
+        my_mock_open = mock_open(read_data=self.pcf_json)
 
         os.environ['DNS_SUFFIX'] = 'example.com'
         os.environ['OPS_MANAGER_VERSION'] = '99.0.1'
@@ -92,3 +95,27 @@ class TestSettings(unittest.TestCase):
         expected_om_command = "om -k --target https://some-random-ec2-domain.example.com --username 'admin' --password 'monkey123'"
         om_command = settings.get_om_with_auth(self.settings)
         self.assertEqual(om_command, expected_om_command)
+
+    def test_get_stack_region(self):
+        self.assertEqual(self.settings.get_stack_region(), "us-west-2")
+
+    def test_get_stack_region_bad_input(self):
+        new_json = json.loads(self.pcf_json)
+        new_json["Stacks"][0]["StackId"] = "foo:bar:yo"
+        self.pcf_json = json.dumps(new_json)
+        my_mock_open = mock_open(read_data=self.pcf_json)
+        with patch('settings.open', my_mock_open):
+            self.settings = settings.Settings()
+        self.assertRaises(ValueError, self.settings.get_stack_region)
+
+    def test_get_s3_endpoint(self):
+        self.assertEqual(self.settings.get_s3_endpoint(), "s3-us-west-2.amazonaws.com")
+
+    def test_get_s3_endpoint_east1(self):
+        new_json = json.loads(self.pcf_json)
+        new_json["Stacks"][0]["StackId"] = "arn:aws:cloudformation:us-east-1:277693604504:stack/pcf-try-again/36ac83b0-2a08-11e7-9a53-500c314110fd"
+        self.pcf_json = json.dumps(new_json)
+        my_mock_open = mock_open(read_data=self.pcf_json)
+        with patch('settings.open', my_mock_open):
+            self.settings = settings.Settings()
+        self.assertEqual(self.settings.get_s3_endpoint(), "s3.amazonaws.com")
