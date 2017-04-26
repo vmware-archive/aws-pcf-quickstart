@@ -37,10 +37,11 @@ def configure_ert(my_settings: Settings):
 
 
 def configure_ert_resources(my_settings: Settings):
+    prefix = my_settings.stack_name
+    if my_settings.elb_prefix != "":
+        prefix = my_settings.elb_prefix
     ert_resource_ctx = {
-        "router_lb_name": "{stack_name}{elb_prefix}".format(
-            stack_name=my_settings.stack_name, elb_prefix=my_settings.elb_prefix
-        ),
+        "router_lb_name": "{prefix}".format(prefix=prefix)
     }
     with open("templates/ert_resources_config.j2.json", 'r') as f:
         ert_resource_template = Template(f.read())
