@@ -1,0 +1,95 @@
+---
+
+resources:
+- name: quickstart-release
+  type: github-release
+  source:
+    owner: cf-platform-eng
+    repository: quickstart
+    access_token: {{access_token}}
+
+- name: pivnet-release
+  type: github-release
+  source:
+    owner: pivotal-cf
+    repository: pivnet-cli
+    access_token: {{access_token}}
+    version: v0.0.49
+
+- name: om-release
+  type: github-release
+  source:
+    owner: pivotal-cf
+    repository: om
+    access_token: {{access_token}}
+    version: v0.0.22
+
+- name: quickstart-repo
+  type: git
+  source:
+    branch: master
+    uri: https://github.com/cf-platform-eng/quickstart
+    username: cholick
+    password: {{access_token}}
+    ignore_paths:
+      - ci/*.yml
+
+- name: version
+  type: semver
+  source:
+    driver: git
+    uri: https://github.com/cf-platform-eng/quickstart
+    branch: master
+    file: ci/version
+    username: cholick
+    password: {{access_token}}
+
+jobs:
+- name: test-pipeline
+  plan:
+  - get: pivnet-release
+  - get: om-release
+  - get: quickstart-repo
+  - get: version
+    params: {bump: patch}
+  - task: test-pipeline
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: python
+          tag: "3"
+      inputs:
+      - name: pivnet-release
+      - name: om-release
+      - name: quickstart-repo
+      outputs:
+      - name: output
+      run:
+        path: bash
+        args:
+        - -exc
+        - |
+          mkdir -p quickstart
+          mkdir -p quickstart/bin
+          cp -r quickstart-repo/* quickstart
+          cp om-release/om-linux quickstart/bin/om
+          cp pivnet-release/pivnet-linux* quickstart/bin/pivnet
+          pushd quickstart
+          mkdir -p vendor
+          pip download --no-binary :all: --dest vendor -r requirements.txt
+          popd
+
+          mkdir -p output
+          tar -czvf output/quickstart.tgz quickstart
+
+  - put: version
+    params: {file: version/version}
+  - put: quickstart-release
+    params:
+      name: version/version
+      tag: version/version
+      globs:
+      - output/quickstart.tgz
+

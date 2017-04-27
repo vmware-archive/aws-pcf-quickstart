@@ -1,0 +1,37 @@
+---
+
+resources:
+- name: quickstart-repo
+  type: git
+  source:
+    branch: master
+    uri: https://github.com/cf-platform-eng/quickstart
+    username: cholick
+    password: {{access_token}}
+    ignore_paths:
+      - ci/*.yml
+
+jobs:
+- name: test-pipeline
+  plan:
+  - get: quickstart-repo
+    trigger: true
+  - task: unit-test
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: python
+          tag: "3"
+      inputs:
+      - name: quickstart-repo
+      run:
+        path: bash
+        args:
+        - -exc
+        - |
+          pushd quickstart-repo
+          pip install -r requirements.txt
+          python -m unittest discover -v -s ./lib -p '*_test.py'
+          popd
