@@ -44,6 +44,15 @@ resources:
     username: cholick
     password: {{access_token}}
 
+- name: quickstart-bucket
+  type: s3
+  source:
+    bucket: quickstart-testing
+    regexp: quickstart-(.*).tgz
+    access_key_id: {{access_key_id}}
+    secret_access_key: {{secret_access_key}}
+
+
 jobs:
 - name: test-pipeline
   plan:
@@ -82,7 +91,7 @@ jobs:
           popd
 
           mkdir -p output
-          tar -czvf output/quickstart.tgz quickstart
+          tar -czvf output/quickstart-`cat quickstart-repo/ci/version`.tgz quickstart
 
   - put: version
     params: {file: version/version}
@@ -91,5 +100,16 @@ jobs:
       name: version/version
       tag: version/version
       globs:
-      - output/quickstart.tgz
+      - output/quickstart-*.tgz
+
+- name: quickstart-bucket
+  plan:
+  - get: quickstart-release
+    trigger: true
+    passed:
+      - test-pipeline
+  - put: quickstart-bucket
+    params:
+      file: quickstart-release/quickstart-*.tgz
+
 
