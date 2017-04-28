@@ -171,13 +171,13 @@ Resources:
       Description: Misc
       Type: String
       Value: !GetAtt 01PCFBase.Outputs.PcfElasticRuntimeS3DropletsBucket
-  PcfIamInstanceProfile:
+  PcfIamRole:
     Type: "AWS::SSM::Parameter"
     Properties:
-      Name: !Sub "${AWS::StackName}.PcfIamInstanceProfile"
+      Name: !Sub "${AWS::StackName}.PcfIamRole"
       Description: Misc
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfIamInstanceProfile
+      Value: !GetAtt 01PCFBase.Outputs.PcfIamRole
   PcfElbSshDnsName:
     Type: "AWS::SSM::Parameter"
     Properties:
