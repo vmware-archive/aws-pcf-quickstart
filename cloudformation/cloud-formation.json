@@ -1586,6 +1586,9 @@
     "PcfVpc": {
       "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfVpc" ]}
     },
+    "PcfIamRole": {
+      "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfIamRole" ]}
+    },
     "PcfIamUserName": {
       "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfIamUserName" ]}
     },
@@ -1654,6 +1657,6 @@
     },
     "PcfRdsDBName": {
       "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfRdsDBName" ]}
-    }
+    },
   }
 }
