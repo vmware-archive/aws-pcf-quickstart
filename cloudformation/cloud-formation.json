@@ -1586,6 +1586,9 @@
     "PcfVpc": {
       "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfVpc" ]}
     },
+    "PcfIamInstanceProfile": {
+      "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfIamInstanceProfile" ]}
+    },
     "PcfIamRole": {
       "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfIamRole" ]}
     },
