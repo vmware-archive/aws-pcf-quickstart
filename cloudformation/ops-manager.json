@@ -767,6 +767,9 @@
     "PcfIamInstanceProfile": {
       "Value": {"Ref": "PcfIamInstanceProfile"}
     },
+    "PcfIamRole": {
+      "Value": {"Ref": "PcfIamRole"}
+    },
     "PcfOpsManagerS3Bucket": {
       "Value": {"Ref": "PcfOpsManagerS3Bucket"}
     },
