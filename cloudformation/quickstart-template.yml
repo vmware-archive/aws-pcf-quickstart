@@ -366,9 +366,15 @@ Resources:
         - Key: Name
           Value: "PCF Ops Manager"
       UserData: !Base64
-                  "Fn::Sub": |
-                    #!/bin/bash
-                    echo Hello World.
+        "Fn::Sub": |
+          #!/bin/bash
+          PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
+          DEBIAN_FRONTEND=noninteractive apt-get update -y && apt-get upgrade -y
+          DEBIAN_FRONTEND=noninteractive apt-get install -y python3-dev python3-pip
+          pip3 install --upgrade pip awscli
+          mkdir -p /var/local/cloudformation/
+          echo "{\"StackName\":\"${AWS::StackName}\",\"StackId\":\"${AWS::StackId}\",\"Region\",\"${AWS::Region}\"}"
+          chmod 0755 /var/local/cloudformation/stack-meta.json
 Outputs:
   OpsManager:
     Description: Url For Logging into OpsManager
