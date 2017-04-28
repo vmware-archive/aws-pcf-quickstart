@@ -346,7 +346,7 @@ Resources:
     Properties: 
       ImageId: !FindInMap [01OpsManagerAMI, !Ref "AWS::Region", 64]
       InstanceType: m4.large
-      IamInstanceProfile: !GetAtt 01PCFBase.Outputs.PcfIamInstanceProfile
+      IamInstanceProfile: !GetAtt 01PCFBase.Outputs.PcfIamRole
       KeyName: !Ref 14OpsManKeyPair
       Monitoring: true
       BlockDeviceMappings:
