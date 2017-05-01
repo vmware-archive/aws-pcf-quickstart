@@ -1,9 +1,12 @@
 import json
 import re
-
+import boto3
 import os
+import sys
+import itertools
 
 output_file = "/tmp/pcf-stack.json"
+parameters_file = "/tmp/parameters_store.json"
 
 
 class Settings:
@@ -20,12 +23,21 @@ class Settings:
             if not self.stack:
                 raise ValueError('{} should conform to {"Stacks":[{....}]}')
 
+        self.parameters = self.get_parameters()
+
         self.parse_environ()
         self.parse_stack()
 
     def parse_stack(self):
         self.stack_name = self.stack.get('StackName')
         self.stack_id = self.stack.get('StackId')
+
+        print ("----------------------------")
+        print
+        print (self.get_parameters())
+
+        sys.exit(0)
+
         self.key_pair_name = self.find_parameter("01NATKeyPair")
         self.pivnet_token = self.find_parameter("11PivnetToken")
         self.admin_email = self.find_parameter("12AdminEmail")
@@ -74,11 +86,18 @@ class Settings:
     def get_fully_qualified_domain(self):
         return self.dns_suffix
 
+    # def find_output(self, name: str):
+    #     for output in self.stack.get("Outputs"):
+    #         key = output.get("OutputKey", None)
+    #         if key == name:
+    #             return output.get("OutputValue")
+    #     return None
+
     def find_output(self, name: str):
-        for output in self.stack.get("Outputs"):
-            key = output.get("OutputKey", None)
+        for output in self.parameters:
+            key = output.get("Name", None)
             if key == name:
-                return output.get("OutputValue")
+                return output.get("Value")
         return None
 
     def find_parameter(self, name: str):
@@ -102,6 +121,67 @@ class Settings:
             return "s3.amazonaws.com"
         else:
             return "s3-{}.amazonaws.com".format(stack_region)
+
+    def get_aws_rest_client(self):
+        client = boto3.client('ssm')
+        return client
+
+    def define_parameters(self):
+        Names = [
+            "PcfElbDnsName",
+            "PcfElasticRuntimeS3BuildpacksBucket",
+            "PcfRdsPassword",
+            "PcfRdsUsername",
+            "PcfIamUserAccessKey",
+            "PcfIamUserSecretAccessKey",
+            "PcfVpc",
+            "PcfVmsSecurityGroupId",
+            "PcfPrivateSubnetAvailabilityZone",
+            "PcfPrivateSubnet2AvailabilityZone",
+            "PcfPrivateSubnetId",
+            "PcfPrivateSubnet2Id",
+            "PcfPrivateSubnetAvailabilityZone",
+            "PcfPrivateSubnet2AvailabilityZone",
+            "PcfRdsAddress",
+            "PcfRdsUsername",
+            "PcfRdsPassword",
+            "PcfRdsPort",
+            "PcfElasticRuntimeS3BuildpacksBucket",
+            "PcfElasticRuntimeS3DropletsBucket",
+            "PcfElasticRuntimeS3PackagesBucket",
+            "PcfElasticRuntimeS3ResourcesBucket"
+        ]
+        return Names
+
+    def get_parameters(self):
+
+        client = boto3.client(service_name='ssm', region_name='us-east-1')
+        parameters = self.define_parameters()
+        parameterslist = []
+        param_results = []
+        j = 1
+        for i in parameters:
+
+            parameterslist.append(self.stack_name + "." + i)
+
+            if (len(parameterslist) % 9 == 0 or len(parameters) == j):
+                print ("testsin n,,,l;")
+                print (parameterslist)
+                response = client.get_parameters(
+                    Names=parameterslist,
+                    WithDecryption=False
+                )
+
+                param_results.append(response.get("Parameters"))
+                parameterslist = []
+
+            j = j + 1
+        flatten_results = list(itertools.chain.from_iterable(param_results))
+
+        with open('/tmp/parameters_store.json', 'w') as file:
+            json.dump(flatten_results,  file, indent=4)
+        return flatten_results
+
 
 
 def get_om_with_auth(settings: Settings):
