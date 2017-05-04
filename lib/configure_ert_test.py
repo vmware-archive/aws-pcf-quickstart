@@ -14,7 +14,7 @@ class TestConfigureERT(unittest.TestCase):
         self.settings.opsman_password = 'monkey-123'
         self.settings.stack_name = 'pcf-to-the-max-stack'
         self.settings.elb_prefix = 'to-the-max'
-        self.settings.dns_suffix = 'example.com'
+        self.settings.pcf_input_domain = 'example.com'
         self.settings.pcf_rds_address = 'https://rds.example.com'
         self.settings.pcf_rds_username = 'user'
         self.settings.pcf_rds_password = 'monkey123'

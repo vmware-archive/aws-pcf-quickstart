@@ -57,7 +57,7 @@ def configure_ert_config(my_settings: Settings):
     ert_config_template_ctx = {
         "pcf_rds_address": my_settings.pcf_rdsaddress,
         "pcf_rds_username": my_settings.pcf_rdsusername,
-        "dns_suffix": my_settings.dns_suffix,
+        "dns_suffix": my_settings.pcf_input_domain,
         "pcf_rds_password": my_settings.pcf_rdspassword,
         "admin_email": my_settings.pcf_input_adminemail,
         "pcf_elastic_runtime_s3_buildpacks_bucket": my_settings.pcf_elasticruntimes3buildpacksbucket,

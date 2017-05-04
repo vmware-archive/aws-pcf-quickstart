@@ -77,6 +77,12 @@ Parameters:
   13AdminEmail:
     Type: String
     Description: Admin email used by mysql monitor, for example
+  14HostedZoneId:
+    Type: String
+    Description: Existing hosted zone to create DNS records under
+  15Domain:
+    Type: String
+    Description: Root or subdomain for all Pivotal Cloud Foundry DNS entries (e.g. - example.com or pcf.example.com). Must match hosted zone.
 Mappings:
   ## Mapping of OpsManager AMI in AWS Regions.
   01OpsManagerAMI:
@@ -356,7 +362,7 @@ Resources:
       Value: !GetAtt 01PCFBase.Outputs.PcfPublicSubnetAvailabilityZone2
   ## This is the End of our Secured Parameters
   ## This is the EC2 Ops Manager
-  01OpsManagerInstance: 
+  01OpsManagerInstance:
     Type: AWS::EC2::Instance
     Properties: 
       ImageId: !FindInMap [01OpsManagerAMI, !Ref "AWS::Region", 64]
@@ -390,7 +396,34 @@ Resources:
           mkdir -p /var/local/cloudformation/
           echo "{\"StackName\":\"${AWS::StackName}\",\"StackId\":\"${AWS::StackId}\",\"Region\",\"${AWS::Region}\"}" > /var/local/cloudformation/stack-meta.json
           chmod 0755 /var/local/cloudformation/stack-meta.json
+  02DNSOpsMan:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref 14HostedZoneId
+      Name: !Join [ "", [ "opsman.", !Ref 15Domain] ]
+      ResourceRecords:
+        - !Sub "${01OpsManagerInstance.PublicIp}"
+      TTL: 60
+      Type: A
+  03DNSStar:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref 14HostedZoneId
+      Name: !Join [ "", [ "*.", !Ref 15Domain] ]
+      ResourceRecords:
+        - !GetAtt 01PCFBase.Outputs.PcfElbDnsName
+      TTL: 60
+      Type: CNAME
+  04DNSSsh:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref 14HostedZoneId
+      Name: !Join [ "", [ "ssh.sys.", !Ref 15Domain] ]
+      ResourceRecords:
+        - !GetAtt 01PCFBase.Outputs.PcfElbSshDnsName
+      TTL: 60
+      Type: CNAME
 Outputs:
   OpsManager:
     Description: Url For Logging into OpsManager
-    Value: !Sub "Https://${01OpsManagerInstance.PublicDnsName}"
+    Value: !Sub "https://${01OpsManagerInstance.PublicDnsName}"

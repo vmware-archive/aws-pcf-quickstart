@@ -24,6 +24,14 @@ input_params = {
                 {
                     'ParameterValue': 'abc123',
                     'ParameterKey': '12PivnetToken'
+                },
+                {
+                    'ParameterValue': 'my-zone-id',
+                    'ParameterKey': '14HostedZoneId'
+                },
+                {
+                    'ParameterValue': 'pcf.example.com',
+                    'ParameterKey': '15Domain'
                 }
             ]
         }
@@ -114,6 +122,8 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(self.settings.pcf_input_opsmankeypair, "my-key")
         self.assertEqual(self.settings.pcf_input_adminemail, "admin@example.com")
         self.assertEqual(self.settings.pcf_input_elbprefix, "elb-pre-yo")
+        self.assertEqual(self.settings.pcf_input_hostedzoneid, "my-zone-id")
+        self.assertEqual(self.settings.pcf_input_domain, "pcf.example.com")
 
     def test_parse_meta(self):
         self.assertEqual(self.settings.stack_name, "pcf-stack")
@@ -138,7 +148,6 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(self.settings.pcf_privatesubnet2availabilityzone, "canada-1b")
 
     def test_parses_environment(self):
-        self.assertEqual(self.settings.dns_suffix, 'example.com')
         self.assertEqual(self.settings.ops_manager_version, '99.0.1')
         self.assertEqual(self.settings.opsman_url, 'https://some-random-ec2-domain.example.com')
         self.assertEqual(self.settings.ssh_private_key, 'my-key-value-asdf-1234')

@@ -150,8 +150,16 @@ class Settings:
     def pcf_input_elbprefix(self):
         return self.input_parameters["10ElbPrefix"]
 
+    @property
+    def pcf_input_hostedzoneid(self):
+        return self.input_parameters["14HostedZoneId"]
+
+    @property
+    def pcf_input_domain(self):
+        return self.input_parameters["15Domain"]
+
+
     def parse_environ(self):
-        self.dns_suffix = os.environ['DNS_SUFFIX']
         self.ops_manager_version = os.environ['OPS_MANAGER_VERSION']
         self.ert_version = os.environ['ERT_VERSION']
         self.aws_broker_version = os.environ['AWS_BROKER_VERSION']
@@ -164,9 +172,6 @@ class Settings:
         self.tile_bucket_s3_name = os.environ['TILE_BUCKET_S3_NAME']
         self.tile_bucket_s3_access_key = os.environ['TILE_BUCKET_S3_ACCESS_KEY']
         self.tile_bucket_s3_secret_access_key = os.environ['TILE_BUCKET_S3_SECRET_ACCESS_KEY']
-
-    def get_fully_qualified_domain(self):
-        return self.dns_suffix
 
     def get_s3_endpoint(self):
         stack_region = self.region
