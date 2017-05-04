@@ -38,8 +38,8 @@ def configure_ert(my_settings: Settings):
 
 def configure_ert_resources(my_settings: Settings):
     prefix = my_settings.stack_name
-    if my_settings.elb_prefix != "":
-        prefix = my_settings.elb_prefix
+    if my_settings.pcf_input_elbprefix != "":
+        prefix = my_settings.pcf_input_elbprefix
     ert_resource_ctx = {
         "router_lb_name": "{prefix}".format(prefix=prefix)
     }
@@ -55,17 +55,17 @@ def configure_ert_resources(my_settings: Settings):
 
 def configure_ert_config(my_settings: Settings):
     ert_config_template_ctx = {
-        "pcf_rds_address": my_settings.pcf_rds_address,
-        "pcf_rds_username": my_settings.pcf_rds_username,
+        "pcf_rds_address": my_settings.pcf_rdsaddress,
+        "pcf_rds_username": my_settings.pcf_rdsusername,
         "dns_suffix": my_settings.dns_suffix,
-        "pcf_rds_password": my_settings.pcf_rds_password,
-        "admin_email": my_settings.admin_email,
-        "pcf_elastic_runtime_s3_buildpacks_bucket": my_settings.pcf_elastic_runtime_s3_buildpacks_bucket,
-        "pcf_elastic_runtime_s3_droplets_bucket": my_settings.pcf_elastic_runtime_s3_droplets_bucket,
-        "pcf_elastic_runtime_s3_packages_bucket": my_settings.pcf_elastic_runtime_s3_packages_bucket,
-        "pcf_elastic_runtime_s3_resources_bucket": my_settings.pcf_elastic_runtime_s3_resources_bucket,
-        "pcf_iam_access_key_id": my_settings.pcf_iam_access_key_id,
-        "pcf_iam_secret_access_key": my_settings.pcf_iam_secret_access_key,
+        "pcf_rds_password": my_settings.pcf_rdspassword,
+        "admin_email": my_settings.pcf_input_adminemail,
+        "pcf_elastic_runtime_s3_buildpacks_bucket": my_settings.pcf_elasticruntimes3buildpacksbucket,
+        "pcf_elastic_runtime_s3_droplets_bucket": my_settings.pcf_elasticruntimes3dropletsbucket,
+        "pcf_elastic_runtime_s3_packages_bucket": my_settings.pcf_elasticruntimes3packagesbucket,
+        "pcf_elastic_runtime_s3_resources_bucket": my_settings.pcf_elasticruntimes3resourcesbucket,
+        "pcf_iam_access_key_id": my_settings.pcf_iamuseraccesskey,
+        "pcf_iam_secret_access_key": my_settings.pcf_iamusersecretaccesskey,
         "s3_endpoint": my_settings.get_s3_endpoint()
     }
     with open("templates/ert_config.j2.json", 'r') as f:
@@ -97,10 +97,10 @@ def configure_tile_az(my_settings: Settings, tile_name: str):
 
 def create_required_databases(my_settings: Settings):
     cmd = "mysql -h {hostname} --user={username} --port={port} --password={password} < templates/required_dbs.sql".format(
-        hostname=my_settings.pcf_rds_address,
-        username=my_settings.pcf_rds_username,
-        port=my_settings.pcf_rds_port,
-        password=my_settings.pcf_rds_password
+        hostname=my_settings.pcf_rdsaddress,
+        username=my_settings.pcf_rdsusername,
+        port=my_settings.pcf_rdsport,
+        password=my_settings.pcf_rdspassword
     )
 
     return om_manager.exponential_backoff(cmd, my_settings.debug)

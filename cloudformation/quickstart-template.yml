@@ -119,7 +119,22 @@ Resources:
         11PivnetToken: !Ref 12PivnetToken
         12AdminEmail: !Ref 13AdminEmail
       TemplateURL: !Ref 09CloudFoundryTemplate
-  ## This Policy is for Allowing the OpsManager EC2 Instance access to the Stored Parameters.
+  ## This Policy is for Allowing the OpsManager EC2 Instance access to the Describe stack and
+  ## Stored Parameters.
+  PCFDescribeStackPolicy:
+    Type: "AWS::IAM::Policy"
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Action:
+              - "cloudformation:DescribeStacks"
+            Resource: !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${AWS::StackName}/*"
+      PolicyName: !Sub ${AWS::StackName}-describe-stack
+      Roles:
+        - !GetAtt 01PCFBase.Outputs.PcfIamRole
   PCFParameterStorePolicy:
     Type: "AWS::IAM::Policy"
     Properties: 
@@ -373,7 +388,7 @@ Resources:
           DEBIAN_FRONTEND=noninteractive apt-get install -y python3-dev python3-pip
           pip3 install --upgrade pip awscli
           mkdir -p /var/local/cloudformation/
-          echo "{\"StackName\":\"${AWS::StackName}\",\"StackId\":\"${AWS::StackId}\",\"Region\",\"${AWS::Region}\"}"
+          echo "{\"StackName\":\"${AWS::StackName}\",\"StackId\":\"${AWS::StackId}\",\"Region\",\"${AWS::Region}\"}" > /var/local/cloudformation/stack-meta.json
           chmod 0755 /var/local/cloudformation/stack-meta.json
 Outputs:
   OpsManager:

@@ -10,19 +10,19 @@ def configure_opsman_director(my_settings: Settings):
 
     template_ctx = {
         "zones": my_settings.zones,
-        "access_key_id": my_settings.pcf_iam_access_key_id,
-        "secret_access_key": my_settings.pcf_iam_secret_access_key,
-        "vpc_id": my_settings.vpc_id,
-        "security_group": my_settings.security_group,
-        "key_pair_name": my_settings.key_pair_name,
+        "access_key_id": my_settings.pcf_iamuseraccesskey,
+        "secret_access_key": my_settings.pcf_iamusersecretaccesskey,
+        "vpc_id": my_settings.pcf_vpc,
+        "security_group": my_settings.pcf_vmssecuritygroupid,
+        "key_pair_name": my_settings.pcf_input_opsmankeypair,
         "ssh_private_key": my_settings.ssh_private_key.replace("\n", "\\n"),
         "region": my_settings.region,
         "encrypted": "false",
-        "vpc_private_subnet_id": my_settings.vpc_private_subnet_id,
-        "vpc_private_subnet_az": my_settings.vpc_private_subnet_az,
-        "vpc_private_subnet_id2": my_settings.vpc_private_subnet_id2,
-        "vpc_private_subnet_az2": my_settings.vpc_private_subnet_az2,
-        "singleton_availability_zone": my_settings.vpc_private_subnet_az
+        "vpc_private_subnet_id": my_settings.pcf_privatesubnetid,
+        "vpc_private_subnet_az": my_settings.pcf_privatesubnetavailabilityzone,
+        "vpc_private_subnet_id2": my_settings.pcf_privatesubnet2id,
+        "vpc_private_subnet_az2": my_settings.pcf_privatesubnet2availabilityzone,
+        "singleton_availability_zone": my_settings.pcf_privatesubnetavailabilityzone
 
     }
     with open("templates/bosh_az_config.j2.json", 'r') as f:
