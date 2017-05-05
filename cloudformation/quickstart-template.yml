@@ -91,8 +91,8 @@ Parameters:
     Description: Select the SSH keypair to use for Ops Manager and all VMS in the deployment
   17PCFKeyPairPrivate:
     Type: String
-    Description: Private half of PCFKeyPair, used as the key for all instance deployed via PCF BOSH
-    AllowedPattern: "^[\n]?-----BEGIN RSA PRIVATE KEY-----([+=/\w\n]*)-----END RSA PRIVATE KEY-----$"
+    Description: Private half of PCFKeyPair, used as the key for all instance deployed via PCF BOSH. Replan \n with comma, because we hate you
+    AllowedPattern: '^-----BEGIN RSA PRIVATE KEY-----,([+=/\w,]*),-----END RSA PRIVATE KEY-----$'
 
 Mappings:
   ## Mapping of OpsManager AMI in AWS Regions.
@@ -371,6 +371,13 @@ Resources:
       Description: Misc
       Type: String
       Value: !GetAtt 01PCFBase.Outputs.PcfPublicSubnetAvailabilityZone2
+  PcfPrivateSSHKey:
+    Type: "AWS::SSM::Parameter"
+    Properties:
+      Name: !Sub "${AWS::StackName}.PcfPrivateSSHKey"
+      Description: Misc
+      Type: String
+      Value:  !Join [ "\n", !Split [ ",", !Ref 17PCFKeyPairPrivate]]
   ## This is the End of our Secured Parameters
   ## This is the EC2 Ops Manager
   01OpsManagerInstance:
@@ -386,7 +393,7 @@ Resources:
       ImageId: !FindInMap [01OpsManagerAMI, !Ref "AWS::Region", 64]
       InstanceType: m4.large
       IamInstanceProfile: !GetAtt 01PCFBase.Outputs.PcfIamInstanceProfile
-      KeyName: !Ref 14OpsManKeyPair
+      KeyName: !Ref 14PCFKeyPair
       Monitoring: true
       BlockDeviceMappings:
         - DeviceName: "/dev/sda1"
@@ -407,17 +414,19 @@ Resources:
       UserData: !Base64
         "Fn::Sub": |
           #!/bin/bash
-          PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-          DEBIAN_FRONTEND=noninteractive apt-get update -y
-          DEBIAN_FRONTEND=noninteractive apt-get install -y python3-dev python3-pip
-          pip3 install --upgrade pip awscli
-          mkdir -p /var/local/cloudformation/
-          echo "{\"StackName\":\"${AWS::StackName}\",\"StackId\":\"${AWS::StackId}\",\"Region\",\"${AWS::Region}\"}" > /var/local/cloudformation/stack-meta.json
-          chmod 0755 /var/local/cloudformation/stack-meta.json
+          (
+            PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+            DEBIAN_FRONTEND=noninteractive apt-get update -y
+            DEBIAN_FRONTEND=noninteractive apt-get install -y python3-dev python3-pip
+            pip3 install --upgrade pip awscli
+            mkdir -p /var/local/cloudformation/
+            echo "{\"StackName\":\"${AWS::StackName}\",\"StackId\":\"${AWS::StackId}\",\"Region\",\"${AWS::Region}\"}" > /var/local/cloudformation/stack-meta.json
+            chmod 0755 /var/local/cloudformation/stack-meta.json
 
-          tar -xvf /tmp/quickstart-release.tgz -C /home/ubuntu/
-          chown ubuntu:ubuntu /home/ubuntu/quickstart
-          su ubuntu -c /home/ubuntu/quickstart/bootstrap.sh
+            tar -xvf /tmp/quickstart-release.tgz -C /home/ubuntu/
+            chown ubuntu:ubuntu /home/ubuntu/quickstart
+            su ubuntu -c /home/ubuntu/quickstart/bootstrap.sh
+          ) 2>&1 | tee /var/log/user_data.log
 
   02DNSOpsMan:
     Type: AWS::Route53::RecordSet
