@@ -60,7 +60,8 @@ jobs:
   - get: om-release
   - get: quickstart-repo
   - get: version
-    params: {bump: patch}
+    params:
+      bump: patch
   - task: test-pipeline
     config:
       platform: linux
@@ -73,6 +74,7 @@ jobs:
       - name: pivnet-release
       - name: om-release
       - name: quickstart-repo
+      - name: version
       outputs:
       - name: output
       run:
@@ -91,7 +93,7 @@ jobs:
           popd
 
           mkdir -p output
-          tar -czvf output/quickstart-`cat quickstart-repo/ci/version`.tgz quickstart
+          tar -czvf output/quickstart-`cat version/version`.tgz quickstart
 
   - put: version
     params: {file: version/version}
