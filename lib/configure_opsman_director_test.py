@@ -15,14 +15,13 @@ class TestConfigureOpsManDirector(unittest.TestCase):
         self.settings.vpc_id = "vpc-123"
         self.settings.security_group = "sec-123"
         self.settings.key_pair_name = "mytestkeypair"
-        self.settings.ssh_private_key = "private key"
         self.settings.region = "region-123"
         self.settings.vpc_private_subnet_id = "subnet1"
         self.settings.vpc_private_subnet_az = "east1"
         self.settings.vpc_private_subnet_id2 = "subnet2"
         self.settings.vpc_private_subnet_az2 = "east2"
         self.settings.opsman_url = "https://example123.com"
-        self.settings.opsman_password = "monkey123"
+        self.settings.pcf_input_opsmanageradminpassword = "monkey123"
         self.settings.opsman_user = "testuser"
         self.settings.debug = False
 

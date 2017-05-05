@@ -15,7 +15,7 @@ input_params = {
                 },
                 {
                     'ParameterValue': 'my-key',
-                    'ParameterKey': '14OpsManKeyPair'
+                    'ParameterKey': '14PCFKeyPair'
                 },
                 {
                     'ParameterValue': 'elb-pre-yo',
@@ -32,6 +32,14 @@ input_params = {
                 {
                     'ParameterValue': 'pcf.example.com',
                     'ParameterKey': '15Domain'
+                },
+                {
+                    'ParameterValue': 'monkey123',
+                    'ParameterKey': '16OpsManagerAdminPassword'
+                },
+                {
+                    'ParameterValue': '-----BEGIN RSA PRIVATE KEY-----foobarabc/q-----END RSA PRIVATE KEY-----',
+                    'ParameterKey': '17PCFKeyPairPrivate'
                 }
             ]
         }
@@ -119,11 +127,13 @@ class TestSettings(unittest.TestCase):
 
     def test_pcf_input(self):
         self.assertEqual(self.settings.pcf_input_pivnettoken, "abc123")
-        self.assertEqual(self.settings.pcf_input_opsmankeypair, "my-key")
+        self.assertEqual(self.settings.pcf_input_pcfkeypair, "my-key")
         self.assertEqual(self.settings.pcf_input_adminemail, "admin@example.com")
         self.assertEqual(self.settings.pcf_input_elbprefix, "elb-pre-yo")
         self.assertEqual(self.settings.pcf_input_hostedzoneid, "my-zone-id")
         self.assertEqual(self.settings.pcf_input_domain, "pcf.example.com")
+        self.assertEqual(self.settings.pcf_input_opsmanageradminpassword, "monkey123")
+        self.assertEqual(self.settings.pcf_input_pcfkeypairprivate, "-----BEGIN RSA PRIVATE KEY-----foobarabc/q-----END RSA PRIVATE KEY-----")
 
     def test_parse_meta(self):
         self.assertEqual(self.settings.stack_name, "pcf-stack")
@@ -149,16 +159,13 @@ class TestSettings(unittest.TestCase):
 
     def test_parses_environment(self):
         self.assertEqual(self.settings.ops_manager_version, '99.0.1')
-        self.assertEqual(self.settings.opsman_url, 'https://some-random-ec2-domain.example.com')
-        self.assertEqual(self.settings.ssh_private_key, 'my-key-value-asdf-1234')
-
-        self.assertEqual(self.settings.opsman_password, 'monkey123')
+        self.assertEqual(self.settings.opsman_url, 'https://opsman.pcf.example.com')
 
     def test_default_values(self):
         self.assertEqual(self.settings.opsman_user, 'admin')
 
     def test_get_om_with_auth(self):
-        expected_om_command = "om -k --target https://some-random-ec2-domain.example.com --username 'admin' --password 'monkey123'"
+        expected_om_command = "om -k --target https://opsman.pcf.example.com --username 'admin' --password 'monkey123'"
         om_command = settings.get_om_with_auth(self.settings)
         self.assertEqual(om_command, expected_om_command)
 

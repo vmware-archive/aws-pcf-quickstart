@@ -23,9 +23,7 @@ class ProgressPercentage(object):
 
 def download_tiles(my_settings: settings.Settings):
     s3 = boto3.client(
-        service_name='s3', region_name=my_settings.tile_bucket_region,
-        aws_access_key_id=my_settings.tile_bucket_s3_access_key,
-        aws_secret_access_key=my_settings.tile_bucket_s3_secret_access_key
+        service_name='s3', region_name=my_settings.tile_bucket_region
     )
     for filename in [
         "cf-{}.pivotal".format(my_settings.ert_version),

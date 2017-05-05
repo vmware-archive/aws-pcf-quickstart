@@ -139,8 +139,8 @@ class Settings:
         return self.input_parameters["12PivnetToken"]
 
     @property
-    def pcf_input_opsmankeypair(self):
-        return self.input_parameters["14OpsManKeyPair"]
+    def pcf_input_pcfkeypair(self):
+        return self.input_parameters["14PCFKeyPair"]
 
     @property
     def pcf_input_adminemail(self):
@@ -158,20 +158,24 @@ class Settings:
     def pcf_input_domain(self):
         return self.input_parameters["15Domain"]
 
+    @property
+    def pcf_input_opsmanageradminpassword(self):
+        return self.input_parameters["16OpsManagerAdminPassword"]
+
+    @property
+    def pcf_input_pcfkeypairprivate(self):
+        return self.input_parameters["17PCFKeyPairPrivate"]
+
+    @property
+    def opsman_url(self):
+        return "https://opsman.{}".format(self.pcf_input_domain)
 
     def parse_environ(self):
         self.ops_manager_version = os.environ['OPS_MANAGER_VERSION']
         self.ert_version = os.environ['ERT_VERSION']
         self.aws_broker_version = os.environ['AWS_BROKER_VERSION']
-        # use elb url, output from cloudformation template
-        self.opsman_url = os.environ['OPS_MANAGER_URL']
-        # todo: password charset validation? generate instead?
-        self.opsman_password = os.environ['OPS_MANAGER_ADMIN_PASSWORD']
-        self.ssh_private_key = os.environ['SSH_PRIVATE_KEY']
         self.tile_bucket_region = os.environ['TILE_BUCKET_REGION']
         self.tile_bucket_s3_name = os.environ['TILE_BUCKET_S3_NAME']
-        self.tile_bucket_s3_access_key = os.environ['TILE_BUCKET_S3_ACCESS_KEY']
-        self.tile_bucket_s3_secret_access_key = os.environ['TILE_BUCKET_S3_SECRET_ACCESS_KEY']
 
     def get_s3_endpoint(self):
         stack_region = self.region
@@ -224,5 +228,5 @@ def get_om_with_auth(settings: Settings):
     return "om -k --target {url} --username '{username}' --password '{password}'".format(
         url=settings.opsman_url,
         username=settings.opsman_user,
-        password=settings.opsman_password
+        password=settings.pcf_input_opsmanageradminpassword
     )

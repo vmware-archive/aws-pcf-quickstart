@@ -44,11 +44,19 @@ resources:
     username: cholick
     password: {{access_token}}
 
-- name: quickstart-bucket
+- name: quickstart-versioned-release
   type: s3
   source:
     bucket: quickstart-testing
     regexp: quickstart-(.*).tgz
+    access_key_id: {{access_key_id}}
+    secret_access_key: {{secret_access_key}}
+
+- name: quickstart-latest-release
+  type: s3
+  source:
+    bucket: quickstart-testing
+    versioned_file: quickstart-release.tgz
     access_key_id: {{access_key_id}}
     secret_access_key: {{secret_access_key}}
 
@@ -86,7 +94,9 @@ jobs:
           mkdir -p quickstart/bin
           cp -r quickstart-repo/* quickstart
           cp om-release/om-linux quickstart/bin/om
+          chmod +x quickstart/bin/om
           cp pivnet-release/pivnet-linux* quickstart/bin/pivnet
+          chmod +x quickstart/bin/pivnet
           pushd quickstart
           mkdir -p vendor
           pip download --no-binary :all: --dest vendor -r requirements.txt
@@ -104,14 +114,19 @@ jobs:
       globs:
       - output/quickstart-*.tgz
 
-- name: quickstart-bucket
+- name: quickstart-versioned-release
   plan:
   - get: quickstart-release
     trigger: true
     passed:
       - test-pipeline
-  - put: quickstart-bucket
+  - put: quickstart-versioned-release
     params:
       file: quickstart-release/quickstart-*.tgz
+  - put: quickstart-latest-release
+    params:
+      file: quickstart-release/quickstart-*.tgz
+
+
 
 

@@ -17,8 +17,8 @@ def format_om_json_str(om_json: str):
 
 def config_opsman_auth(my_settings: settings.Settings):
     cmd = "om -k --target {0} configure-authentication --username '{1}' --password '{2}' --decryption-passphrase '{3}'".format(
-        my_settings.opsman_url, my_settings.opsman_user, my_settings.opsman_password,
-        my_settings.opsman_password
+        my_settings.opsman_url, my_settings.opsman_user, my_settings.pcf_input_opsmanageradminpassword,
+        my_settings.pcf_input_opsmanageradminpassword
     )
     return exponential_backoff(cmd, my_settings.debug)
 

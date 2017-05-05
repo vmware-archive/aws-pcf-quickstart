@@ -1,6 +1,5 @@
 requests>=2.13.0
 click>=6.7
 PyYAML>=3.1
-mock>=2.0
 jinja2>=2.9
 boto3>=1.4

@@ -11,7 +11,7 @@ class TestConfigureERT(unittest.TestCase):
         self.settings = Mock(Settings)
         self.settings.opsman_url = 'https://cf.example.com'
         self.settings.opsman_user = 'admin'
-        self.settings.opsman_password = 'monkey-123'
+        self.settings.pcf_input_opsmanageradminpassword = 'monkey-123'
         self.settings.stack_name = 'pcf-to-the-max-stack'
         self.settings.elb_prefix = 'to-the-max'
         self.settings.pcf_input_domain = 'example.com'

@@ -9,9 +9,6 @@ Parameters:
   01NATKeyPair:
     Type: AWS::EC2::KeyPair::KeyName
     Description: Select the SSH keypair to use for the NAT vm
-  14OpsManKeyPair:
-    Type: AWS::EC2::KeyPair::KeyName
-    Description: Select the SSH keypair to use for the NAT vm
   02NATInstanceType:
     Type: String
     AllowedValues:
@@ -83,6 +80,20 @@ Parameters:
   15Domain:
     Type: String
     Description: Root or subdomain for all Pivotal Cloud Foundry DNS entries (e.g. - example.com or pcf.example.com). Must match hosted zone.
+  16OpsManagerAdminPassword:
+    Type: String
+    NoEcho: 'true'
+    MinLength: '14'
+    AllowedPattern: "[\\w-_]*"
+    Description: Admin password to log on to OpsManager
+  14PCFKeyPair:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Select the SSH keypair to use for Ops Manager and all VMS in the deployment
+  17PCFKeyPairPrivate:
+    Type: String
+    Description: Private half of PCFKeyPair, used as the key for all instance deployed via PCF BOSH
+    AllowedPattern: "^[\n]?-----BEGIN RSA PRIVATE KEY-----([+=/\w\n]*)-----END RSA PRIVATE KEY-----$"
+
 Mappings:
   ## Mapping of OpsManager AMI in AWS Regions.
   01OpsManagerAMI:
@@ -364,6 +375,13 @@ Resources:
   ## This is the EC2 Ops Manager
   01OpsManagerInstance:
     Type: AWS::EC2::Instance
+    Metadata:
+      AWS::CloudFormation::Init:
+        config:
+          files:
+            /tmp/quickstart.tgz:
+              source: "https://s3.amazonaws.com/quickstart-testing/quickstart-release.tgz"
+              mode: "000644"
     Properties: 
       ImageId: !FindInMap [01OpsManagerAMI, !Ref "AWS::Region", 64]
       InstanceType: m4.large
@@ -383,19 +401,24 @@ Resources:
             - !GetAtt 01PCFBase.Outputs.PcfOpsManagerSecurityGroupId
           SubnetId: !GetAtt 01PCFBase.Outputs.PcfPublicSubnetId
       SourceDestCheck: true 
-      Tags: 
+      Tags:
         - Key: Name
           Value: "PCF Ops Manager"
       UserData: !Base64
         "Fn::Sub": |
           #!/bin/bash
-          PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
-          DEBIAN_FRONTEND=noninteractive apt-get update -y && apt-get upgrade -y
+          PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+          DEBIAN_FRONTEND=noninteractive apt-get update -y
           DEBIAN_FRONTEND=noninteractive apt-get install -y python3-dev python3-pip
           pip3 install --upgrade pip awscli
           mkdir -p /var/local/cloudformation/
           echo "{\"StackName\":\"${AWS::StackName}\",\"StackId\":\"${AWS::StackId}\",\"Region\",\"${AWS::Region}\"}" > /var/local/cloudformation/stack-meta.json
           chmod 0755 /var/local/cloudformation/stack-meta.json
+
+          tar -xvf /tmp/quickstart-release.tgz -C /home/ubuntu/
+          chown ubuntu:ubuntu /home/ubuntu/quickstart
+          su ubuntu -c /home/ubuntu/quickstart/bootstrap.sh
+
   02DNSOpsMan:
     Type: AWS::Route53::RecordSet
     Properties:
