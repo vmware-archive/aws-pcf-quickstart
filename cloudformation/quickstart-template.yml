@@ -382,14 +382,7 @@ Resources:
   ## This is the EC2 Ops Manager
   01OpsManagerInstance:
     Type: AWS::EC2::Instance
-    Metadata:
-      AWS::CloudFormation::Init:
-        config:
-          files:
-            /tmp/quickstart.tgz:
-              source: "https://s3.amazonaws.com/quickstart-testing/quickstart-release.tgz"
-              mode: "000644"
-    Properties: 
+    Properties:
       ImageId: !FindInMap [01OpsManagerAMI, !Ref "AWS::Region", 64]
       InstanceType: m4.large
       IamInstanceProfile: !GetAtt 01PCFBase.Outputs.PcfIamInstanceProfile
@@ -414,19 +407,24 @@ Resources:
       UserData: !Base64
         "Fn::Sub": |
           #!/bin/bash
-          (
-            PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-            DEBIAN_FRONTEND=noninteractive apt-get update -y
-            DEBIAN_FRONTEND=noninteractive apt-get install -y python3-dev python3-pip
-            pip3 install --upgrade pip awscli
-            mkdir -p /var/local/cloudformation/
-            echo "{\"StackName\":\"${AWS::StackName}\",\"StackId\":\"${AWS::StackId}\",\"Region\",\"${AWS::Region}\"}" > /var/local/cloudformation/stack-meta.json
-            chmod 0755 /var/local/cloudformation/stack-meta.json
+          set -ex
 
-            tar -xvf /tmp/quickstart-release.tgz -C /home/ubuntu/
-            chown ubuntu:ubuntu /home/ubuntu/quickstart
-            su ubuntu -c /home/ubuntu/quickstart/bootstrap.sh
-          ) 2>&1 | tee /var/log/user_data.log
+          PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+          DEBIAN_FRONTEND=noninteractive apt-get update -y
+          DEBIAN_FRONTEND=noninteractive apt-get install -y python3-dev python3-pip
+          pip3 install --upgrade pip awscli
+
+          mkdir -p /var/local/cloudformation/
+          echo "{\"StackName\":\"${AWS::StackName}\",\"StackId\":\"${AWS::StackId}\",\"Region\",\"${AWS::Region}\"}" > /var/local/cloudformation/stack-meta.json
+          chmod 0755 /var/local/cloudformation/stack-meta.json
+
+          wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 --tries=15 \
+              https://s3.amazonaws.com/quickstart-testing/quickstart-release.tgz \
+              -O /tmp/quickstart-release.tgz
+
+          tar -xvf /tmp/quickstart-release.tgz -C /home/ubuntu/
+          chown -R ubuntu:ubuntu /home/ubuntu/quickstart
+          su ubuntu -c /home/ubuntu/quickstart/bootstrap.sh
 
   02DNSOpsMan:
     Type: AWS::Route53::RecordSet
