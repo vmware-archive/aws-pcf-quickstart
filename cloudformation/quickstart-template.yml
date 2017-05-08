@@ -415,7 +415,7 @@ Resources:
           pip3 install --upgrade pip awscli
 
           mkdir -p /var/local/cloudformation/
-          echo "{\"StackName\":\"${AWS::StackName}\",\"StackId\":\"${AWS::StackId}\",\"Region\",\"${AWS::Region}\"}" > /var/local/cloudformation/stack-meta.json
+          echo "{\"StackName\":\"${AWS::StackName}\",\"StackId\":\"${AWS::StackId}\",\"Region\":\"${AWS::Region}\"}" > /var/local/cloudformation/stack-meta.json
           chmod 0755 /var/local/cloudformation/stack-meta.json
 
           wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 --tries=15 \
