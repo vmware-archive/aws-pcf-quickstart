@@ -16,6 +16,7 @@ class Settings:
         "PcfVpc",
         "PcfVmsSecurityGroupId",
         "PcfOpsManagerAdminPassword",
+        "PcfPrivateSSHKey",
         "PcfPrivateSubnetAvailabilityZone",
         "PcfPrivateSubnet2AvailabilityZone",
         "PcfPrivateSubnetId",
@@ -74,8 +75,12 @@ class Settings:
         return self.parameters["PcfVpc"]
 
     @property
-    def pcf_input_opsmanageradminpassword(self):
+    def pcf_opsmanageradminpassword(self):
         return self.parameters["PcfOpsManagerAdminPassword"]
+
+    @property
+    def pcf_pcfprivatesshkey(self):
+        return self.parameters["PcfPrivateSSHKey"]
 
     @property
     def pcf_vmssecuritygroupid(self):
@@ -154,10 +159,6 @@ class Settings:
         return self.input_parameters["15Domain"]
 
     @property
-    def pcf_input_pcfkeypairprivate(self):
-        return self.input_parameters["17PCFKeyPairPrivate"]
-
-    @property
     def opsman_url(self):
         return "https://opsman.{}".format(self.pcf_input_domain)
 
@@ -219,5 +220,5 @@ def get_om_with_auth(settings: Settings):
     return "om -k --target {url} --username '{username}' --password '{password}'".format(
         url=settings.opsman_url,
         username=settings.opsman_user,
-        password=settings.pcf_input_opsmanageradminpassword
+        password=settings.pcf_opsmanageradminpassword
     )

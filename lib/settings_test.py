@@ -32,10 +32,6 @@ input_params = {
                 {
                     'ParameterValue': 'pcf.example.com',
                     'ParameterKey': '15Domain'
-                },
-                {
-                    'ParameterValue': '-----BEGIN RSA PRIVATE KEY-----foobarabc/q-----END RSA PRIVATE KEY-----',
-                    'ParameterKey': '17PCFKeyPairPrivate'
                 }
             ]
         }
@@ -79,6 +75,11 @@ params_store_output = {
             'Type': 'String',
             'Value': 'monkey123',
             'Name': 'PcfOpsManagerAdminPassword'
+        },
+        {
+            'Type': 'String',
+            'Value': '-----BEGIN RSA PRIVATE KEY-----foobarabc/q-----END RSA PRIVATE KEY-----',
+            'Name': 'PcfPrivateSSHKey'
         }
     ]
 }
@@ -133,8 +134,7 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(self.settings.pcf_input_elbprefix, "elb-pre-yo")
         self.assertEqual(self.settings.pcf_input_hostedzoneid, "my-zone-id")
         self.assertEqual(self.settings.pcf_input_domain, "pcf.example.com")
-        self.assertEqual(self.settings.pcf_input_opsmanageradminpassword, "monkey123")
-        self.assertEqual(self.settings.pcf_input_pcfkeypairprivate, "-----BEGIN RSA PRIVATE KEY-----foobarabc/q-----END RSA PRIVATE KEY-----")
+        self.assertEqual(self.settings.pcf_opsmanageradminpassword, "monkey123")
 
     def test_parse_meta(self):
         self.assertEqual(self.settings.stack_name, "pcf-stack")
@@ -157,6 +157,8 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(self.settings.pcf_rdspassword, "monkey123")
         self.assertEqual(self.settings.pcf_privatesubnetavailabilityzone, "canada-1a")
         self.assertEqual(self.settings.pcf_privatesubnet2availabilityzone, "canada-1b")
+        self.assertEqual(self.settings.pcf_pcfprivatesshkey, "-----BEGIN RSA PRIVATE KEY-----foobarabc/q-----END RSA PRIVATE KEY-----")
+
 
     def test_parses_environment(self):
         self.assertEqual(self.settings.ops_manager_version, '99.0.1')

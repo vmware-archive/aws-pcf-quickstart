@@ -15,7 +15,7 @@ class TestOmManager(unittest.TestCase):
         self.settings = Mock(Settings)
         self.settings.opsman_url = 'https://cf.example.com'
         self.settings.opsman_user = 'admin'
-        self.settings.pcf_input_opsmanageradminpassword = 'monkey-123'
+        self.settings.pcf_opsmanageradminpassword = 'monkey-123'
         self.settings.debug = False
 
     def to_bytes(self, str: str):

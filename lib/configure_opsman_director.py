@@ -15,7 +15,7 @@ def configure_opsman_director(my_settings: Settings):
         "vpc_id": my_settings.pcf_vpc,
         "security_group": my_settings.pcf_vmssecuritygroupid,
         "key_pair_name": my_settings.pcf_input_pcfkeypair,
-        "ssh_private_key": my_settings.pcf_input_pcfkeypairprivate.replace("\n", "\\n"),
+        "ssh_private_key": my_settings.pcf_pcfprivatesshkey.replace("\n", "\\n"),
         "region": my_settings.region,
         "encrypted": "false",
         "vpc_private_subnet_id": my_settings.pcf_privatesubnetid,
