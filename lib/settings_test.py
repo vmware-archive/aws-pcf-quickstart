@@ -34,10 +34,6 @@ input_params = {
                     'ParameterKey': '15Domain'
                 },
                 {
-                    'ParameterValue': 'monkey123',
-                    'ParameterKey': '16OpsManagerAdminPassword'
-                },
-                {
                     'ParameterValue': '-----BEGIN RSA PRIVATE KEY-----foobarabc/q-----END RSA PRIVATE KEY-----',
                     'ParameterKey': '17PCFKeyPairPrivate'
                 }
@@ -78,6 +74,11 @@ params_store_output = {
             'Type': 'String',
             'Value': 'canada-1b',
             'Name': 'PcfPrivateSubnet2AvailabilityZone'
+        },
+        {
+            'Type': 'String',
+            'Value': 'monkey123',
+            'Name': 'PcfOpsManagerAdminPassword'
         }
     ]
 }

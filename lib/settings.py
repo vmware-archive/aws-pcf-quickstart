@@ -11,12 +11,11 @@ class Settings:
     paramater_store_keys = [
         "PcfElbDnsName",
         "PcfElasticRuntimeS3BuildpacksBucket",
-        "PcfRdsPassword",
-        "PcfRdsUsername",
         "PcfIamUserAccessKey",
         "PcfIamUserSecretAccessKey",
         "PcfVpc",
         "PcfVmsSecurityGroupId",
+        "PcfOpsManagerAdminPassword",
         "PcfPrivateSubnetAvailabilityZone",
         "PcfPrivateSubnet2AvailabilityZone",
         "PcfPrivateSubnetId",
@@ -63,14 +62,6 @@ class Settings:
         return self.parameters["PcfElasticRuntimeS3BuildpacksBucket"]
 
     @property
-    def pcf_rdspassword(self):
-        return self.parameters["PcfRdsPassword"]
-
-    @property
-    def pcf_rdsusername(self):
-        return self.parameters["PcfRdsUsername"]
-
-    @property
     def pcf_iamuseraccesskey(self):
         return self.parameters["PcfIamUserAccessKey"]
 
@@ -81,6 +72,10 @@ class Settings:
     @property
     def pcf_vpc(self):
         return self.parameters["PcfVpc"]
+
+    @property
+    def pcf_input_opsmanageradminpassword(self):
+        return self.parameters["PcfOpsManagerAdminPassword"]
 
     @property
     def pcf_vmssecuritygroupid(self):
@@ -157,10 +152,6 @@ class Settings:
     @property
     def pcf_input_domain(self):
         return self.input_parameters["15Domain"]
-
-    @property
-    def pcf_input_opsmanageradminpassword(self):
-        return self.input_parameters["16OpsManagerAdminPassword"]
 
     @property
     def pcf_input_pcfkeypairprivate(self):

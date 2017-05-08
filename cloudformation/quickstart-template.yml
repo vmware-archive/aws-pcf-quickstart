@@ -371,6 +371,13 @@ Resources:
       Description: Misc
       Type: String
       Value: !GetAtt 01PCFBase.Outputs.PcfPublicSubnetAvailabilityZone2
+  PcfOpsManagerAdminPassword:
+    Type: "AWS::SSM::Parameter"
+    Properties:
+      Name: !Sub "${AWS::StackName}.PcfOpsManagerAdminPassword"
+      Description: Misc
+      Type: String
+      Value: !Ref 16OpsManagerAdminPassword
   PcfPrivateSSHKey:
     Type: "AWS::SSM::Parameter"
     Properties:
