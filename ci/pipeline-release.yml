@@ -62,7 +62,7 @@ resources:
 
 
 jobs:
-- name: test-pipeline
+- name: github-release
   plan:
   - get: pivnet-release
   - get: om-release
@@ -70,7 +70,7 @@ jobs:
   - get: version
     params:
       bump: patch
-  - task: test-pipeline
+  - task: build-release
     config:
       platform: linux
       image_resource:
@@ -104,7 +104,6 @@ jobs:
 
           mkdir -p output
           tar -czvf output/quickstart-`cat version/version`.tgz quickstart
-
   - put: version
     params: {file: version/version}
   - put: quickstart-release
@@ -119,14 +118,10 @@ jobs:
   - get: quickstart-release
     trigger: true
     passed:
-      - test-pipeline
+      - github-release
   - put: quickstart-versioned-release
     params:
       file: quickstart-release/quickstart-*.tgz
   - put: quickstart-latest-release
     params:
       file: quickstart-release/quickstart-*.tgz
-
-
-
-
