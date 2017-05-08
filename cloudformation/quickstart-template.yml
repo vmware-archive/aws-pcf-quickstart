@@ -456,4 +456,4 @@ Resources:
 Outputs:
   OpsManager:
     Description: Url For Logging into OpsManager
-    Value: !Sub "https://${01OpsManagerInstance.PublicDnsName}"
+    Value: !Join [ "", [ "https://opsman.", !Ref 15Domain] ]
