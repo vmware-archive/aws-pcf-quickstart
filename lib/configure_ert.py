@@ -47,7 +47,7 @@ def configure_ert_resources(my_settings: Settings):
         ert_resource_template = Template(f.read())
     ert_resource_config = om_manager.format_om_json_str(ert_resource_template.render(ert_resource_ctx))
     cmd = "{om_with_auth} configure-product -n cf -pr '{ert_resources}'".format(
-        om_with_auth=settings.get_om_with_auth(my_settings),
+        om_with_auth=om_manager.get_om_with_auth(my_settings),
         ert_resources=ert_resource_config
     )
     return om_manager.exponential_backoff(cmd, my_settings.debug)
@@ -72,7 +72,7 @@ def configure_ert_config(my_settings: Settings):
         ert_template = Template(f.read())
     ert_config = om_manager.format_om_json_str(ert_template.render(ert_config_template_ctx))
     cmd = "{om_with_auth} configure-product -n cf -p '{ert_config}'".format(
-        om_with_auth=settings.get_om_with_auth(my_settings),
+        om_with_auth=om_manager.get_om_with_auth(my_settings),
         ert_config=ert_config
     )
     return om_manager.exponential_backoff(cmd, my_settings.debug)
@@ -87,7 +87,7 @@ def configure_tile_az(my_settings: Settings, tile_name: str):
         az_template = Template(f.read())
     az_config = om_manager.format_om_json_str(az_template.render(az_template_ctx))
     cmd = "{om_with_auth} configure-product -n {tile_name} -pn '{az_config}'".format(
-        om_with_auth=settings.get_om_with_auth(my_settings),
+        om_with_auth=om_manager.get_om_with_auth(my_settings),
         tile_name=tile_name,
         az_config=az_config
     )

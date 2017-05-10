@@ -3,6 +3,7 @@ import unittest
 
 from mock import patch, mock_open, Mock
 
+import om_manager
 import settings
 
 input_params = {
@@ -167,10 +168,6 @@ class TestSettings(unittest.TestCase):
     def test_default_values(self):
         self.assertEqual(self.settings.opsman_user, 'admin')
 
-    def test_get_om_with_auth(self):
-        expected_om_command = "om -k --target https://opsman.pcf.example.com --username 'admin' --password 'monkey123'"
-        om_command = settings.get_om_with_auth(self.settings)
-        self.assertEqual(om_command, expected_om_command)
 
     def test_get_s3_endpoint(self):
         self.assertEqual(self.settings.get_s3_endpoint(), "s3-canada-west-1.amazonaws.com")

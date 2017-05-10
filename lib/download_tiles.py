@@ -1,4 +1,5 @@
 import threading
+import subprocess
 
 import boto3
 import hashlib
@@ -38,16 +39,27 @@ def download_tiles(my_settings: settings.Settings):
 
 
 def download_tile(filename, my_settings, s3):
-    sha256_filename = filename + '.sha256'
+    # temp workaround, since boto seems to need auth
     dest_filename = "/tmp/{}".format(filename)
-    dest_sha256_filename = "/tmp/{}".format(sha256_filename)
-    s3.download_file(my_settings.tile_bucket_s3_name, sha256_filename, dest_sha256_filename,
-                     Callback=ProgressPercentage(dest_sha256_filename))
-    s3.download_file(my_settings.tile_bucket_s3_name, filename, dest_filename,
-                     Callback=ProgressPercentage(dest_filename))
-    with open(dest_sha256_filename, 'r') as f:
-        sha_256 = f.read()
-    return verify_sha256(dest_filename, sha_256)
+    cmd = "wget https://s3-us-west-2.amazonaws.com/pcf-quickstart-tiles/{} -O {}".format(
+        filename, dest_filename
+    )
+    return subprocess.call(cmd, shell=True)
+
+    # sha256_filename = filename + '.sha256'
+    # dest_filename = "/tmp/{}".format(filename)
+    # dest_sha256_filename = "/tmp/{}".format(sha256_filename)
+    # s3.download_file(
+    #     my_settings.tile_bucket_s3_name, sha256_filename, dest_sha256_filename,
+    #     Callback=ProgressPercentage(dest_sha256_filename)
+    # )
+    # s3.download_file(
+    #     my_settings.tile_bucket_s3_name, filename, dest_filename,
+    #     Callback=ProgressPercentage(dest_filename)
+    # )
+    # with open(dest_sha256_filename, 'r') as f:
+    #     sha_256 = f.read()
+    # return verify_sha256(dest_filename, sha_256)
 
 
 def verify_sha256(filename, sha256):

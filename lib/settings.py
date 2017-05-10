@@ -216,9 +216,3 @@ def __chunk_generator(l, n):
         yield l[i:i + n]
 
 
-def get_om_with_auth(settings: Settings):
-    return "om -k --target {url} --username '{username}' --password '{password}'".format(
-        url=settings.opsman_url,
-        username=settings.opsman_user,
-        password=settings.pcf_opsmanageradminpassword
-    )

@@ -34,7 +34,7 @@ class TestConfigureOpsManDirector(unittest.TestCase):
             self.assertEqual(mock_run_command.call_count, 3)
 
     def test_fully_configures(self):
-        with patch('settings.get_om_with_auth') as mock_util_get_om_with_auth:
+        with patch('om_manager.get_om_with_auth') as mock_util_get_om_with_auth:
             mock_util_get_om_with_auth.return_value = "foo"
             with patch('om_manager.run_command') as mock_call:
                 mock_call.return_value = ("", "", 0)

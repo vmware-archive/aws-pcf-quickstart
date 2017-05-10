@@ -46,18 +46,18 @@ class TestConfigureERT(unittest.TestCase):
                         self.assertEqual(1, exit_code)
 
     @patch('om_manager.exponential_backoff')
-    @patch('settings.get_om_with_auth')
-    def test_configure_ert_resources(self, mock_util_get_om_with_auth, mock_backoff):
-        mock_util_get_om_with_auth.return_value = "foo"
+    @patch('om_manager.get_om_with_auth')
+    def test_configure_ert_resources(self, mock_get_om_with_auth, mock_backoff):
+        mock_get_om_with_auth.return_value = "foo"
         configure_ert.configure_ert_resources(self.settings)
 
         cmd = mock_backoff.call_args[0][0]
         self.assertTrue(cmd.startswith("foo configure-product -n cf -pr"))
 
     @patch('om_manager.exponential_backoff')
-    @patch('settings.get_om_with_auth')
-    def test_configure_ert_config(self, mock_util_get_om_with_auth, mock_backoff):
-        mock_util_get_om_with_auth.return_value = "foo"
+    @patch('om_manager.get_om_with_auth')
+    def test_configure_ert_config(self, mock_get_om_with_auth, mock_backoff):
+        mock_get_om_with_auth.return_value = "foo"
         configure_ert.configure_ert_config(self.settings)
         cmd = mock_backoff.call_args[0][0]
         self.assertTrue(cmd.startswith("foo configure-product -n cf -p '{"))

@@ -8,6 +8,8 @@ import os
 import settings
 
 # todo: spin up a class, don't use package level vars
+from settings import Settings
+
 max_retries = 5
 
 
@@ -54,21 +56,21 @@ def run_command(cmd: str, debug_mode):
 
 def apply_changes(my_settings: settings.Settings):
     cmd = "{get_om_with_auth} apply-changes".format(
-        get_om_with_auth=settings.get_om_with_auth(my_settings)
+        get_om_with_auth=get_om_with_auth(my_settings)
     )
     return exponential_backoff(cmd, my_settings.debug)
 
 
 def curl_get(my_settings: settings.Settings, path: str):
     cmd = "{get_om_with_auth} curl --path {path}".format(
-        get_om_with_auth=settings.get_om_with_auth(my_settings), path=path
+        get_om_with_auth=get_om_with_auth(my_settings), path=path
     )
     return run_command(cmd, my_settings.debug)
 
 
 def curl_payload(my_settings: settings.Settings, path: str, data: str, method: str):
     cmd = "{get_om_with_auth} curl --path {path} --request {method} --data '{data}'".format(
-        get_om_with_auth=settings.get_om_with_auth(my_settings), path=path,
+        get_om_with_auth=get_om_with_auth(my_settings), path=path,
         method=method, data=data
     )
     return run_command(cmd, my_settings.debug)
@@ -85,7 +87,7 @@ def is_recoverable_error(err: str):
 
 def stage_product(product_name: str, my_settings: settings.Settings):
     cmd = "{om_with_auth} curl --path /api/v0/available_products".format(
-        om_with_auth=settings.get_om_with_auth(my_settings)
+        om_with_auth=get_om_with_auth(my_settings)
     )
     p = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True)
     out, err = p.communicate()
@@ -98,7 +100,7 @@ def stage_product(product_name: str, my_settings: settings.Settings):
 
     # ok to call multiple times, no-op when already staged
     cmd = "{om_with_auth} stage-product -p {product_name} -v {version}".format(
-        om_with_auth=settings.get_om_with_auth(my_settings),
+        om_with_auth=get_om_with_auth(my_settings),
         product_name=product_name,
         version=cf_version
     )
@@ -107,7 +109,7 @@ def stage_product(product_name: str, my_settings: settings.Settings):
 
 def upload_stemcell(my_settings: settings.Settings, path: str):
     cmd = "{om_with_auth} upload-stemcell -s '{path}'".format(
-        om_with_auth=settings.get_om_with_auth(my_settings), path=path
+        om_with_auth=get_om_with_auth(my_settings), path=path
     )
     return exponential_backoff(cmd, my_settings.debug)
 
@@ -118,10 +120,18 @@ def upload_assets(my_settings: settings.Settings, path: str):
             print("uploading product {0}".format(tile))
 
             cmd = "{om_with_auth} -r 3600 upload-product -p '{path}'".format(
-                om_with_auth=settings.get_om_with_auth(my_settings), path=os.path.join(path, tile))
+                om_with_auth=get_om_with_auth(my_settings), path=os.path.join(path, tile))
 
             exit_code = exponential_backoff(cmd, my_settings.debug)
             if exit_code != 0:
                 return exit_code
 
     return 0
+
+
+def get_om_with_auth(settings: Settings):
+    return "om -k --target {url} --username '{username}' --password '{password}'".format(
+        url=settings.opsman_url,
+        username=settings.opsman_user,
+        password=settings.pcf_opsmanageradminpassword
+    )

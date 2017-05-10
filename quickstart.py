@@ -8,7 +8,8 @@ import click
 PATH = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, os.path.join(PATH, 'lib'))
 
-from lib import settings, om_manager, configure_opsman_director, download_tiles, configure_ert
+from lib import settings, om_manager, configure_opsman_director, download_tiles, configure_ert, \
+    delete_everything
 
 
 @click.group()
@@ -62,6 +63,12 @@ def config_ert(ctx):
 @click.pass_context
 def curl(ctx, path):
     sys.exit(time_cmd(om_manager.curl_get, ctx.obj['settings'], path))
+
+
+@cli.command('delete-everything')
+@click.pass_context
+def delete(ctx):
+    sys.exit(time_cmd(delete_everything.delete_everything, ctx.obj['settings']))
 
 
 def time_cmd(cmd, *args):

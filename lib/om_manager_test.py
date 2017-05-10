@@ -33,7 +33,7 @@ class TestOmManager(unittest.TestCase):
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
         )
 
-    @patch('settings.get_om_with_auth')
+    @patch('om_manager.get_om_with_auth')
     @patch('om_manager.run_command')
     def test_curl_get(self, mock_run_command, mock_get_om_with_auth):
         mock_get_om_with_auth.return_value = "om plus some auth"
@@ -43,7 +43,7 @@ class TestOmManager(unittest.TestCase):
             "om plus some auth curl --path /api/foo", False
         )
 
-    @patch('settings.get_om_with_auth')
+    @patch('om_manager.get_om_with_auth')
     @patch('om_manager.run_command')
     def test_curl_payload(self, mock_run_command, mock_get_om_with_auth):
         mock_get_om_with_auth.return_value = "om plus some auth"
@@ -125,3 +125,9 @@ class TestOmManager(unittest.TestCase):
 
         self.assertEqual(mock_print.call_count, 2)
         self.assertEqual(mock_print.call_args_list[0][0][0], "Debug mode. Would have run command")
+
+
+    def test_get_om_with_auth(self):
+        expected_om_command = "om -k --target https://cf.example.com --username 'admin' --password 'monkey-123'"
+        om_command = om_manager.get_om_with_auth(self.settings)
+        self.assertEqual(om_command, expected_om_command)

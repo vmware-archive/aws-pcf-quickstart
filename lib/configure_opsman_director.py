@@ -41,19 +41,19 @@ def configure_opsman_director(my_settings: Settings):
 
     commands = []
     commands.append("{om_with_auth} configure-bosh --iaas-configuration '{iaas_config}'".format(
-        om_with_auth=settings.get_om_with_auth(my_settings), iaas_config=iaas_config
+        om_with_auth=om_manager.get_om_with_auth(my_settings), iaas_config=iaas_config
     ))
     commands.append("{om_with_auth} configure-bosh --director-configuration '{director_config}'".format(
-        om_with_auth=settings.get_om_with_auth(my_settings), director_config=director_config
+        om_with_auth=om_manager.get_om_with_auth(my_settings), director_config=director_config
     ))
     commands.append("{om_with_auth} configure-bosh --az-configuration '{az_config}'".format(
-        om_with_auth=settings.get_om_with_auth(my_settings), az_config=az_config
+        om_with_auth=om_manager.get_om_with_auth(my_settings), az_config=az_config
     ))
     commands.append("{om_with_auth} configure-bosh --networks-configuration '{network_config}'".format(
-        om_with_auth=settings.get_om_with_auth(my_settings), network_config=network_config
+        om_with_auth=om_manager.get_om_with_auth(my_settings), network_config=network_config
     ))
     commands.append("{om_with_auth} configure-bosh --network-assignment '{network_assignment}'".format(
-        om_with_auth=settings.get_om_with_auth(my_settings), network_assignment=network_assignment_config
+        om_with_auth=om_manager.get_om_with_auth(my_settings), network_assignment=network_assignment_config
     ))
     for cmd in commands:
         out, err, exit_code = om_manager.run_command(cmd, my_settings.debug)
