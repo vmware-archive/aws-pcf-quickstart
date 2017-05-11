@@ -3,7 +3,6 @@ import json
 from jinja2 import Template
 
 import om_manager
-import settings
 from settings import Settings
 
 

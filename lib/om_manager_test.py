@@ -126,7 +126,6 @@ class TestOmManager(unittest.TestCase):
         self.assertEqual(mock_print.call_count, 2)
         self.assertEqual(mock_print.call_args_list[0][0][0], "Debug mode. Would have run command")
 
-
     def test_get_om_with_auth(self):
         expected_om_command = "om -k --target https://cf.example.com --username 'admin' --password 'monkey-123'"
         om_command = om_manager.get_om_with_auth(self.settings)

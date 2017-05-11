@@ -1,12 +1,10 @@
 import json
+import os
 import subprocess
 import time
 from subprocess import Popen, PIPE
 
-import os
-
 import settings
-
 # todo: spin up a class, don't use package level vars
 from settings import Settings
 

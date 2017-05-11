@@ -1,7 +1,7 @@
+import tempfile
 import unittest
 
 import boto3
-import tempfile
 from mock import Mock, patch, mock_open
 
 import download_tiles

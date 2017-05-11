@@ -1,8 +1,8 @@
-import threading
+import hashlib
 import subprocess
+import threading
 
 import boto3
-import hashlib
 
 import settings
 

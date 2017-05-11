@@ -10,12 +10,12 @@ metadata_file = "/var/local/cloudformation/stack-meta.json"
 class Settings:
     paramater_store_keys = [
         "PcfElbDnsName",
-        "PcfElasticRuntimeS3BuildpacksBucket",
         "PcfIamUserAccessKey",
         "PcfIamUserSecretAccessKey",
         "PcfVpc",
         "PcfVmsSecurityGroupId",
         "PcfOpsManagerAdminPassword",
+        "PcfOpsManagerS3Bucket",
         "PcfPrivateSSHKey",
         "PcfPrivateSubnetAvailabilityZone",
         "PcfPrivateSubnet2AvailabilityZone",
@@ -77,6 +77,10 @@ class Settings:
     @property
     def pcf_opsmanageradminpassword(self):
         return self.parameters["PcfOpsManagerAdminPassword"]
+
+    @property
+    def pcf_opsmanagers3bucket(self):
+        return self.parameters["PcfOpsManagerS3Bucket"]
 
     @property
     def pcf_pcfprivatesshkey(self):
@@ -214,5 +218,3 @@ def chunk(l, n):
 def __chunk_generator(l, n):
     for i in range(0, len(l), n):
         yield l[i:i + n]
-
-

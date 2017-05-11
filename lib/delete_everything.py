@@ -1,6 +1,8 @@
-from settings import Settings
-import om_manager
 import boto3
+import botocore.exceptions
+
+import om_manager
+from settings import Settings
 
 
 def delete_everything(my_settings: Settings):
@@ -20,15 +22,29 @@ def delete_everything(my_settings: Settings):
     )
 
     buckets = [
+        my_settings.pcf_opsmanagers3bucket,
         my_settings.pcf_elasticruntimes3buildpacksbucket,
         my_settings.pcf_elasticruntimes3dropletsbucket,
         my_settings.pcf_elasticruntimes3packagesbucket,
         my_settings.pcf_elasticruntimes3resourcesbucket
     ]
 
-    for bucket in buckets:
+    for bucket_name in buckets:
         try:
-            s3.delete_bucket(Bucket=bucket)
+            contents = s3.list_objects_v2(Bucket=bucket_name).get('Contents')
+            while contents is not None:
+                delete_keys = [{'Key': o.get('Key')} for o in contents]
+                s3.delete_objects(Bucket=bucket_name, Delete={
+                    'Objects': delete_keys
+                })
+                contents = s3.list_objects_v2(Bucket=bucket_name).get('Contents')
+            s3.delete_bucket(Bucket=bucket_name)
+        except botocore.exceptions.ClientError as e:
+            error = e.response.get('Error')
+            if error and error.get('Code') == 'NoSuchBucket':
+                continue
+            else:
+                raise e
         except Exception as e:
             print(e)
             return 1
