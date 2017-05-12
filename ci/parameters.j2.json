@@ -1,4 +1,73 @@
 [  {
-    "ParameterKey": "{{foo}}"
+    "ParameterKey": "03OpsManagerIngress",
+    "ParameterValue": "0.0.0.0/0"
+  },
+  {
+    "ParameterKey": "17PCFKeyPairPrivate",
+    "ParameterValue": "{{pcfkeypairprivate}}"
+  },
+  {
+    "ParameterKey": "09CloudFoundryTemplate",
+    "ParameterValue": "https://s3-us-west-2.amazonaws.com/mombergm.us-west-2/pivotal/qs/cloud-formation.json"
+  },
+  {
+    "ParameterKey": "06RdsPassword",
+    "ParameterValue": "{{password}}"
+  },
+  {
+    "ParameterKey": "14HostedZoneId",
+    "ParameterValue": "{{hostedzoneid}}"
+  },
+  {
+    "ParameterKey": "04RdsDBName",
+    "ParameterValue": "bosh"
+  },
+  {
+    "ParameterKey": "01NATKeyPair",
+    "ParameterValue": "{{natkeypair}}"
+  },
+  {
+    "ParameterKey": "11AllowHttpOnElb",
+    "ParameterValue": "true"
+  },
+  {
+    "ParameterKey": "07SSLCertificateARN",
+    "ParameterValue": "{{sslcertificatearn}}"
+  },
+  {
+    "ParameterKey": "16OpsManagerAdminPassword",
+    "ParameterValue": "{{password}}"
+  },
+  {
+    "ParameterKey": "15Domain",
+    "ParameterValue": "{{domain}}"
+  },
+  {
+    "ParameterKey": "08OpsManagerTemplate",
+    "ParameterValue": "https://s3-us-west-2.amazonaws.com/mombergm.us-west-2/pivotal/qs/ops-manager.json"
+  },
+  {
+    "ParameterKey": "10ElbPrefix",
+    "ParameterValue": "my-pcf-elb"
+  },
+  {
+    "ParameterKey": "14PCFKeyPair",
+    "ParameterValue": "{{natkeypair}}"
+  },
+  {
+    "ParameterKey": "05RdsUsername",
+    "ParameterValue": "admin"
+  },
+  {
+    "ParameterKey": "13AdminEmail",
+    "ParameterValue": "noreply@pivotal.io"
+  },
+  {
+    "ParameterKey": "02NATInstanceType",
+    "ParameterValue": "t2.medium"
+  },
+  {
+    "ParameterKey": "12PivnetToken",
+    "ParameterValue": "{{pivnettoken}}"
   }
 ]
