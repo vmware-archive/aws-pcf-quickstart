@@ -13,15 +13,15 @@ pivnettoken = os.environ['AWS_CF_PIVNETTOKEN'],
 
 with open('ci/parameters.j2.json', 'r') as template_file:
     template = template_file.read()
-    rendered = jinja2.Template(template).render(
-        pcfkeypairprivate='{{aws_cf_pcfkeypairprivate}}',
-        password='{{aws_cf_password}}',
-        domain='{{aws_cf_domain}}',
-        hostedzoneid='{{aws_cf_hostedzoneid}}',
-        sslcertificatearn='{{aws_cf_sslcertificatearn}}',
-        natkeypair='{{aws_cf_natkeypair}}',
-        pivnettoken='{{aws_cf_pivnettoken}}'
-    )
+    rendered = jinja2.Template(template).render({
+        "pcfkeypairprivate": pcfkeypairprivate,
+        "password": password,
+        "domain": domain,
+        "hostedzoneid": hostedzoneid,
+        "sslcertificatearn": sslcertificatearn,
+        "natkeypair": natkeypair,
+        "pivnettoken": pivnettoken
+    })
 
     print("---------------------------")
     print(rendered)
