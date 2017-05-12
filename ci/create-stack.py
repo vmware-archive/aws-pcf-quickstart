@@ -1,19 +1,18 @@
 import jinja2
-from jinja2 import Template
 import os
 import sys
 from subprocess import call
 
-pcfkeypairprivate = os.environ['AWS_CF_PCFKEYPAIRPRIVATE'],
-password = os.environ['AWS_CF_PASSWORD'],
-domain = os.environ['AWS_CF_DOMAIN'],
-hostedzoneid = os.environ['AWS_CF_HOSTEDZONEID'],
-sslcertificatearn = os.environ['AWS_CF_SSLCERTIFICATEARN'],
-natkeypair = os.environ['AWS_CF_NATKEYPAIR'],
-pivnettoken = os.environ['AWS_CF_PIVNETTOKEN'],
+pcfkeypairprivate = os.environ['AWS_CF_PCFKEYPAIRPRIVATE']
+password = os.environ['AWS_CF_PASSWORD']
+domain = os.environ['AWS_CF_DOMAIN']
+hostedzoneid = os.environ['AWS_CF_HOSTEDZONEID']
+sslcertificatearn = os.environ['AWS_CF_SSLCERTIFICATEARN']
+natkeypair = os.environ['AWS_CF_NATKEYPAIR']
+pivnettoken = os.environ['AWS_CF_PIVNETTOKEN']
 
 with open('ci/parameters.j2.json', 'r') as template_file:
-    template = Template(template_file.read())
+    template = jinja2.Template(template_file.read())
     ctx = {
         "pcfkeypairprivate": pcfkeypairprivate,
         "password": password,
@@ -23,6 +22,8 @@ with open('ci/parameters.j2.json', 'r') as template_file:
         "natkeypair": natkeypair,
         "pivnettoken": pivnettoken
     }
+    print (ctx)
+
     rendered = template.render(ctx)
 
     print("---------------------------")
