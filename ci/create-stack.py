@@ -22,13 +22,7 @@ with open('ci/parameters.j2.json', 'r') as template_file:
         "natkeypair": natkeypair,
         "pivnettoken": pivnettoken
     }
-    print (ctx)
-
     rendered = template.render(ctx)
-
-    print("---------------------------")
-    print(rendered)
-    print("---------------------------")
 
     with open('parameters.json', 'w') as rendered_file:
         rendered_file.write(rendered)
