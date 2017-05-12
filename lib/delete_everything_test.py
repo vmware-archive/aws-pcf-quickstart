@@ -19,15 +19,11 @@ class TestDeleteEverything(unittest.TestCase):
         self.settings.pcf_iam_secret_access_key = 'key-secret'
         self.settings.debug = False
 
-    @patch('boto3.client')
+    @patch('delete_everything.expire_bucket')
     @patch('om_manager.exponential_backoff')
     @patch('om_manager.get_om_with_auth')
-    def test_om_delete_installation(self, mock_auth, mock_backoff, mock_client_constructor):
+    def test_om_delete_installation(self, mock_auth, mock_backoff, mock_expire_bucket):
         mock_backoff.return_value = 0
-
-        mock_client = Mock()
-        mock_client.list_objects_v2.return_value = {}
-        mock_client_constructor.return_value = mock_client
 
         mock_auth.return_value = "om-with-auth-for-realz"
 
@@ -37,33 +33,59 @@ class TestDeleteEverything(unittest.TestCase):
             "om-with-auth-for-realz delete-installation", False
         )
 
-    @patch('boto3.client')
+    @patch('delete_everything.expire_bucket')
     @patch('om_manager.exponential_backoff')
     @patch('om_manager.get_om_with_auth')
-    def test_om_delete_installation_fails(self, mock_auth, mock_backoff, mock_client_constructor):
+    def test_om_delete_installation_fails(self, mock_auth, mock_backoff, mock_expire_bucket):
         mock_backoff.return_value = 1
-        mock_client = Mock()
-        mock_client_constructor.return_value = mock_client
 
         return_code = delete_everything.delete_everything(self.settings)
 
         self.assertEqual(return_code, 1)
-        mock_client.delete_bucket.assert_not_called()
+
+    @patch('delete_everything.delete_bucket')
+    @patch('delete_everything.expire_bucket')
+    @patch('om_manager.exponential_backoff')
+    @patch('om_manager.get_om_with_auth')
+    def test_expire_buckets(self, mock_auth, mock_backoff, mock_expire_bucket, mock_delete_bucket):
+        mock_backoff.return_value = 0
+
+        return_code = delete_everything.delete_everything(self.settings)
+
+        self.assertEqual(return_code, 0)
+        self.assertEqual(mock_expire_bucket.call_count, 5)
+        mock_expire_bucket.assert_called_with(
+            self.settings, "bucket-rsc"
+        )
+        self.assertEqual(mock_delete_bucket.call_count, 0)
+
+    @patch('delete_everything.delete_bucket')
+    @patch('delete_everything.expire_bucket')
+    @patch('om_manager.exponential_backoff')
+    @patch('om_manager.get_om_with_auth')
+    def test_expire_buckets(self, mock_auth, mock_backoff, mock_expire_bucket, mock_delete_bucket):
+        mock_backoff.return_value = 0
+
+        return_code = delete_everything.delete_everything(self.settings, True)
+
+        self.assertEqual(return_code, 0)
+        self.assertEqual(mock_delete_bucket.call_count, 5)
+        mock_delete_bucket.assert_called_with(
+            self.settings, "bucket-rsc"
+        )
+        self.assertEqual(mock_expire_bucket.call_count, 0)
 
     @patch('boto3.client')
     @patch('om_manager.exponential_backoff')
     @patch('om_manager.get_om_with_auth')
     def test_delete_buckets(self, mock_auth, mock_backoff, mock_client_constructor):
-        mock_backoff.return_value = 0
-
         mock_client = Mock()
         mock_client.list_objects_v2.return_value = {}
         mock_client_constructor.return_value = mock_client
 
-        return_code = delete_everything.delete_everything(self.settings)
+        delete_everything.delete_bucket(self.settings, "bucket-rsc")
 
-        self.assertEqual(return_code, 0)
-        self.assertEqual(mock_client.delete_bucket.call_count, 5)
+        self.assertEqual(mock_client.delete_bucket.call_count, 1)
         mock_client.delete_bucket.assert_called_with(
             Bucket="bucket-rsc"
         )
@@ -76,32 +98,22 @@ class TestDeleteEverything(unittest.TestCase):
 
         mock_client = Mock()
         no_suck_bucket_error = botocore.exceptions.ClientError({'Error': {'Code': 'NoSuchBucket'}}, 'DeleteOrSomething')
-        mock_client.list_objects_v2.side_effect = [
-            {}, {}, no_suck_bucket_error, {}, no_suck_bucket_error,
-        ]
+        mock_client.list_objects_v2.side_effect = no_suck_bucket_error
+
         mock_client_constructor.return_value = mock_client
 
-        return_code = delete_everything.delete_everything(self.settings)
+        delete_everything.delete_everything(self.settings, "bucket-rsc")
 
-        self.assertEqual(return_code, 0)
-        self.assertEqual(mock_client.delete_bucket.call_count, 3)
-        mock_client.delete_bucket.assert_called_with(
-            Bucket="bucket-pkg"
-        )
+        self.assertEqual(mock_client.delete_bucket.call_count, 0)
+
 
     @patch('boto3.client')
     @patch('om_manager.exponential_backoff')
     @patch('om_manager.get_om_with_auth')
-    def test_delete_buckets_fails(self, mock_auth, mock_backoff, mock_client_constructor):
-        mock_backoff.return_value = 0
-
+    def test_expire_bucket(self, mock_auth, mock_backoff, mock_client_constructor):
         mock_client = Mock()
         mock_client_constructor.return_value = mock_client
-        mock_client.list_objects_v2.return_value = {}
-        mock_client.delete_bucket.side_effect = ValueError("Nope")
 
-        return_code = delete_everything.delete_everything(self.settings)
+        delete_everything.expire_bucket(self.settings, "bucket-rsc")
 
-        self.assertEqual(mock_client.delete_bucket.call_count, 1)
-
-        self.assertEqual(return_code, 1)
+        self.assertEqual(mock_client.put_bucket_lifecycle_configuration.call_count, 1)
