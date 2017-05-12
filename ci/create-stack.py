@@ -1,4 +1,5 @@
 import jinja2
+from jinja2 import Template
 import os
 import sys
 from subprocess import call
@@ -12,8 +13,8 @@ natkeypair = os.environ['AWS_CF_NATKEYPAIR'],
 pivnettoken = os.environ['AWS_CF_PIVNETTOKEN'],
 
 with open('ci/parameters.j2.json', 'r') as template_file:
-    template = template_file.read()
-    rendered = jinja2.Template(template).render({
+    template = Template(template_file.read())
+    ctx = {
         "pcfkeypairprivate": pcfkeypairprivate,
         "password": password,
         "domain": domain,
@@ -21,7 +22,8 @@ with open('ci/parameters.j2.json', 'r') as template_file:
         "sslcertificatearn": sslcertificatearn,
         "natkeypair": natkeypair,
         "pivnettoken": pivnettoken
-    })
+    }
+    rendered = template.render(ctx)
 
     print("---------------------------")
     print(rendered)
