@@ -1,5 +1,6 @@
 import jinja2
 import os
+import sys
 from subprocess import call
 
 pcfkeypairprivate = os.environ['AWS_CF_PCFKEYPAIRPRIVATE'],
@@ -13,7 +14,7 @@ pivnettoken = os.environ['AWS_CF_PIVNETTOKEN'],
 with open('ci/parameters.j2.json', 'r') as template_file:
     template = template_file.read()
     rendered = jinja2.Template(template).render(
-        pcfkeypairprivate='''{{aws_cf_pcfkeypairprivate}}''',
+        pcfkeypairprivate='{{aws_cf_pcfkeypairprivate}}',
         password='{{aws_cf_password}}',
         domain='{{aws_cf_domain}}',
         hostedzoneid='{{aws_cf_hostedzoneid}}',
@@ -21,6 +22,11 @@ with open('ci/parameters.j2.json', 'r') as template_file:
         natkeypair='{{aws_cf_natkeypair}}',
         pivnettoken='{{aws_cf_pivnettoken}}'
     )
+
+    print("---------------------------")
+    print(rendered)
+    print("---------------------------")
+
     with open('parameters.json', 'w') as rendered_file:
         rendered_file.write(rendered)
 
@@ -32,4 +38,4 @@ with open('ci/parameters.j2.json', 'r') as template_file:
               --parameters file:///`pwd`/parameters.json
  """
 
-    call(cmd, shell=True)
+    sys.exit(call(cmd, shell=True))
