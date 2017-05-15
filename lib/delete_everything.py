@@ -23,6 +23,8 @@ def delete_everything(my_settings: Settings, delete_buckets=False):
         my_settings.pcf_elasticruntimes3resourcesbucket
     ]
 
+    # todo: should we delete the keypair...?
+
     for bucket_name in buckets:
         try:
             if delete_buckets:

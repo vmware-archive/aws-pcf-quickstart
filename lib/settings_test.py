@@ -75,11 +75,6 @@ params_store_output = {
             'Type': 'String',
             'Value': 'monkey123',
             'Name': 'PcfOpsManagerAdminPassword'
-        },
-        {
-            'Type': 'String',
-            'Value': '-----BEGIN RSA PRIVATE KEY-----foobarabc/q-----END RSA PRIVATE KEY-----',
-            'Name': 'PcfPrivateSSHKey'
         }
     ]
 }
@@ -91,7 +86,6 @@ class TestSettings(unittest.TestCase):
         os.environ['OPS_MANAGER_VERSION'] = '99.0.1'
         os.environ['OPS_MANAGER_URL'] = 'https://some-random-ec2-domain.example.com'
         os.environ['OPS_MANAGER_ADMIN_PASSWORD'] = 'monkey123'
-        os.environ["SSH_PRIVATE_KEY"] = "my-key-value-asdf-1234"
         os.environ["ERT_VERSION"] = "1.2.3"
         os.environ["AWS_BROKER_VERSION"] = "4.5.6"
         os.environ["TILE_BUCKET_S3_NAME"] = "my-bucket"
@@ -157,7 +151,6 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(self.settings.pcf_rdspassword, "monkey123")
         self.assertEqual(self.settings.pcf_privatesubnetavailabilityzone, "canada-1a")
         self.assertEqual(self.settings.pcf_privatesubnet2availabilityzone, "canada-1b")
-        self.assertEqual(self.settings.pcf_pcfprivatesshkey, "-----BEGIN RSA PRIVATE KEY-----foobarabc/q-----END RSA PRIVATE KEY-----")
 
     def test_parses_environment(self):
         self.assertEqual(self.settings.ops_manager_version, '99.0.1')

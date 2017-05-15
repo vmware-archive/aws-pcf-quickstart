@@ -16,7 +16,6 @@ class Settings:
         "PcfVmsSecurityGroupId",
         "PcfOpsManagerAdminPassword",
         "PcfOpsManagerS3Bucket",
-        "PcfPrivateSSHKey",
         "PcfPrivateSubnetAvailabilityZone",
         "PcfPrivateSubnet2AvailabilityZone",
         "PcfPrivateSubnetId",
@@ -81,10 +80,6 @@ class Settings:
     @property
     def pcf_opsmanagers3bucket(self):
         return self.parameters["PcfOpsManagerS3Bucket"]
-
-    @property
-    def pcf_pcfprivatesshkey(self):
-        return self.parameters["PcfPrivateSSHKey"]
 
     @property
     def pcf_vmssecuritygroupid(self):

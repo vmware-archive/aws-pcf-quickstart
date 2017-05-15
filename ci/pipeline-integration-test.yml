@@ -1,0 +1,56 @@
+---
+
+resources:
+- name: quickstart-repo
+  type: git
+  source:
+    branch: integration
+    uri: https://github.com/cf-platform-eng/quickstart
+    username: cholick
+    password: {{access_token}}
+    ignore_paths:
+      - ci/*.yml
+
+jobs:
+- name: integration-test
+  plan:
+  - get: quickstart-repo
+    trigger: false
+  - task: integration-test
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: python
+          tag: "3"
+      inputs:
+      - name: quickstart-repo
+      params:
+        AWS_CF_PASSWORD: {{aws_cf_password}}
+        AWS_CF_DOMAIN: {{aws_cf_domain}}
+        AWS_CF_HOSTEDZONEID: {{aws_cf_hostedzoneid}}
+        AWS_CF_SSLCERTIFICATEARN: {{aws_cf_sslcertificatearn}}
+        AWS_CF_NATKEYPAIR: {{aws_cf_natkeypair}}
+        AWS_CF_PIVNETTOKEN: {{aws_cf_pivnettoken}}
+      run:
+        path: bash
+        args:
+        - -exc
+        - |
+          mkdir ~/.aws
+          echo "
+          [default]
+          aws_access_key_id = {{aws_integration_access_key_id}}
+          aws_secret_access_key = {{aws_integration_secret_access_key}}
+          region = us-west-2
+          " > ~/.aws/config
+
+          pushd quickstart-repo
+          echo "Explicitly installing mock, as we don't want it in the distribution deps"
+          pip install -r requirements.txt
+          pip install awscli jinja2
+
+          python ./ci/create-stack.py
+
+          popd
