@@ -53,7 +53,7 @@ Parameters:
     Description: S3 Location for OpsManager CloudFormation Template
   09CloudFoundryTemplate:
     Type: String
-    Default: https://s3-us-west-2.amazonaws.com/mombergm.us-west-2/pivotal/qs/cloud-formation.json
+    Default: https://s3-us-west-2.amazonaws.com/pcf-quickstart-tiles/cloud-formation.json
     Description: S3 Location for Base Deployment CloudFormation Template
   10ElbPrefix:
     Type: String
