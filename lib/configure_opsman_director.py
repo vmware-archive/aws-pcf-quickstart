@@ -1,10 +1,13 @@
 from jinja2 import Template
-
+import boto3
 import om_manager
+from os.path import expanduser
 from settings import Settings
 
 
 def configure_opsman_director(my_settings: Settings):
+    keyname, keybytes = generate_ssh_keypair(my_settings)
+
     director_config = '{"ntp_servers_string": "0.amazon.pool.ntp.org,1.amazon.pool.ntp.org,2.amazon.pool.ntp.org,3.amazon.pool.ntp.org"}'
 
     template_ctx = {
@@ -13,8 +16,8 @@ def configure_opsman_director(my_settings: Settings):
         "secret_access_key": my_settings.pcf_iamusersecretaccesskey,
         "vpc_id": my_settings.pcf_vpc,
         "security_group": my_settings.pcf_vmssecuritygroupid,
-        "key_pair_name": my_settings.pcf_input_pcfkeypair,
-        "ssh_private_key": my_settings.pcf_pcfprivatesshkey.replace("\n", "\\n"),
+        "key_pair_name": keyname,
+        "ssh_private_key": keybytes.replace("\n", "\\n"),
         "region": my_settings.region,
         "encrypted": "false",
         "vpc_private_subnet_id": my_settings.pcf_privatesubnetid,
@@ -64,3 +67,18 @@ def configure_opsman_director(my_settings: Settings):
             return exit_code
 
     return 0
+
+
+def generate_ssh_keypair(my_settings: Settings):
+    client = boto3.client(service_name='ec2', region_name=my_settings.region)
+
+    keyname = "{}-pcf-keypair".format(my_settings.stack_name)
+    response = client.create_key_pair(
+        DryRun=False,
+        KeyName=keyname
+    )
+    home = expanduser("~/.ssh")
+    with open('{}/{}.pem'.format(home, keyname), 'w') as keyfile:
+        keyfile.write(response.get('KeyMaterial'))
+
+    return keyname, response.get('KeyMaterial')

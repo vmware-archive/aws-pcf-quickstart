@@ -3,10 +3,6 @@
     "ParameterValue": "0.0.0.0/0"
   },
   {
-    "ParameterKey": "17PCFKeyPairPrivate",
-    "ParameterValue": "{{pcfkeypairprivate}}"
-  },
-  {
     "ParameterKey": "09CloudFoundryTemplate",
     "ParameterValue": "https://s3-us-west-2.amazonaws.com/mombergm.us-west-2/pivotal/qs/cloud-formation.json"
   },

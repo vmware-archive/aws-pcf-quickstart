@@ -15,7 +15,7 @@ jobs:
 - name: integration-test
   plan:
   - get: quickstart-repo
-    trigger: true
+    trigger: false
   - task: integration-test
     config:
       platform: linux
@@ -27,7 +27,6 @@ jobs:
       inputs:
       - name: quickstart-repo
       params:
-        AWS_CF_PCFKEYPAIRPRIVATE: {{aws_cf_pcfkeypairprivate}}
         AWS_CF_PASSWORD: {{aws_cf_password}}
         AWS_CF_DOMAIN: {{aws_cf_domain}}
         AWS_CF_HOSTEDZONEID: {{aws_cf_hostedzoneid}}

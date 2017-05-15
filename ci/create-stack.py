@@ -3,7 +3,6 @@ import os
 import sys
 from subprocess import call
 
-pcfkeypairprivate = os.environ['AWS_CF_PCFKEYPAIRPRIVATE']
 password = os.environ['AWS_CF_PASSWORD']
 domain = os.environ['AWS_CF_DOMAIN']
 hostedzoneid = os.environ['AWS_CF_HOSTEDZONEID']
@@ -14,7 +13,6 @@ pivnettoken = os.environ['AWS_CF_PIVNETTOKEN']
 with open('ci/parameters.j2.json', 'r') as template_file:
     template = jinja2.Template(template_file.read())
     ctx = {
-        "pcfkeypairprivate": pcfkeypairprivate,
         "password": password,
         "domain": domain,
         "hostedzoneid": hostedzoneid,

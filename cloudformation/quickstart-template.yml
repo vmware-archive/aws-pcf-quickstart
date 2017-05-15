@@ -49,7 +49,7 @@ Parameters:
     Description: ARN for pre-uploaded SSL certificate
   08OpsManagerTemplate:
     Type: String
-    Default: https://s3-us-west-2.amazonaws.com/mombergm.us-west-2/pivotal/qs/ops-manager.json
+    Default: https://s3-us-west-2.amazonaws.com/pcf-quickstart-tiles/ops-manager.json
     Description: S3 Location for OpsManager CloudFormation Template
   09CloudFoundryTemplate:
     Type: String
@@ -89,11 +89,6 @@ Parameters:
   14PCFKeyPair:
     Type: AWS::EC2::KeyPair::KeyName
     Description: Select the SSH keypair to use for Ops Manager and all VMS in the deployment
-  17PCFKeyPairPrivate:
-    Type: String
-    Description: Private half of PCFKeyPair, used as the key for all instance deployed via PCF BOSH. Replan \n with comma, because we hate you
-    AllowedPattern: '^-----BEGIN RSA PRIVATE KEY-----,([+=/\w,]*),-----END RSA PRIVATE KEY-----$'
-
 Mappings:
   ## Mapping of OpsManager AMI in AWS Regions.
   01OpsManagerAMI:
@@ -400,13 +395,6 @@ Resources:
       Description: Misc
       Type: String
       Value: !Ref 16OpsManagerAdminPassword
-  PcfPrivateSSHKey:
-    Type: "AWS::SSM::Parameter"
-    Properties:
-      Name: !Sub "${AWS::StackName}.PcfPrivateSSHKey"
-      Description: Misc
-      Type: String
-      Value:  !Join [ "\n", !Split [ ",", !Ref 17PCFKeyPairPrivate]]
   ## This is the End of our Secured Parameters
   ## This is the EC2 Ops Manager
   01OpsManagerInstance:
