@@ -4,7 +4,7 @@ resources:
 - name: quickstart-repo
   type: git
   source:
-    branch: integration
+    branch: master
     uri: https://github.com/cf-platform-eng/quickstart
     username: cholick
     password: {{access_token}}
