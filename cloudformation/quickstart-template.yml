@@ -486,7 +486,7 @@ Resources:
         - !Sub "${BoostrapInstance.PublicIp}"
       TTL: 60
       Type: A
-  03DNSStar:
+  DNSStar:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneId: !Ref 14HostedZoneId
@@ -495,13 +495,31 @@ Resources:
         - !GetAtt 01PCFBase.Outputs.PcfElbDnsName
       TTL: 60
       Type: CNAME
-  04DNSSsh:
+  DNSSsh:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneId: !Ref 14HostedZoneId
       Name: !Join [ "", [ "ssh.sys.", !Ref 15Domain] ]
       ResourceRecords:
         - !GetAtt 01PCFBase.Outputs.PcfElbSshDnsName
+      TTL: 60
+      Type: CNAME
+  DNSSys:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref 14HostedZoneId
+      Name: !Join [ "", [ "*.sys.", !Ref 15Domain] ]
+      ResourceRecords:
+        - !GetAtt 01PCFBase.Outputs.PcfElbDnsName
+      TTL: 60
+      Type: CNAME
+  DNSApps:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref 14HostedZoneId
+      Name: !Join [ "", [ "*.apps.", !Ref 15Domain] ]
+      ResourceRecords:
+        - !GetAtt 01PCFBase.Outputs.PcfElbDnsName
       TTL: 60
       Type: CNAME
 Outputs:
