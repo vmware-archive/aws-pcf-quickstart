@@ -16,6 +16,7 @@ def check_status(password, opsman, identifier):
     out_bytes, err_bytes = p.communicate()
     out = out_bytes.decode("utf-8").strip()
     if p.returncode != 0:
+        print("curling opsman status failed")
         sys.exit(p.returncode)
 
     settings = json.loads(out)
