@@ -64,3 +64,5 @@ with open('./cloudformation/quickstart-template.yml', 'r') as template_file:
     if stack_status != "CREATE_COMPLETE":
         print("Stack creation did not complete, exiting...")
         sys.exit(1)
+    else:
+        sys.exit(0)
