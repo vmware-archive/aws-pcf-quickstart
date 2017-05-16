@@ -15,6 +15,7 @@ def check_status(password, opsman, identifier):
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     out_bytes, err_bytes = p.communicate()
     out = out_bytes.decode("utf-8").strip()
+
     if p.returncode != 0:
         print("curling opsman status failed")
         sys.exit(p.returncode)
@@ -42,8 +43,11 @@ def main(argv):
         elif status == "succeeded":
             print("p-bosh install succeeded")
             break
+        elif status is None:
+            print("p-bosh install doesn't exist yet")
+            time.sleep(30)
         else:
-            print("p-bosh install in running")
+            print("p-bosh install is running")
             time.sleep(300)
 
     status = None
@@ -55,8 +59,11 @@ def main(argv):
         elif status == "succeeded":
             print("cf install succeeded")
             break
+        elif status is None:
+            print("cf install doesn't exist yet")
+            time.sleep(30)
         else:
-            print("cf install in running")
+            print("cf install is running")
             time.sleep(300)
 
     print("Done")

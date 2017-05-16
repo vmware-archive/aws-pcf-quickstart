@@ -11,6 +11,14 @@ resources:
     ignore_paths:
       - ci/*.yml
 
+- name: om-release
+  type: github-release
+  source:
+    owner: pivotal-cf
+    repository: om
+    access_token: {{access_token}}
+    version: v0.0.22
+
 jobs:
 - name: integration-test
   plan:
@@ -33,24 +41,49 @@ jobs:
         AWS_CF_SSLCERTIFICATEARN: {{aws_cf_sslcertificatearn}}
         AWS_CF_NATKEYPAIR: {{aws_cf_natkeypair}}
         AWS_CF_PIVNETTOKEN: {{aws_cf_pivnettoken}}
+        AWS_ACCESS_KEY_ID: {{aws_integration_access_key_id}}
+        AWS_SECRET_ACCESS_KEY: {{aws_integration_secret_access_key}}
+        AWS_INTEGRATION_REGION: {{aws_integration_region}}
       run:
         path: bash
         args:
         - -exc
         - |
-          mkdir ~/.aws
-          echo "
-          [default]
-          aws_access_key_id = {{aws_integration_access_key_id}}
-          aws_secret_access_key = {{aws_integration_secret_access_key}}
-          region = us-west-2
-          " > ~/.aws/config
-
           pushd quickstart-repo
-          echo "Explicitly installing mock, as we don't want it in the distribution deps"
           pip install -r requirements.txt
-          pip install awscli jinja2
-
           python ./ci/create-stack.py
+          popd
 
+- name: check-status
+  plan:
+  - get: om-release
+  - get: quickstart-repo
+    passed: [ integration-test ]
+    trigger: true
+  - task: check-status
+    attempts: 10
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: python
+          tag: "3"
+      inputs:
+      - name: om-release
+      - name: quickstart-repo
+      params:
+        AWS_CF_PASSWORD: {{aws_cf_password}}
+        AWS_CF_DOMAIN: {{aws_cf_domain}}
+      run:
+        path: bash
+        args:
+        - -exc
+        - |
+          mv om-release/om-linux /usr/local/bin/om
+          chmod +x /usr/local/bin/om
+          pushd quickstart-repo
+          pip install -r requirements.txt
+          sleep 30
+          python ./ci/check-status.py
           popd

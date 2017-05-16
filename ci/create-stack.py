@@ -54,11 +54,13 @@ with open('./cloudformation/quickstart-template.yml', 'r') as template_file:
         ],
     )
     stack_id = create_response.get("StackId")
+    print("Created stack: {}".format(stack_id))
 
     stack_status = describe_stack_status(client, stack_id)
     while stack_status == 'CREATE_IN_PROGRESS':
         time.sleep(300)
         stack_status = describe_stack_status(client, stack_id)
+        print("Checking status got {}".format(stack_status))
 
     print("Final status {}".format(stack_status))
     if stack_status != "CREATE_COMPLETE":
