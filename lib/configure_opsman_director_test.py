@@ -1,6 +1,7 @@
 import unittest
 
 from mock import Mock, patch, mock_open
+from os.path import expanduser
 
 import configure_opsman_director
 from settings import Settings
@@ -55,8 +56,9 @@ class TestConfigureOpsManDirector(unittest.TestCase):
                 self.assertTrue(calls[3][0][0].startswith("foo configure-bosh --networks-configuration '{"))
                 self.assertTrue(calls[4][0][0].startswith("foo configure-bosh --network-assignment '{"))
 
+    @patch('os.chmod')
     @patch('boto3.client')
-    def test_generate_ssh_keypair(self, mock_client_constructor):
+    def test_generate_ssh_keypair(self, mock_client_constructor, mock_chmod):
         mock_client = Mock()
         mock_client.create_key_pair.return_value = {
             'KeyMaterial': "------blah----"
@@ -75,5 +77,9 @@ class TestConfigureOpsManDirector(unittest.TestCase):
         handle = my_mock_open()
         handle.write.assert_called_once_with("------blah----")
 
+        home = expanduser("~/.ssh")
+        expected_keypath = "{}/my-pcf-stack-pcf-keypair.pem".format(home)
+
         self.assertEqual(keyname, expected_key_name)
         self.assertEqual(keybytes, "------blah----")
+        mock_chmod.assert_called_with(expected_keypath, 0o400)

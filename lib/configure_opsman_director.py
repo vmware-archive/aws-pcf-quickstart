@@ -1,6 +1,7 @@
 from jinja2 import Template
 import boto3
 import om_manager
+import os
 from os.path import expanduser
 from settings import Settings
 
@@ -77,8 +78,12 @@ def generate_ssh_keypair(my_settings: Settings):
         DryRun=False,
         KeyName=keyname
     )
+
     home = expanduser("~/.ssh")
-    with open('{}/{}.pem'.format(home, keyname), 'w') as keyfile:
+    pem_file = '{}/{}.pem'.format(home, keyname)
+
+    with open(pem_file, 'w') as keyfile:
         keyfile.write(response.get('KeyMaterial'))
+    os.chmod(pem_file, 0o400)
 
     return keyname, response.get('KeyMaterial')
