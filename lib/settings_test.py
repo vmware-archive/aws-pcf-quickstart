@@ -82,17 +82,6 @@ params_store_output = {
 
 class TestSettings(unittest.TestCase):
     def setUp(self):
-        os.environ['DNS_SUFFIX'] = 'example.com'
-        os.environ['OPS_MANAGER_VERSION'] = '99.0.1'
-        os.environ['OPS_MANAGER_URL'] = 'https://some-random-ec2-domain.example.com'
-        os.environ['OPS_MANAGER_ADMIN_PASSWORD'] = 'monkey123'
-        os.environ["ERT_VERSION"] = "1.2.3"
-        os.environ["AWS_BROKER_VERSION"] = "4.5.6"
-        os.environ["TILE_BUCKET_S3_NAME"] = "my-bucket"
-        os.environ["TILE_BUCKET_S3_ACCESS_KEY"] = "my-access-key"
-        os.environ["TILE_BUCKET_S3_SECRET_ACCESS_KEY"] = "my-access-secret"
-        os.environ["TILE_BUCKET_REGION"] = "canada-1"
-
         self.meta_json = """
 {
   "StackName": "pcf-stack",
@@ -151,10 +140,6 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(self.settings.pcf_rdspassword, "monkey123")
         self.assertEqual(self.settings.pcf_privatesubnetavailabilityzone, "canada-1a")
         self.assertEqual(self.settings.pcf_privatesubnet2availabilityzone, "canada-1b")
-
-    def test_parses_environment(self):
-        self.assertEqual(self.settings.ops_manager_version, '99.0.1')
-        self.assertEqual(self.settings.opsman_url, 'https://opsman.pcf.example.com')
 
     def test_default_values(self):
         self.assertEqual(self.settings.opsman_user, 'admin')

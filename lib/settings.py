@@ -6,6 +6,12 @@ import boto3
 output_file = "/tmp/pcf-stack.json"
 metadata_file = "/var/local/cloudformation/stack-meta.json"
 
+ops_manager_version="1.10.4"
+ert_version="1.10.4-build.1"
+aws_broker_version="1.2.0.147"
+tile_bucket_s3_name="pcf-quickstart-tiles"
+tile_bucket_region="us-west-2"
+
 
 class Settings:
     paramater_store_keys = [
@@ -36,7 +42,7 @@ class Settings:
         self.debug = False
         self.opsman_user = 'admin'
 
-        self.parse_environ()
+        self.set_versions_and_buckets()
         self.parse_meta()
         self.get_parameters()
         self.describe_stack()
@@ -161,12 +167,12 @@ class Settings:
     def opsman_url(self):
         return "https://opsman.{}".format(self.pcf_input_domain)
 
-    def parse_environ(self):
-        self.ops_manager_version = os.environ['OPS_MANAGER_VERSION']
-        self.ert_version = os.environ['ERT_VERSION']
-        self.aws_broker_version = os.environ['AWS_BROKER_VERSION']
-        self.tile_bucket_region = os.environ['TILE_BUCKET_REGION']
-        self.tile_bucket_s3_name = os.environ['TILE_BUCKET_S3_NAME']
+    def set_versions_and_buckets(self):
+        self.ops_manager_version = ops_manager_version
+        self.ert_version = ert_version
+        self.aws_broker_version = aws_broker_version
+        self.tile_bucket_region = tile_bucket_region
+        self.tile_bucket_s3_name = tile_bucket_s3_name
 
     def get_s3_endpoint(self):
         stack_region = self.region

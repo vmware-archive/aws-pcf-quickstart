@@ -466,6 +466,8 @@ Resources:
 
           tar -xvf /tmp/quickstart-release.tgz -C /home/ubuntu/
           chown -R ubuntu:ubuntu /home/ubuntu/quickstart
+
+          /home/ubuntu/quickstart/daemon/install.sh
           su ubuntu -c /home/ubuntu/quickstart/bootstrap.sh
 
   02DNSOpsMan:
