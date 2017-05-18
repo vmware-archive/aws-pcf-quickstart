@@ -63,6 +63,7 @@ jobs:
     params:
       bump: patch
   - task: build-ami
+    attempts: 5
     config:
       platform: linux
       image_resource:
