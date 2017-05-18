@@ -84,4 +84,6 @@ jobs:
         - -exc
         - |
           ./quickstart-repo/ci/generate-packer.py
-
+  - put: ami-version
+    params:
+      file: ami-version/version
