@@ -46,6 +46,14 @@ rsync -avzh --exclude=env --exclude=.git --exclude=.idea . ubuntu@ec2-....comput
 * boto3.client - work out some failure modes and retry secenarios
 
 
+# Docker
+
+```bash
+docker build ci -t cfplatformeng/quickstart-ci
+docker tag cfplatformeng/quickstart-ci cfplatformeng/quickstart-ci:1 #where 1 is the tag version number
+docker push cfplatformeng/quickstart-ci
+```
+
 # Changes to cloud-formation template:
 
 * 11PivnetToken

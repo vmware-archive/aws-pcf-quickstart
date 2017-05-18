@@ -67,8 +67,7 @@ jobs:
       image_resource:
         type: docker-image
         source:
-          repository: python
-          tag: "3"
+          repository: cfplatformeng/quickstart-ci
       inputs:
       - name: om-release
       - name: quickstart-repo

@@ -22,8 +22,7 @@ jobs:
       image_resource:
         type: docker-image
         source:
-          repository: python
-          tag: "3"
+          repository: cfplatformeng/quickstart-ci
       inputs:
       - name: quickstart-repo
       run:
@@ -32,8 +31,6 @@ jobs:
         - -exc
         - |
           pushd quickstart-repo
-          echo "Explicitly installing mock, as we don't want it in the distribution deps"
-          pip install mock
           pip install -r requirements.txt
           python -m unittest discover -v -s ./lib -p '*_test.py'
           popd

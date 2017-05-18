@@ -1,0 +1,29 @@
+{
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "access_key": "{{aws_access_key_id}}",
+      "secret_key": "{{aws_secret_access_key}}",
+      "region": "us-east-1",
+      "source_ami": "ami-20631a36",
+      "instance_type": "t2.micro",
+      "ssh_username": "ubuntu",
+      "ami_name": "pcf bootstrap {{ami_version}}"
+    }
+  ],
+  "provisioners": [
+    {
+      "destination": "/home/ubuntu/",
+      "source": "{{ert_file}}",
+      "type": "file"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sleep 30",
+        "sudo apt-get update -y"
+      ]
+    }
+  ]
+}
+

@@ -1,0 +1,87 @@
+---
+
+resource_types:
+- name: pivnet
+  type: docker-image
+  source:
+    repository: pivotalcf/pivnet-resource
+    tag: latest-final
+
+resources:
+- name: quickstart-repo
+  type: git
+  source:
+    branch: master
+    uri: https://github.com/cf-platform-eng/quickstart
+    username: cholick
+    password: {{access_token}}
+    ignore_paths:
+      - ci/*.yml
+
+- name: ami-version
+  type: semver
+  source:
+    driver: git
+    uri: https://github.com/cf-platform-eng/quickstart
+    branch: ami_version
+    file: ami_version
+    username: cholick
+    password: {{access_token}}
+
+- name: ert-tile
+  type: pivnet
+  source:
+    api_token: {{pivnet_token}}
+    product_slug: elastic-runtime
+    product_version: 1\.10\.8
+
+- name: aws-broker-tile
+  type: pivnet
+  source:
+    api_token: {{pivnet_token}}
+    product_slug: pcf-service-broker-for-aws
+    product_version: "1.2.0"
+
+- name: stemcell
+  type: pivnet
+  source:
+    api_token: {{pivnet_token}}
+    product_slug: stemcells
+    product_version: "3363.15"
+
+jobs:
+- name: build-ami
+  plan:
+  - get: quickstart-repo
+  - get: ert-tile
+  - get: aws-broker-tile
+  - get: stemcell
+    params:
+      globs:
+      - "*-aws-*.tgz"
+  - get: ami-version
+    params:
+      bump: patch
+  - task: build-ami
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: cfplatformeng/quickstart-ci
+      inputs:
+      - name: quickstart-repo
+      - name: ert-tile
+      - name: aws-broker-tile
+      - name: stemcell
+      - name: ami-version
+      params:
+        AWS_ACCESS_KEY_ID: {{aws_integration_access_key_id}}
+        AWS_SECRET_ACCESS_KEY: {{aws_integration_secret_access_key}}
+      run:
+        path: bash
+        args:
+        - -exc
+        - |
+          ./quickstart-repo/ci/generate-packer.py
+
