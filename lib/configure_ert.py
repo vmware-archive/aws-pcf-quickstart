@@ -32,6 +32,11 @@ def configure_ert(my_settings: Settings):
         print("Failed to configure ERT")
         return exit_code
 
+    exit_code = configure_ert_multiaz_resources(my_settings)
+    if exit_code != 0:
+        print("Failed to configure Multi AZ ERT")
+        return exit_code
+
     return create_required_databases(my_settings)
 
 
@@ -51,6 +56,17 @@ def configure_ert_resources(my_settings: Settings):
     )
     return om_manager.exponential_backoff(cmd, my_settings.debug)
 
+def configure_ert_multiaz_resources(my_settings: Settings):
+    if my_settings.pcf_pcfnumberofazs > 1:
+        with open("templates/ert_multiaz_resources_config.j2.json", 'r') as f:
+            ert_resource_multiaz_template = f.read()
+        ert_resource_config = om_manager.format_om_json_str(ert_resource_multiaz_template)
+        cmd = "{om_with_auth} configure-product -n cf -pr '{ert_resources}'".format(
+            om_with_auth=om_manager.get_om_with_auth(my_settings),
+            ert_resources=ert_resource_config
+        )
+        return om_manager.exponential_backoff(cmd, my_settings.debug)
+    return 0
 
 def configure_ert_config(my_settings: Settings):
     ert_config_template_ctx = {

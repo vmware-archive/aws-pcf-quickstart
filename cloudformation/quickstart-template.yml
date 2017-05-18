@@ -75,7 +75,7 @@ Parameters:
     Type: String
     Description: Admin email used by mysql monitor, for example
   14HostedZoneId:
-    Type: String
+    Type: AWS::Route53::HostedZone::Id
     Description: Existing hosted zone to create DNS records under
   15Domain:
     Type: String
@@ -89,6 +89,11 @@ Parameters:
   14PCFKeyPair:
     Type: AWS::EC2::KeyPair::KeyName
     Description: Select the SSH keypair to use for Ops Manager and all VMS in the deployment
+  NumberOfAZs:
+    Type: Number
+    AllowedValues: [1,2]
+    Default: 1
+    Description: Select number of Avalaibility Zones (either 1 or 2)
 Mappings:
   ## Mapping of OpsManager AMI in AWS Regions.
   01OpsManagerAMI:
@@ -395,6 +400,13 @@ Resources:
       Description: Misc
       Type: String
       Value: !Ref 16OpsManagerAdminPassword
+  PcfNumberOfAZs:
+    Type: "AWS::SSM::Parameter"
+    Properties:
+      Name: !Sub "${AWS::StackName}.PcfNumberOfAZs"
+      Description: Misc
+      Type: Number
+      Value: !Ref NumberOfAZs
   ## This is the End of our Secured Parameters
   ## This is the EC2 Ops Manager
   01OpsManagerInstance:

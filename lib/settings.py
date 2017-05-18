@@ -35,7 +35,8 @@ class Settings:
         "PcfElasticRuntimeS3BuildpacksBucket",
         "PcfElasticRuntimeS3DropletsBucket",
         "PcfElasticRuntimeS3PackagesBucket",
-        "PcfElasticRuntimeS3ResourcesBucket"
+        "PcfElasticRuntimeS3ResourcesBucket",
+        "PcfNumberOfAZs"
     ]
 
     def __init__(self):
@@ -138,6 +139,10 @@ class Settings:
     @property
     def pcf_elasticruntimes3resourcesbucket(self):
         return self.parameters["PcfElasticRuntimeS3ResourcesBucket"]
+
+    @property
+    def pcf_pcfnumberofazs(self):
+        return self.parameters["PcfNumberOfAZs"]
 
     @property
     def pcf_input_pivnettoken(self):
