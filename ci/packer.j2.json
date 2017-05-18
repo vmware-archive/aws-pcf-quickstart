@@ -8,7 +8,13 @@
       "source_ami": "ami-20631a36",
       "instance_type": "t2.micro",
       "ssh_username": "ubuntu",
-      "ami_name": "pcf bootstrap {{ami_version}}"
+      "ami_name": "pcf bootstrap {{ami_version}}",
+      "launch_block_device_mappings": [
+        {
+          "device_name": "/dev/sda1",
+          "volume_size": 40
+        }
+      ]
     }
   ],
   "provisioners": [
@@ -18,10 +24,22 @@
       "type": "file"
     },
     {
+      "destination": "/home/ubuntu/",
+      "source": "{{broker_file}}",
+      "type": "file"
+    },
+     {
+      "destination": "/home/ubuntu/",
+      "source": "{{stemcell_file}}",
+      "type": "file"
+    },
+    {
       "type": "shell",
       "inline": [
         "sleep 30",
-        "sudo apt-get update -y"
+        "sudo apt-get update -y",
+        "apt-get install -y python3-dev python3-pip mysql-client-core-5.7",
+        "pip3 install --upgrade pip awscli"
       ]
     }
   ]

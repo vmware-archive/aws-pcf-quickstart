@@ -8,13 +8,19 @@ import sys
 import jinja2
 
 
-def main(argv):
-    ert_file_match = glob.glob("ert-tile/*.pivotal")
-    if len(ert_file_match) != 1:
-        raise ValueError("Didn't correctly find ert pivotal file")
-    ert_file = ert_file_match[0]
+def find_file(pattern):
+    file_match = glob.glob(pattern)
+    if len(file_match) != 1:
+        raise ValueError("Didn't correctly find {} pivotal file".format(pattern))
+    return file_match[0]
 
-    with open('./ami-version/ami_version', 'r') as version_file:
+
+def main(argv):
+    ert_file = find_file("ert-tile/*.pivotal")
+    broker_file = find_file("aws-broker-tile/*.pivotal")
+    stemcell_file = find_file("stemcell/*.tgz")
+
+    with open('./ami-version/version', 'r') as version_file:
         ami_version = version_file.read()
 
     with open('./quickstart-repo/ci/packer.j2.json', 'r') as template_file:
@@ -24,7 +30,9 @@ def main(argv):
             "aws_access_key_id": os.environ['AWS_ACCESS_KEY_ID'],
             "aws_secret_access_key": os.environ['AWS_SECRET_ACCESS_KEY'],
             "ert_file": ert_file,
-            "ami_version": ami_version
+            "ami_version": ami_version,
+            "broker_file": broker_file,
+            "stemcell_file": stemcell_file
         }
 
         rendered = template.render(ctx)
