@@ -41,7 +41,7 @@ def main(argv):
 
     cmd = "packer build packer.json"
 
-    subprocess.call(cmd, shell=True)
+    sys.exit(subprocess.call(cmd, shell=True))
 
 
 if __name__ == "__main__":
