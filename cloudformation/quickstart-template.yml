@@ -117,7 +117,7 @@ Mappings:
       "64": "ami-915470f1"
     us-west-2: 
       "64": "ami-483ba628"
-  BoostrapAMI:
+  BootstrapAMI:
     # Ubuntu 16.04 LTS until custom AMI (https://cloud-images.ubuntu.com/locator/ec2/)
     ap-northeast-1:
       "64": ami-afb09dc8
@@ -433,11 +433,11 @@ Resources:
       Tags:
         - Key: Name
           Value: "PCF Ops Manager"
-  BoostrapInstance:
+  BootstrapInstance:
     Type: AWS::EC2::Instance
     DependsOn: 01OpsManagerInstance
     Properties:
-      ImageId: !FindInMap [BoostrapAMI, !Ref "AWS::Region", 64]
+      ImageId: !FindInMap [BootstrapAMI, !Ref "AWS::Region", 64]
       InstanceType: t2.micro
       IamInstanceProfile: !GetAtt 01PCFBase.Outputs.PcfIamInstanceProfile
       KeyName: !Ref 14PCFKeyPair
@@ -497,7 +497,7 @@ Resources:
       HostedZoneId: !Ref 14HostedZoneId
       Name: !Join [ "", [ "bootstrap.", !Ref 15Domain] ]
       ResourceRecords:
-        - !Sub "${BoostrapInstance.PublicIp}"
+        - !Sub "${BootstrapInstance.PublicIp}"
       TTL: 60
       Type: A
   DNSStar:
