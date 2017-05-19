@@ -19,28 +19,29 @@
   ],
   "provisioners": [
     {
-      "destination": "/home/ubuntu/",
-      "source": "{{ert_file}}",
-      "type": "file"
-    },
-    {
-      "destination": "/home/ubuntu/",
-      "source": "{{broker_file}}",
-      "type": "file"
-    },
-     {
-      "destination": "/home/ubuntu/",
-      "source": "{{stemcell_file}}",
-      "type": "file"
-    },
-    {
       "type": "shell",
       "inline": [
         "sleep 30",
+        "mkdir /home/ubuntu/tiles",
         "sudo apt-get update -y",
         "sudo apt-get install -y python3-dev python3-pip mysql-client-core-5.7",
         "sudo pip3 install --upgrade pip awscli"
       ]
+    },
+    {
+      "destination": "/home/ubuntu/tiles/",
+      "source": "{{ert_file}}",
+      "type": "file"
+    },
+    {
+      "destination": "/home/ubuntu/tiles/",
+      "source": "{{broker_file}}",
+      "type": "file"
+    },
+     {
+      "destination": "/home/ubuntu/tiles/",
+      "source": "{{stemcell_file}}",
+      "type": "file"
     }
   ]
 }
