@@ -6,11 +6,11 @@ import boto3
 output_file = "/tmp/pcf-stack.json"
 metadata_file = "/var/local/cloudformation/stack-meta.json"
 
-ops_manager_version="1.10.4"
-ert_version="1.10.4-build.1"
-aws_broker_version="1.2.0.147"
-tile_bucket_s3_name="pcf-quickstart-tiles"
-tile_bucket_region="us-west-2"
+ops_manager_version = "1.10.4"
+ert_version = "1.10.4-build.1"
+aws_broker_version = "1.2.0.147"
+tile_bucket_s3_name = "pcf-quickstart-tiles"
+tile_bucket_region = "us-west-2"
 
 
 class Settings:
@@ -142,7 +142,7 @@ class Settings:
 
     @property
     def pcf_pcfnumberofazs(self):
-        return self.parameters["PcfNumberOfAZs"]
+        return int(self.parameters["PcfNumberOfAZs"])
 
     @property
     def pcf_input_pivnettoken(self):

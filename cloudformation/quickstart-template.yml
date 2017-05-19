@@ -405,7 +405,7 @@ Resources:
     Properties:
       Name: !Sub "${AWS::StackName}.PcfNumberOfAZs"
       Description: Misc
-      Type: Number
+      Type: String
       Value: !Ref NumberOfAZs
   ## This is the End of our Secured Parameters
   ## This is the EC2 Ops Manager

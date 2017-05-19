@@ -77,7 +77,7 @@ params_store_output = {
             'Name': 'PcfOpsManagerAdminPassword'
         },
         {
-            'Type': 'Number',
+            'Type': 'String',
             'Value': '1',
             'Name': 'PcfNumberOfAZs'
         }
@@ -145,7 +145,7 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(self.settings.pcf_rdspassword, "monkey123")
         self.assertEqual(self.settings.pcf_privatesubnetavailabilityzone, "canada-1a")
         self.assertEqual(self.settings.pcf_privatesubnet2availabilityzone, "canada-1b")
-        self.assertEqual(self.settings.pcf_pcfnumberofazs, "1")
+        self.assertEqual(self.settings.pcf_pcfnumberofazs, 1)
 
     def test_default_values(self):
         self.assertEqual(self.settings.opsman_user, 'admin')
