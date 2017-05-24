@@ -1,0 +1,101 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: >
+  An example template to showcase the use of Custom Resource Registration in CloudFormation. [ Only works in us-west-2 ]
+
+Parameters:
+  Subnet:
+    Type: String
+    Description: Select the AZ Where your instance will be launched.
+  SSHKeyPair:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: SSH Key used to log into custom resource.
+  SG:
+    Type: String
+    Description: Associated Security Group.
+
+Resources:
+  CustomResourceIAMRole:
+    Type: "AWS::IAM::Role"
+    Properties: 
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement: 
+          - Effect: "Allow"
+            Principal: 
+              Service: 
+                - "ec2.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: "SQSroot"
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - 
+                Effect: "Allow"
+                Action: "sqs:*"
+                Resource: !GetAtt SQSQueue.Arn
+  CRInstanceProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties: 
+      Roles:
+        - !Ref CustomResourceIAMRole
+  SQSQueue:
+    Type: "AWS::SQS::Queue"
+  SNSTopic:
+    Type: "AWS::SNS::Topic"
+    Properties: 
+      DisplayName: custom-resource-topic
+      Subscription:
+        - Endpoint: !GetAtt SQSQueue.Arn
+          Protocol: sqs
+    DependsOn: SQSQueue
+  MyCustomResource:
+    Type: Custom::CloudFoundryPhase1
+    Version: 1.0
+    Properties:
+      ServiceToken: !Ref SNSTopic
+      ExampleProperty1: ExampleValue1
+      ExampleProperty2: ExampleValue2
+    DeletionPolicy: Retain
+    DependsOn: SNSTopic
+  ## This instance will be used to Query the SQS Queue and Respond with a Custom Resource Status Update. 
+  BoostrapInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-4836a428
+      InstanceType: t2.micro
+      IamInstanceProfile: !Ref CRInstanceProfile
+      KeyName: !Ref SSHKeyPair
+      Monitoring: true
+      BlockDeviceMappings:
+        - DeviceName: "/dev/sda1"
+          Ebs:
+            DeleteOnTermination: true
+            VolumeSize: 50
+            VolumeType: gp2
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: "true"
+          DeviceIndex: "0"
+          GroupSet:
+            - !Ref SG
+          SubnetId: !Ref Subnet
+      SourceDestCheck: true
+      Tags:
+        - Key: Name
+          Value: "custom-resource-compute"
+      UserData: !Base64
+        "Fn::Sub": |
+          #!/bin/bash
+          set -ex
+
+          sudo yum update -y
+          sudo yum install awscli
+          echo QueueURL:${SQSQueue} > ~/SQSInfo.yml
+          echo QueueARN:${SQSQueue.Arn} >> ~/SQSInfo.yml
+
+Outputs:
+  EC2Instance:
+    Value: !GetAtt BoostrapInstance.PublicIp
