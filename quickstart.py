@@ -52,6 +52,13 @@ def upload_assets(ctx, path):
     sys.exit(time_cmd(om_manager.upload_assets, ctx.obj['settings'], path))
 
 
+@cli.command('upload-stemcell')
+@click.argument('path')
+@click.pass_context
+def upload_stemcells(ctx, path):
+    sys.exit(time_cmd(om_manager.upload_stemcell, ctx.obj['settings'], path))
+
+
 @cli.command('configure-ert')
 @click.pass_context
 def config_ert(ctx):

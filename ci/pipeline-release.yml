@@ -39,8 +39,8 @@ resources:
   source:
     driver: git
     uri: https://github.com/cf-platform-eng/quickstart
-    branch: master
-    file: ci/version
+    branch: quickstart_release_version
+    file: quickstart_release_version
     username: cholick
     password: {{access_token}}
 

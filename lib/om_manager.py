@@ -106,10 +106,18 @@ def stage_product(product_name: str, my_settings: settings.Settings):
 
 
 def upload_stemcell(my_settings: settings.Settings, path: str):
-    cmd = "{om_with_auth} upload-stemcell -s '{path}'".format(
-        om_with_auth=get_om_with_auth(my_settings), path=path
-    )
-    return exponential_backoff(cmd, my_settings.debug)
+    for stemcell in os.listdir(path):
+        if stemcell.endswith(".tgz"):
+            print("uploading stemcell {0}".format(stemcell))
+            cmd = "{om_with_auth} upload-stemcell -s '{path}'".format(
+                om_with_auth=get_om_with_auth(my_settings), path=os.path.join(path, stemcell)
+            )
+            exit_code = exponential_backoff(cmd, my_settings.debug)
+            if exit_code != 0:
+                return exit_code
+
+    return 0
+
 
 
 def upload_assets(my_settings: settings.Settings, path: str):

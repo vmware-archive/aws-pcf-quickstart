@@ -1,6 +1,7 @@
 import json
 
 from jinja2 import Template
+from subprocess import call
 
 import om_manager
 from settings import Settings
@@ -69,6 +70,7 @@ def configure_ert_multiaz_resources(my_settings: Settings):
     return 0
 
 def configure_ert_config(my_settings: Settings):
+    cert, key = generate_ssl_cert(my_settings)
     ert_config_template_ctx = {
         "pcf_rds_address": my_settings.pcf_rdsaddress,
         "pcf_rds_username": my_settings.pcf_rdsusername,
@@ -81,7 +83,9 @@ def configure_ert_config(my_settings: Settings):
         "pcf_elastic_runtime_s3_resources_bucket": my_settings.pcf_elasticruntimes3resourcesbucket,
         "pcf_iam_access_key_id": my_settings.pcf_iamuseraccesskey,
         "pcf_iam_secret_access_key": my_settings.pcf_iamusersecretaccesskey,
-        "s3_endpoint": my_settings.get_s3_endpoint()
+        "s3_endpoint": my_settings.get_s3_endpoint(),
+        "cert": cert.replace("\n", "\\n"),
+        "key": key.replace("\n", "\\n")
     }
     with open("templates/ert_config.j2.json", 'r') as f:
         ert_template = Template(f.read())
@@ -156,3 +160,15 @@ def modify_vm_types(my_settings: Settings):
             print(err)
 
     return return_code
+
+
+def generate_ssl_cert(my_settings: Settings):
+
+    call("scripts/gen_ssl_certs.sh {}".format(my_settings.pcf_input_domain), shell=True)
+    with open("{}.crt".format(my_settings.pcf_input_domain), 'r') as cert_file:
+        cert = cert_file.read()
+
+    with open("{}.key".format(my_settings.pcf_input_domain), 'r') as key_file:
+        key = key_file.read()
+
+    return cert, key

@@ -28,6 +28,7 @@ DNS.2 = *.sys.${ROOT_DOMAIN}
 DNS.3 = *.apps.${ROOT_DOMAIN}
 DNS.4 = *.login.${ROOT_DOMAIN}
 DNS.5 = *.uaa.${ROOT_DOMAIN}
+DNS.6 = login.${ROOT_DOMAIN}
 EOF
 fi
 
