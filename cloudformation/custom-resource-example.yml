@@ -44,6 +44,22 @@ Resources:
         - !Ref CustomResourceIAMRole
   SQSQueue:
     Type: "AWS::SQS::Queue"
+  SQSQueuePolicy:
+    Type: "AWS::SQS::QueuePolicy"
+    Properties: 
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement: 
+          - Effect: "Allow"
+            Principal:
+              AWS: "*"
+            Action: "sqs:SendMessage"
+            Resource: !GetAtt SQSQueue.Arn
+            Condition:
+              ArnEquals: 
+                aws:SourceArn: !Ref SNSTopic
+      Queues:
+        - !Ref SQSQueue
   SNSTopic:
     Type: "AWS::SNS::Topic"
     Properties: 
@@ -51,7 +67,6 @@ Resources:
       Subscription:
         - Endpoint: !GetAtt SQSQueue.Arn
           Protocol: sqs
-    DependsOn: SQSQueue
   MyCustomResource:
     Type: Custom::CloudFoundryPhase1
     Version: 1.0
@@ -60,7 +75,8 @@ Resources:
       ExampleProperty1: ExampleValue1
       ExampleProperty2: ExampleValue2
     DeletionPolicy: Retain
-    DependsOn: SNSTopic
+    DependsOn: [SQSQueuePolicy,BoostrapInstance]
+
   ## This instance will be used to Query the SQS Queue and Respond with a Custom Resource Status Update. 
   BoostrapInstance:
     Type: AWS::EC2::Instance
@@ -71,7 +87,7 @@ Resources:
       KeyName: !Ref SSHKeyPair
       Monitoring: true
       BlockDeviceMappings:
-        - DeviceName: "/dev/sda1"
+        - DeviceName: "/dev/xvda"
           Ebs:
             DeleteOnTermination: true
             VolumeSize: 50
@@ -82,7 +98,6 @@ Resources:
           GroupSet:
             - !Ref SG
           SubnetId: !Ref Subnet
-      SourceDestCheck: true
       Tags:
         - Key: Name
           Value: "custom-resource-compute"
@@ -92,9 +107,9 @@ Resources:
           set -ex
 
           sudo yum update -y
-          sudo yum install awscli
-          echo QueueURL:${SQSQueue} > ~/SQSInfo.yml
-          echo QueueARN:${SQSQueue.Arn} >> ~/SQSInfo.yml
+          sudo yum install -y awscli jq
+          echo QueueURL:${SQSQueue} > /home/ec2-user/SQSInfo.yml
+          echo QueueARN:${SQSQueue.Arn} >> /home/ec2-user/SQSInfo.yml
 
 Outputs:
   EC2Instance:
