@@ -6,14 +6,14 @@ resources:
   source:
     owner: cf-platform-eng
     repository: quickstart
-    access_token: {{access_token}}
+    access_token: {{github_access_token}}
 
 - name: pivnet-release
   type: github-release
   source:
     owner: pivotal-cf
     repository: pivnet-cli
-    access_token: {{access_token}}
+    access_token: {{github_access_token}}
     version: v0.0.49
 
 - name: om-release
@@ -21,7 +21,7 @@ resources:
   source:
     owner: pivotal-cf
     repository: om
-    access_token: {{access_token}}
+    access_token: {{github_access_token}}
     version: v0.0.22
 
 - name: quickstart-repo
@@ -30,7 +30,7 @@ resources:
     branch: master
     uri: https://github.com/cf-platform-eng/quickstart
     username: cholick
-    password: {{access_token}}
+    password: {{github_access_token}}
     ignore_paths:
       - ci/*.yml
 
@@ -42,23 +42,25 @@ resources:
     branch: quickstart_release_version
     file: quickstart_release_version
     username: cholick
-    password: {{access_token}}
+    password: {{github_access_token}}
 
 - name: quickstart-versioned-release
   type: s3
   source:
-    bucket: quickstart-testing
+    bucket: aws-pcf-quickstart-releases
+    region_name: us-west-2
     regexp: quickstart-(.*).tgz
-    access_key_id: {{access_key_id}}
-    secret_access_key: {{secret_access_key}}
+    access_key_id: {{s3_access_key_id}}
+    secret_access_key: {{s3_secret_access_key}}
 
 - name: quickstart-latest-release
   type: s3
   source:
-    bucket: quickstart-testing
+    bucket: aws-pcf-quickstart-releases
+    region_name: us-west-2
     versioned_file: quickstart-release.tgz
-    access_key_id: {{access_key_id}}
-    secret_access_key: {{secret_access_key}}
+    access_key_id: {{s3_access_key_id}}
+    secret_access_key: {{s3_secret_access_key}}
 
 
 jobs:
@@ -105,7 +107,8 @@ jobs:
           mkdir -p output
           tar -czvf output/quickstart-`cat version/version`.tgz quickstart
   - put: version
-    params: {file: version/version}
+    params:
+      file: version/version
   - put: quickstart-release
     params:
       name: version/version

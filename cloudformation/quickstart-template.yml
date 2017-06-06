@@ -49,11 +49,11 @@ Parameters:
     Description: ARN for pre-uploaded SSL certificate
   08OpsManagerTemplate:
     Type: String
-    Default: https://s3-us-west-2.amazonaws.com/pcf-quickstart-tiles/ops-manager.json
+    Default: https://s3-us-west-2.amazonaws.com/aws-pcf-quickstart-templates/ops-manager.json
     Description: S3 Location for OpsManager CloudFormation Template
   09CloudFoundryTemplate:
     Type: String
-    Default: https://s3-us-west-2.amazonaws.com/pcf-quickstart-tiles/cloud-formation.json
+    Default: https://s3-us-west-2.amazonaws.com/aws-pcf-quickstart-templates/cloud-formation.json
     Description: S3 Location for Base Deployment CloudFormation Template
   10ElbPrefix:
     Type: String
