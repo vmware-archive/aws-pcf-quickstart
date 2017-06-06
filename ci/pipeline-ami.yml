@@ -14,7 +14,7 @@ resources:
     branch: master
     uri: https://github.com/cf-platform-eng/quickstart
     username: cholick
-    password: {{access_token}}
+    password: {{github_access_token}}
     ignore_paths:
       - ci/*.yml
 
@@ -26,7 +26,7 @@ resources:
     branch: ami_version
     file: ami_version
     username: cholick
-    password: {{access_token}}
+    password: {{github_access_token}}
 
 - name: ert-tile
   type: pivnet
@@ -77,8 +77,8 @@ jobs:
       - name: stemcell
       - name: ami-version
       params:
-        AWS_ACCESS_KEY_ID: {{aws_integration_access_key_id}}
-        AWS_SECRET_ACCESS_KEY: {{aws_integration_secret_access_key}}
+        AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
+        AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}
       run:
         path: bash
         args:
