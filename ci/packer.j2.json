@@ -30,7 +30,17 @@
     },
     {
       "destination": "/home/ubuntu/tiles/",
+      "source": "{{ert_file}}",
+      "type": "file"
+    },
+    {
+      "destination": "/home/ubuntu/tiles/",
       "source": "{{broker_file}}",
+      "type": "file"
+    },
+     {
+      "destination": "/home/ubuntu/tiles/",
+      "source": "{{stemcell_file}}",
       "type": "file"
     }
   ]
