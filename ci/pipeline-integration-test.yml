@@ -7,7 +7,7 @@ resources:
     branch: master
     uri: https://github.com/cf-platform-eng/quickstart
     username: cholick
-    password: {{access_token}}
+    password: {{github_access_token}}
     ignore_paths:
       - ci/*.yml
 
@@ -16,7 +16,7 @@ resources:
   source:
     owner: pivotal-cf
     repository: om
-    access_token: {{access_token}}
+    access_token: {{github_access_token}}
     version: v0.0.22
 
 jobs:
@@ -41,8 +41,8 @@ jobs:
         AWS_CF_SSLCERTIFICATEARN: {{aws_cf_sslcertificatearn}}
         AWS_CF_NATKEYPAIR: {{aws_cf_natkeypair}}
         AWS_CF_PIVNETTOKEN: {{aws_cf_pivnettoken}}
-        AWS_ACCESS_KEY_ID: {{aws_integration_access_key_id}}
-        AWS_SECRET_ACCESS_KEY: {{aws_integration_secret_access_key}}
+        AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
+        AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}
         AWS_INTEGRATION_REGION: {{aws_integration_region}}
       run:
         path: bash

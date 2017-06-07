@@ -75,7 +75,7 @@ def curl_payload(my_settings: settings.Settings, path: str, data: str, method: s
 
 
 def is_recoverable_error(err: str):
-    recoverable_errors = ["i/o timeout", "connection refused"]
+    recoverable_errors = ["i/o timeout", "connection refused", "received unexpected status"]
     clean_err = err
     for recoverable_error in recoverable_errors:
         if clean_err.endswith(recoverable_error):
