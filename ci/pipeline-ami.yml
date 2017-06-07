@@ -49,6 +49,24 @@ resources:
     product_slug: stemcells
     product_version: "3363.20"
 
+- name: packer-result
+  type: s3
+  source:
+    bucket: aws-pcf-quickstart-releases
+    region_name: us-west-2
+    regexp: packer-result-(.*).json
+    access_key_id: {{s3_access_key_id}}
+    secret_access_key: {{s3_secret_access_key}}
+
+- name: ami-mapping
+  type: s3
+  source:
+    bucket: aws-pcf-quickstart-releases
+    region_name: us-west-2
+    regexp: ami-mapping-(.*).json
+    access_key_id: {{s3_access_key_id}}
+    secret_access_key: {{s3_secret_access_key}}
+
 jobs:
 - name: build-ami
   plan:
@@ -63,7 +81,7 @@ jobs:
     params:
       bump: patch
   - task: build-ami
-    attempts: 5
+    attempts: 2
     config:
       platform: linux
       image_resource:
@@ -76,6 +94,8 @@ jobs:
       - name: aws-broker-tile
       - name: stemcell
       - name: ami-version
+      outputs:
+      - name: output
       params:
         AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
         AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}
@@ -85,6 +105,46 @@ jobs:
         - -exc
         - |
           ./quickstart-repo/ci/generate-packer.py
+          mkdir -p output
+          cp manifest.json output/packer-result-$(cat ./ami-version/version).json
   - put: ami-version
     params:
       file: ami-version/version
+  - put: packer-result
+    params:
+      file: output/packer-result-*.json
+
+- name: replicate-ami
+  plan:
+  - get: quickstart-repo
+  - get: packer-result
+    trigger: true
+    passed:
+    - build-ami
+  - get: ami-version
+  - task: replicate-ami
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: cfplatformeng/quickstart-ci
+      inputs:
+      - name: quickstart-repo
+      - name: packer-result
+      - name: ami-version
+      outputs:
+      - name: output
+      params:
+        AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
+        AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}
+      run:
+        path: bash
+        args:
+        - -exc
+        - |
+          mkdir -p output
+          ./quickstart-repo/ci/copy-image.py
+  - put: ami-mapping
+    params:
+      file: output/ami-mapping-*.json
