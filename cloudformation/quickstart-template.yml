@@ -451,7 +451,7 @@ Resources:
           chmod 0755 /var/local/cloudformation/stack-meta.json
 
           wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 --tries=15 \
-              https://s3.amazonaws.com/quickstart-testing/quickstart-release.tgz \
+              https://s3-us-west-2.amazonaws.com/aws-pcf-quickstart-releases/quickstart-release.tgz \
               -O /tmp/quickstart-release.tgz
 
           tar -xvf /tmp/quickstart-release.tgz -C /home/ubuntu/
