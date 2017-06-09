@@ -514,7 +514,7 @@ Resources:
           chown -R ubuntu:ubuntu /home/ubuntu/quickstart
 
           /home/ubuntu/quickstart/daemon/install.sh
-          #su ubuntu -c /home/ubuntu/quickstart/bootstrap.sh
+          su ubuntu -c /home/ubuntu/quickstart/bootstrap.sh
 
   02DNSOpsMan:
     Type: AWS::Route53::RecordSet
