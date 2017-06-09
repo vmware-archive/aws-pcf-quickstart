@@ -142,9 +142,10 @@ Resources:
         12AdminEmail: !Ref 13AdminEmail
       TemplateURL: !Ref 09CloudFoundryTemplate
   ## Custom resource stuff
-  CustomResourceSQSQueue.fifo:
+  CustomResourceSQSQueue:
     Type: "AWS::SQS::Queue"
     Properties:
+      Name: CustomResourceSQSQueue.fifo
       FifoQueue: true
   CustomResourceSQSQueuePolicy:
     Type: "AWS::SQS::QueuePolicy"
