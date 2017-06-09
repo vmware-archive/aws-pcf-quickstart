@@ -145,7 +145,7 @@ Resources:
   CustomResourceSQSQueue:
     Type: "AWS::SQS::Queue"
     Properties:
-      Name: CustomResourceSQSQueue.fifo
+      QueueName: CustomResourceSQSQueue.fifo
       FifoQueue: true
   CustomResourceSQSQueuePolicy:
     Type: "AWS::SQS::QueuePolicy"
