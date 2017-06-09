@@ -36,7 +36,8 @@ class Settings:
         "PcfElasticRuntimeS3DropletsBucket",
         "PcfElasticRuntimeS3PackagesBucket",
         "PcfElasticRuntimeS3ResourcesBucket",
-        "PcfNumberOfAZs"
+        "PcfNumberOfAZs",
+        "PcfCustomResourceSQSQueueUrl"
     ]
 
     def __init__(self):
@@ -143,6 +144,10 @@ class Settings:
     @property
     def pcf_pcfnumberofazs(self):
         return int(self.parameters["PcfNumberOfAZs"])
+
+    @property
+    def pcf_pcfcustomresourcesqsqueueurl(self):
+        return self.parameters["PcfCustomResourceSQSQueueUrl"]
 
     @property
     def pcf_input_pivnettoken(self):

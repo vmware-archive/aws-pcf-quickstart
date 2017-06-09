@@ -141,6 +141,40 @@ Resources:
         11PivnetToken: !Ref 12PivnetToken
         12AdminEmail: !Ref 13AdminEmail
       TemplateURL: !Ref 09CloudFoundryTemplate
+  ## Custom resource stuff
+  CustomResourceSQSQueue:
+    Type: "AWS::SQS::Queue"
+    Properties:
+      FifoQueue: true
+  CustomResourceSQSQueuePolicy:
+    Type: "AWS::SQS::QueuePolicy"
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              AWS: "*"
+            Action: "sqs:SendMessage"
+            Resource: !GetAtt CustomResourceSQSQueue.Arn
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !Ref CustomResourceSNSTopic
+      Queues:
+        - !Ref CustomResourceSQSQueue
+  CustomResourceSNSTopic:
+    Type: "AWS::SNS::Topic"
+    Properties:
+      DisplayName: custom-resource-topic
+      Subscription:
+        - Endpoint: !GetAtt CustomResourceSQSQueue.Arn
+          Protocol: sqs
+  MyCustomBOSH:
+    Type: Custom::BOSH
+    Version: 1.0
+    Properties:
+      ServiceToken: !Ref CustomResourceSNSTopic
+    DependsOn: [CustomResourceSQSQueuePolicy,BootstrapInstance]
   ## This Policy is for Allowing the OpsManager EC2 Instance access to the Describe stack and
   ## Stored Parameters.
   PCFDescribeStackPolicy:
@@ -170,6 +204,18 @@ Resources:
               - "ssm:GetParameters"
             Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}.*"
       PolicyName: !Sub ${AWS::StackName}-parameter-store
+      Roles:
+        - !GetAtt 01PCFBase.Outputs.PcfIamRole
+  PCFCustomResourcePolicy:
+    Type: "AWS::IAM::Policy"
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Action: "sqs:*"
+            Resource: !GetAtt CustomResourceSQSQueue.Arn
       Roles:
         - !GetAtt 01PCFBase.Outputs.PcfIamRole
   ## This is the Start of our Secured Parameters
@@ -390,6 +436,14 @@ Resources:
       Description: Misc
       Type: String
       Value: !Ref NumberOfAZs
+  PcfCustomResourceSQSQueueUrl:
+    Type: "AWS::SSM::Parameter"
+    Properties:
+      Name: !Sub "${AWS::StackName}.PcfCustomResourceSQSQueueUrl"
+      Description: Misc
+      Type: String
+      Value: !Ref CustomResourceSQSQueue
+
   ## This is the End of our Secured Parameters
   ## This is the EC2 Ops Manager
   01OpsManagerInstance:
@@ -458,7 +512,7 @@ Resources:
           chown -R ubuntu:ubuntu /home/ubuntu/quickstart
 
           /home/ubuntu/quickstart/daemon/install.sh
-          su ubuntu -c /home/ubuntu/quickstart/bootstrap.sh
+          #su ubuntu -c /home/ubuntu/quickstart/bootstrap.sh
 
   02DNSOpsMan:
     Type: AWS::Route53::RecordSet

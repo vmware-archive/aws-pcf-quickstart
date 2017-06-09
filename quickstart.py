@@ -1,94 +1,30 @@
-import datetime
 import os
 import sys
-import time
-
-import click
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, os.path.join(PATH, 'lib'))
 
-from lib import settings, om_manager, configure_opsman_director, download_tiles, configure_ert, \
-    delete_everything
+from lib import settings, om_manager, configure_opsman_director, configure_ert, sqs
+
+my_settings = settings.Settings()
+
+asset_path = '/home/ubuntu/times'
 
 
-@click.group()
-@click.option('--debug/--no-debug', default=False)
-@click.pass_context
-def cli(ctx, debug):
-    my_settings = settings.Settings()
-    ctx.obj['settings'] = my_settings
-    my_settings.debug = debug
+def check_return_code(return_code, step_name):
+    print("Running {}".format(step_name))
+    if return_code != 0:
+        sqs.report_cr_creation_failure(my_settings)
+        sys.exit(1)
 
 
-@cli.command('configure-opsman-auth')
-@click.pass_context
-def config_opsman_auth_cmd(ctx):
-    sys.exit(time_cmd(om_manager.config_opsman_auth, ctx.obj['settings']))
+check_return_code(om_manager.config_opsman_auth(my_settings), 'config_opsman_auth')
+check_return_code(configure_opsman_director.configure_opsman_director(my_settings), 'configure_opsman_director')
+check_return_code(om_manager.apply_changes(my_settings), 'apply_changes')
+check_return_code(om_manager.upload_assets(my_settings, asset_path), 'my_settings')
+check_return_code(om_manager.upload_stemcell(my_settings, asset_path), 'my_settings')
+check_return_code(configure_ert.configure_ert(my_settings), 'configure_ert')
+check_return_code(om_manager.apply_changes(my_settings), 'apply_changes')
 
-
-@cli.command('configure-opsman-director')
-@click.pass_context
-def config_bosh(ctx):
-    sys.exit(time_cmd(configure_opsman_director.configure_opsman_director, ctx.obj['settings']))
-
-
-@cli.command('apply-changes')
-@click.pass_context
-def apply_changes(ctx):
-    sys.exit(time_cmd(om_manager.apply_changes, ctx.obj['settings']))
-
-
-@cli.command('download-tiles')
-@click.pass_context
-def apply_changes(ctx):
-    sys.exit(time_cmd(download_tiles.download_tiles, ctx.obj['settings']))
-
-
-@cli.command('upload-assets')
-@click.argument('path')
-@click.pass_context
-def upload_assets(ctx, path):
-    sys.exit(time_cmd(om_manager.upload_assets, ctx.obj['settings'], path))
-
-
-@cli.command('upload-stemcell')
-@click.argument('path')
-@click.pass_context
-def upload_stemcells(ctx, path):
-    sys.exit(time_cmd(om_manager.upload_stemcell, ctx.obj['settings'], path))
-
-
-@cli.command('configure-ert')
-@click.pass_context
-def config_ert(ctx):
-    sys.exit(time_cmd(configure_ert.configure_ert, ctx.obj['settings']))
-
-
-@cli.command('curl')
-@click.argument('path')
-@click.pass_context
-def curl(ctx, path):
-    sys.exit(time_cmd(om_manager.curl_get, ctx.obj['settings'], path))
-
-
-@cli.command('delete-everything')
-@click.pass_context
-def delete(ctx):
-    sys.exit(time_cmd(delete_everything.delete_everything, ctx.obj['settings']))
-
-
-def time_cmd(cmd, *args):
-    cmd_name = cmd.__name__
-    print("Starting {}".format(cmd_name))
-    start = time.time()
-    exit_code = cmd(*args)
-    end = time.time()
-    print("Duration for {}: {}".format(cmd_name, datetime.timedelta(seconds=end - start)))
-    if exit_code != 0:
-        print("{} failed".format(cmd_name))
-    return exit_code
-
-
-if __name__ == "__main__":
-    cli(obj={})
+exit_code = sqs.report_cr_creation_success(my_settings)
+sys.exit(exit_code)
