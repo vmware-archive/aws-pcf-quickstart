@@ -217,6 +217,7 @@ Resources:
             Effect: "Allow"
             Action: "sqs:*"
             Resource: !GetAtt CustomResourceSQSQueue.Arn
+      PolicyName: !Sub ${AWS::StackName}-custom-resource
       Roles:
         - !GetAtt 01PCFBase.Outputs.PcfIamRole
   ## This is the Start of our Secured Parameters
