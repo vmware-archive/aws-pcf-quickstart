@@ -19,12 +19,13 @@ def check_return_code(return_code, step_name):
 
 
 check_return_code(om_manager.config_opsman_auth(my_settings), 'config_opsman_auth')
+
+print("Reporting success early, until we workout how to increase the timeout")
+sqs.report_cr_creation_success(my_settings)
+
 check_return_code(configure_opsman_director.configure_opsman_director(my_settings), 'configure_opsman_director')
 check_return_code(om_manager.apply_changes(my_settings), 'apply_changes')
 check_return_code(om_manager.upload_assets(my_settings, asset_path), 'my_settings')
 check_return_code(om_manager.upload_stemcell(my_settings, asset_path), 'my_settings')
 check_return_code(configure_ert.configure_ert(my_settings), 'configure_ert')
 check_return_code(om_manager.apply_changes(my_settings), 'apply_changes')
-
-exit_code = sqs.report_cr_creation_success(my_settings)
-sys.exit(exit_code)

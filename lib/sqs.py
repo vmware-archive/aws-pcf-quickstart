@@ -7,11 +7,11 @@ import settings
 
 
 def report_cr_creation_failure(my_settings: settings.Settings):
-    report_create_status(my_settings, 'FAILED')
+    return report_create_status(my_settings, 'FAILED')
 
 
 def report_cr_creation_success(my_settings: settings.Settings):
-    report_create_status(my_settings, 'SUCCESS')
+    return report_create_status(my_settings, 'SUCCESS')
 
 
 def report_create_status(my_settings: settings.Settings, status: str):
