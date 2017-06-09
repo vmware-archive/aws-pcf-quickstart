@@ -60,7 +60,7 @@ def get_messages(my_settings: settings.Settings):
     sqs = boto3.client(service_name='sqs', region_name=my_settings.region)
     response = sqs.receive_message(
         QueueUrl=my_settings.pcf_pcfcustomresourcesqsqueueurl,
-        MaxNumberOfMessages=100,
+        MaxNumberOfMessages=10,
         VisibilityTimeout=0
     )
 
