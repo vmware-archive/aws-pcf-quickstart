@@ -1,7 +1,7 @@
 import json
+from subprocess import call
 
 from jinja2 import Template
-from subprocess import call
 
 import om_manager
 from settings import Settings
@@ -57,6 +57,7 @@ def configure_ert_resources(my_settings: Settings):
     )
     return om_manager.exponential_backoff(cmd, my_settings.debug)
 
+
 def configure_ert_multiaz_resources(my_settings: Settings):
     if my_settings.pcf_pcfnumberofazs > 1:
         with open("templates/ert_multiaz_resources_config.j2.json", 'r') as f:
@@ -68,6 +69,7 @@ def configure_ert_multiaz_resources(my_settings: Settings):
         )
         return om_manager.exponential_backoff(cmd, my_settings.debug)
     return 0
+
 
 def configure_ert_config(my_settings: Settings):
     cert, key = generate_ssl_cert(my_settings)
@@ -163,7 +165,6 @@ def modify_vm_types(my_settings: Settings):
 
 
 def generate_ssl_cert(my_settings: Settings):
-
     call("scripts/gen_ssl_certs.sh {}".format(my_settings.pcf_input_domain), shell=True)
     with open("{}.crt".format(my_settings.pcf_input_domain), 'r') as cert_file:
         cert = cert_file.read()

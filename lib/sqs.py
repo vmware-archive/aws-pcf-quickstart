@@ -63,5 +63,8 @@ def get_messages(my_settings: settings.Settings):
         MaxNumberOfMessages=10,
         VisibilityTimeout=0
     )
+    print("-------------------------")
+    print(json.dumps(response, indent="  "))
+    print("-------------------------")
 
     return response.get('Messages', [])
