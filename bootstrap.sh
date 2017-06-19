@@ -6,4 +6,4 @@ cd /home/ubuntu/quickstart
 export PATH=./bin:$PATH
 sudo pip3 install ./vendor/*
 
-python3 quickstart.py
+python3 -u quickstart.py

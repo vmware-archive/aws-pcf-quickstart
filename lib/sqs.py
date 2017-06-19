@@ -1,6 +1,6 @@
 import json
-import boto3
 
+import boto3
 import requests
 
 import settings
@@ -35,6 +35,8 @@ def report_create_status(my_settings: settings.Settings, status: str):
         params=response_params,
         data=str.encode(json.dumps(response_for_cloud_formation))
     )
+    #todo: delete message from queue
+
     return 0
 
 

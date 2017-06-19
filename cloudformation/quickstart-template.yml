@@ -145,9 +145,15 @@ Resources:
   CustomResourceSQSQueue:
     Type: "AWS::SQS::Queue"
     Properties:
-      QueueName: CustomResourceSQSQueue.fifo
-      FifoQueue: true
-      VisibilityTimeout: 5
+      QueueName: CustomResourceSQSQueue
+      VisibilityTimeout: 0
+  CustomResourceSNSTopic:
+    Type: "AWS::SNS::Topic"
+    Properties:
+      DisplayName: custom-resource-topic
+      Subscription:
+        - Endpoint: !GetAtt CustomResourceSQSQueue.Arn
+          Protocol: sqs
   CustomResourceSQSQueuePolicy:
     Type: "AWS::SQS::QueuePolicy"
     Properties:
@@ -164,13 +170,6 @@ Resources:
                 aws:SourceArn: !Ref CustomResourceSNSTopic
       Queues:
         - !Ref CustomResourceSQSQueue
-  CustomResourceSNSTopic:
-    Type: "AWS::SNS::Topic"
-    Properties:
-      DisplayName: custom-resource-topic
-      Subscription:
-        - Endpoint: !GetAtt CustomResourceSQSQueue.Arn
-          Protocol: sqs
   MyCustomBOSH:
     Type: Custom::BOSH
     Version: 1.0

@@ -8,7 +8,7 @@ from lib import settings, om_manager, configure_opsman_director, configure_ert, 
 
 my_settings = settings.Settings()
 
-asset_path = '/home/ubuntu/times'
+asset_path = '/home/ubuntu/tiles'
 
 
 def check_return_code(return_code, step_name):
