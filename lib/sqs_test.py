@@ -56,12 +56,13 @@ class TestOmManager(unittest.TestCase):
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0].get('MD5OfBody'), '46e9054484367800fbd6bb8e13aaea36')
 
+    @patch('sqs.delete_messages')
     @patch('sqs.get_messages')
     @patch('requests.put')
-    def test_cr_creation_success(self, mock_put, mock_get_messages):
+    def test_cr_creation_success(self, mock_put, mock_get_messages, mock_delete_messages):
         mock_get_messages.return_value = self.response.get('Messages')
 
-        return_code = sqs.report_cr_creation_success(self.settings)
+        return_code = sqs.report_cr_creation_success(self.settings, 'MyCustomResource')
 
         body = {
             'Status': 'SUCCESS',
@@ -71,8 +72,7 @@ class TestOmManager(unittest.TestCase):
             'StackId': 'arn:aws:cloudformation:us-west-2:540420658117:stack/pcf-stack/1e820540-4c58-11e7-a965-50d5ca0184f2',
             'Data': {}
         }
-        payload=json.dumps(body)
-
+        payload = json.dumps(body)
 
         self.assertEqual(mock_put.call_count, 1)
         mock_put.assert_called_with(
@@ -81,12 +81,29 @@ class TestOmManager(unittest.TestCase):
             data=bytes(payload, 'utf-8')
         )
         self.assertEqual(return_code, 0)
+        self.assertEqual(mock_delete_messages.call_count, 1)
 
     @patch('sqs.get_messages')
     @patch('requests.put')
     def test_cr_creation_no_messages(self, mock_put, mock_get_messages):
         mock_get_messages.return_value = []
 
-        return_code = sqs.report_cr_creation_success(self.settings)
+        return_code = sqs.report_cr_creation_success(self.settings, 'MyCustomResource')
 
         self.assertEqual(return_code, 1)
+
+    @patch('boto3.client')
+    def test_delete_message(self, mock_client_constructor):
+        mock_client = Mock()
+        mock_client_constructor.return_value = mock_client
+        mock_client.delete_message.return_value = self.response
+
+        message = self.response.get('Messages')[0]
+
+        sqs.delete_messages(self.settings, message)
+
+        self.assertEqual(mock_client.delete_message.call_count, 1)
+        mock_client.delete_message.assert_called_with(
+            QueueUrl="https://queue.example.com",
+            ReceiptHandle="AQEBCLcjvnWL65ILiE9/L6WzthEatj3punqXWcxK/VGSfOhkjbfaMoy6GHtxPr/giOjO2gIW7buTv9Mkhk7/tpgbgJEm338nzoLOxqiW4s3fzoQWrjDu0HHpcD1KrMJBeVstxnLglEOOny2KRozfsLjbeH5HoXuo+8mrb0nwVUglIK2vBkAPHLOGu64/BPOR6dt2qgYK4hzytgXQprcLlS5rYrrpYkqBKjWt9PCuwSG244LuN3brNyRIgxPR9SQ/ja9CWocx7sS3Ri6tAVU8zP4OxjRmfdMj/EEdL3Wm5m4v7+hnGDnj0LSV/3UX6C1/ozIOtHY6bqN6HQ6nM48Dk6UTEm78ApFuYmOFnh5xfcAEJHHN9meqnMsYMe0l8hTEBRHDYII/W4K5APbUNNsuoU/R3uYgqWlNMFWDvxSORKPwy/2O0Kk51+ZE/fyGEaVncoof"
+        )
