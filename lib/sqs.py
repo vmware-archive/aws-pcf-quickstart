@@ -6,15 +6,23 @@ import requests
 import settings
 
 
-def report_cr_creation_failure(my_settings: settings.Settings, logical_resource_id: str):
-    return report_create_status(my_settings, logical_resource_id, 'FAILED')
-
-
 def report_cr_creation_success(my_settings: settings.Settings, logical_resource_id: str):
-    return report_create_status(my_settings, logical_resource_id, 'SUCCESS')
+    return report_status(my_settings, 'Create', logical_resource_id, 'SUCCESS')
 
 
-def report_create_status(my_settings: settings.Settings, logical_resource_id: str, status: str):
+def report_cr_creation_failure(my_settings: settings.Settings, logical_resource_id: str):
+    return report_status(my_settings, 'Create', logical_resource_id, 'FAILED')
+
+
+def report_cr_deletion_success(my_settings: settings.Settings, logical_resource_id: str):
+    return report_status(my_settings, 'Delete', logical_resource_id, 'SUCCESS')
+
+
+def report_cr_deletion_failure(my_settings: settings.Settings, logical_resource_id: str):
+    return report_status(my_settings, 'Delete', logical_resource_id, 'FAILED')
+
+
+def report_status(my_settings: settings.Settings, request_type: str, logical_resource_id: str, status: str):
     raw_message = get_messages(my_settings)
     if len(raw_message) < 1:
         print("No message on queue... so we can't report back")
@@ -22,10 +30,10 @@ def report_create_status(my_settings: settings.Settings, logical_resource_id: st
     messages = [parse_message(m) for m in raw_message]
     create_messages = [
         m for m in messages if
-        m.get('RequestType') == 'Create' and m.get('LogicalResourceId') == logical_resource_id
+        m.get('RequestType') == request_type and m.get('LogicalResourceId') == logical_resource_id
     ]
     if len(create_messages) < 1:
-        print("No message of type 'Create', so unable to report back to CloudFormation")
+        print("No message of type '{}', so unable to report back to CloudFormation".format(request_type))
         return 1
     create_message = create_messages[0]
     response_for_cloud_formation = build_payload(create_message, status)

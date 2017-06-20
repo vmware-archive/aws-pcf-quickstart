@@ -97,25 +97,25 @@ Parameters:
 Mappings:
   ## Mapping of OpsManager AMI in AWS Regions.
   01OpsManagerAMI:
-    ap-northeast-1: 
+    ap-northeast-1:
       "64": "ami-6088a607"
-    ap-northeast-2: 
+    ap-northeast-2:
       "64": "ami-f831e396"
-    ap-southeast-1: 
+    ap-southeast-1:
       "64": "ami-06e65e65"
-    ap-southeast-2: 
+    ap-southeast-2:
       "64": "ami-93f6fff0"
-    eu-west-1: 
+    eu-west-1:
       "64": "ami-cfc8cfa9"
-    eu-central-1: 
+    eu-central-1:
       "64": "ami-cff72aa0"
-    sa-east-1: 
+    sa-east-1:
       "64": "ami-921c71fe"
-    us-east-1: 
+    us-east-1:
       "64": "ami-8d48da9b"
-    us-west-1: 
+    us-west-1:
       "64": "ami-915470f1"
-    us-west-2: 
+    us-west-2:
       "64": "ami-483ba628"
   BootstrapAMI:
     us-west-1:
@@ -175,7 +175,42 @@ Resources:
     Version: 1.0
     Properties:
       ServiceToken: !Ref CustomResourceSNSTopic
-    DependsOn: [CustomResourceSQSQueuePolicy,BootstrapInstance]
+    DependsOn:
+    - CustomResourceSQSQueuePolicy
+    - BootstrapInstance
+    - 01OpsManagerInstance
+    - PcfElbDnsName
+    - PcfPublicSubnetAvailabilityZone
+    - PcfPrivateSubnetAvailabilityZone
+    - PcfPrivateSubnet2AvailabilityZone
+    - PcfElasticRuntimeS3DropletsBucket
+    - PcfIamRole
+    - PcfElbSshDnsName
+    - PcfVmsSecurityGroupId
+    - PcfElasticRuntimeS3BuildpacksBucket
+    - PcfVpc
+    - PcfPublicSubnetId
+    - PcfRdsPassword
+    - PcfIamUserName
+    - PcfPrivateSubnet2Id
+    - PcfRdsDBName
+    - PcfOpsManagerS3Bucket
+    - PcfPublicSubnetId2
+    - PcfElasticRuntimeS3PackagesBucket
+    - PcfIamUserSecretAccessKey
+    - PcfIamUserAccessKey
+    - PcfRdsPort
+    - PcfRdsUsername
+    - PcfElbDnsName
+    - PcfPrivateSubnetId
+    - PcfElasticRuntimeS3ResourcesBucket
+    - PcfRdsAddress
+    - PcfElbTcpDnsName
+    - PcfOpsManagerSecurityGroupId
+    - PcfPublicSubnetAvailabilityZone2
+    - PcfOpsManagerAdminPassword
+    - PcfNumberOfAZs
+    - PcfCustomResourceSQSQueueUrl
   ## This Policy is for Allowing the OpsManager EC2 Instance access to the Describe stack and
   ## Stored Parameters.
   PCFDescribeStackPolicy:
@@ -194,13 +229,13 @@ Resources:
         - !GetAtt 01PCFBase.Outputs.PcfIamRole
   PCFParameterStorePolicy:
     Type: "AWS::IAM::Policy"
-    Properties: 
+    Properties:
       PolicyDocument:
         Version: "2012-10-17"
-        Statement: 
-          - 
+        Statement:
+          -
             Effect: "Allow"
-            Action: 
+            Action:
               - "ssm:DescribeParameters"
               - "ssm:GetParameters"
             Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}.*"
@@ -221,9 +256,9 @@ Resources:
       Roles:
         - !GetAtt 01PCFBase.Outputs.PcfIamRole
   ## This is the Start of our Secured Parameters
-  PcfElbDnsName:      
+  PcfElbDnsName:
     Type: "AWS::SSM::Parameter"
-    Properties: 
+    Properties:
       Name: !Sub "${AWS::StackName}.PcfElbDnsName"
       Description: PCF Provisioned ELB
       Type: String
@@ -462,13 +497,13 @@ Resources:
             DeleteOnTermination: true
             VolumeSize: 100
             VolumeType: gp2
-      NetworkInterfaces: 
+      NetworkInterfaces:
         - AssociatePublicIpAddress: "true"
           DeviceIndex: "0"
-          GroupSet: 
+          GroupSet:
             - !GetAtt 01PCFBase.Outputs.PcfOpsManagerSecurityGroupId
           SubnetId: !GetAtt 01PCFBase.Outputs.PcfPublicSubnetId
-      SourceDestCheck: true 
+      SourceDestCheck: true
       Tags:
         - Key: Name
           Value: "PCF Ops Manager"

@@ -24,6 +24,7 @@ def delete_everything(my_settings: Settings, delete_buckets=False):
     ]
 
     # todo: should we delete the keypair...?
+    # todo: call delete twice
 
     for bucket_name in buckets:
         try:

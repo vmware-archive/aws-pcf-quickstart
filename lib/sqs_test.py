@@ -7,7 +7,7 @@ import sqs
 from settings import Settings
 
 
-class TestOmManager(unittest.TestCase):
+class TestSqs(unittest.TestCase):
     def setUp(self):
         self.settings = Mock(Settings)
         self.settings.region = 'canada-1a'
@@ -59,7 +59,7 @@ class TestOmManager(unittest.TestCase):
     @patch('sqs.delete_messages')
     @patch('sqs.get_messages')
     @patch('requests.put')
-    def test_cr_creation_success(self, mock_put, mock_get_messages, mock_delete_messages):
+    def test_report_status(self, mock_put, mock_get_messages, mock_delete_messages):
         mock_get_messages.return_value = self.response.get('Messages')
 
         return_code = sqs.report_cr_creation_success(self.settings, 'MyCustomResource')
@@ -85,7 +85,7 @@ class TestOmManager(unittest.TestCase):
 
     @patch('sqs.get_messages')
     @patch('requests.put')
-    def test_cr_creation_no_messages(self, mock_put, mock_get_messages):
+    def test_report_status_no_messages(self, mock_put, mock_get_messages):
         mock_get_messages.return_value = []
 
         return_code = sqs.report_cr_creation_success(self.settings, 'MyCustomResource')
@@ -107,3 +107,15 @@ class TestOmManager(unittest.TestCase):
             QueueUrl="https://queue.example.com",
             ReceiptHandle="AQEBCLcjvnWL65ILiE9/L6WzthEatj3punqXWcxK/VGSfOhkjbfaMoy6GHtxPr/giOjO2gIW7buTv9Mkhk7/tpgbgJEm338nzoLOxqiW4s3fzoQWrjDu0HHpcD1KrMJBeVstxnLglEOOny2KRozfsLjbeH5HoXuo+8mrb0nwVUglIK2vBkAPHLOGu64/BPOR6dt2qgYK4hzytgXQprcLlS5rYrrpYkqBKjWt9PCuwSG244LuN3brNyRIgxPR9SQ/ja9CWocx7sS3Ri6tAVU8zP4OxjRmfdMj/EEdL3Wm5m4v7+hnGDnj0LSV/3UX6C1/ozIOtHY6bqN6HQ6nM48Dk6UTEm78ApFuYmOFnh5xfcAEJHHN9meqnMsYMe0l8hTEBRHDYII/W4K5APbUNNsuoU/R3uYgqWlNMFWDvxSORKPwy/2O0Kk51+ZE/fyGEaVncoof"
         )
+
+    @patch('sqs.report_status')
+    def test_report_deletion_success(self, mock_report_status):
+        sqs.report_cr_deletion_success(self.settings, 'MyCustomResource')
+
+        mock_report_status.assert_called_with(self.settings, 'Delete', 'MyCustomResource', 'SUCCESS')
+
+    @patch('sqs.report_status')
+    def test_report_deletion_failure(self, mock_report_status):
+        sqs.report_cr_deletion_failure(self.settings, 'MyCustomResource')
+
+        mock_report_status.assert_called_with(self.settings, 'Delete', 'MyCustomResource', 'FAILED')
