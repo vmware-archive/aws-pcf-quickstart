@@ -179,6 +179,14 @@ Resources:
     - CustomResourceSQSQueuePolicy
     - BootstrapInstance
     - 01OpsManagerInstance
+    - 02DNSOpsMan
+    - DNSSys
+    - DNSStar
+    - DNS
+    - DNSApps
+    - PCFDescribeStackPolicy
+    - PCFParameterStorePolicy
+    - PCFCustomResourcePolicy
     - PcfElbDnsName
     - PcfPublicSubnetAvailabilityZone
     - PcfPrivateSubnetAvailabilityZone
