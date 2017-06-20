@@ -40,6 +40,7 @@ def report_create_status(my_settings: settings.Settings, logical_resource_id: st
     )
 
     for create_message in create_messages:
+        print("Deleting message", create_message.get('ReceiptHandle'))
         delete_messages(my_settings, create_message)
 
     return 0
@@ -60,7 +61,10 @@ def parse_message(matryoshka_message):
     body = json.loads(matryoshka_message.get('Body'))
     print("Parsed message, body")
     print(body)
-    return json.loads(body.get('Message'))
+    parsed = json.loads(body.get('Message'))
+    parsed["ReceiptHandle"] = matryoshka_message.get("ReceiptHandle")
+
+    return parsed
 
 
 def delete_messages(my_settings: settings.Settings, message):
@@ -76,7 +80,7 @@ def get_messages(my_settings: settings.Settings):
     response = sqs.receive_message(
         QueueUrl=my_settings.pcf_pcfcustomresourcesqsqueueurl,
         MaxNumberOfMessages=10,
-        VisibilityTimeout=0
+        VisibilityTimeout=1
     )
     # todo: remove debugging
     print("-------------------------")

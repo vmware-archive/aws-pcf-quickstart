@@ -146,7 +146,7 @@ Resources:
     Type: "AWS::SQS::Queue"
     Properties:
       QueueName: CustomResourceSQSQueue
-      VisibilityTimeout: 0
+      VisibilityTimeout: 1
   CustomResourceSNSTopic:
     Type: "AWS::SNS::Topic"
     Properties:
@@ -176,8 +176,6 @@ Resources:
     Properties:
       ServiceToken: !Ref CustomResourceSNSTopic
     DependsOn: [CustomResourceSQSQueuePolicy,BootstrapInstance]
-    # todo: retain is temp, for testing
-    DeletionPolicy: Retain
   ## This Policy is for Allowing the OpsManager EC2 Instance access to the Describe stack and
   ## Stored Parameters.
   PCFDescribeStackPolicy:

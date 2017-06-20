@@ -50,7 +50,7 @@ class TestOmManager(unittest.TestCase):
         mock_client.receive_message.assert_called_with(
             QueueUrl="https://queue.example.com",
             MaxNumberOfMessages=10,
-            VisibilityTimeout=0
+            VisibilityTimeout=1
         )
 
         self.assertEqual(len(messages), 1)
