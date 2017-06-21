@@ -6,19 +6,19 @@ import requests
 import settings
 
 
-def report_cr_creation_success(my_settings: settings.Settings, logical_resource_id: str):
+def report_cr_creation_success(my_settings: settings.Settings, logical_resource_id: str = ""):
     return report_status(my_settings, 'Create', logical_resource_id, 'SUCCESS')
 
 
-def report_cr_creation_failure(my_settings: settings.Settings, logical_resource_id: str):
+def report_cr_creation_failure(my_settings: settings.Settings, logical_resource_id: str = ""):
     return report_status(my_settings, 'Create', logical_resource_id, 'FAILED')
 
 
-def report_cr_deletion_success(my_settings: settings.Settings, logical_resource_id: str):
+def report_cr_deletion_success(my_settings: settings.Settings, logical_resource_id: str = ""):
     return report_status(my_settings, 'Delete', logical_resource_id, 'SUCCESS')
 
 
-def report_cr_deletion_failure(my_settings: settings.Settings, logical_resource_id: str):
+def report_cr_deletion_failure(my_settings: settings.Settings, logical_resource_id: str = ""):
     return report_status(my_settings, 'Delete', logical_resource_id, 'FAILED')
 
 
@@ -28,28 +28,25 @@ def report_status(my_settings: settings.Settings, request_type: str, logical_res
         print("No message on queue... so we can't report back")
         return 1
     messages = [parse_message(m) for m in raw_message]
-    create_messages = [
-        m for m in messages if
-        m.get('RequestType') == request_type and m.get('LogicalResourceId') == logical_resource_id
-    ]
-    if len(create_messages) < 1:
+    filtered_messages = [m for m in messages if m.get('RequestType') == request_type]
+    if logical_resource_id != "":
+        filtered_messages = [m for m in messages if m.get('LogicalResourceId') == logical_resource_id]
+
+    if len(filtered_messages) < 1:
         print("No message of type '{}', so unable to report back to CloudFormation".format(request_type))
         return 1
-    create_message = create_messages[0]
-    response_for_cloud_formation = build_payload(create_message, status)
 
-    response_url_full = create_message.get('ResponseURL')
-    print('Uploading to signed url: {}'.format(response_url_full))
-    response_url, response_params = response_url_full.split('?')
-    requests.put(
-        url=response_url,
-        params=response_params,
-        data=str.encode(json.dumps(response_for_cloud_formation))
-    )
+    for message in filtered_messages:
+        response_for_cloud_formation = build_payload(message, status)
+        response_url_full = message.get('ResponseURL')
+        response_url, response_params = response_url_full.split('?')
+        requests.put(
+            url=response_url, params=response_params,
+            data=str.encode(json.dumps(response_for_cloud_formation))
+        )
 
-    for create_message in create_messages:
-        print("Deleting message", create_message.get('ReceiptHandle'))
-        delete_messages(my_settings, create_message)
+        print("Deleting message", message.get('ReceiptHandle'))
+        delete_messages(my_settings, message)
 
     return 0
 
@@ -67,8 +64,6 @@ def build_payload(create_message, status):
 
 def parse_message(matryoshka_message):
     body = json.loads(matryoshka_message.get('Body'))
-    print("Parsed message, body")
-    print(body)
     parsed = json.loads(body.get('Message'))
     parsed["ReceiptHandle"] = matryoshka_message.get("ReceiptHandle")
 
@@ -90,9 +85,7 @@ def get_messages(my_settings: settings.Settings):
         MaxNumberOfMessages=10,
         VisibilityTimeout=1
     )
-    # todo: remove debugging
-    print("-------------------------")
+    print("SQS Messages")
     print(json.dumps(response, indent="  "))
-    print("-------------------------")
 
     return response.get('Messages', [])
