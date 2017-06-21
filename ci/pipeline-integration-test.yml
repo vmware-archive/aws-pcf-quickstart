@@ -106,7 +106,6 @@ jobs:
   plan:
   - get: om-release
   - get: quickstart-repo
-    passed: [ check-status ]
   - get: aws-pcf-concourse-state
     passed: [integration-test]
   - task: delete-cf
