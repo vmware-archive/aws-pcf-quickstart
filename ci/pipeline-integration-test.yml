@@ -67,9 +67,7 @@ jobs:
           cp quickstart-repo/stackid output/stackid
   - put: aws-pcf-concourse-state
     params:
-      name: output/stackid
-      globs:
-      - output/stackid
+      file: output/stackid
 
 - name: check-status
   plan:
