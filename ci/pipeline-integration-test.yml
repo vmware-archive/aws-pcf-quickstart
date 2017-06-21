@@ -19,6 +19,15 @@ resources:
     access_token: {{github_access_token}}
     version: v0.0.22
 
+- name: aws-pcf-concourse-state
+  type: s3
+  source:
+    bucket: aws-pcf-concourse-state
+    region_name: us-west-2
+    versioned_file: stackid
+    access_key_id: {{aws_admin_key_id}}
+    secret_access_key: {{aws_admin_secret_access_key}}
+
 jobs:
 - name: integration-test
   plan:
@@ -34,6 +43,8 @@ jobs:
           tag: "3"
       inputs:
       - name: quickstart-repo
+      outputs:
+      - name: output
       params:
         AWS_CF_PASSWORD: {{aws_cf_password}}
         AWS_CF_DOMAIN: {{aws_cf_domain}}
@@ -53,6 +64,12 @@ jobs:
           pip install -r requirements.txt
           python ./ci/create-stack.py
           popd
+          cp quickstart-repo/stackid output/stackid
+  - put: aws-pcf-concourse-state
+    params:
+      name: output/stackid
+      globs:
+      - output/stackid
 
 - name: check-status
   plan:
@@ -85,4 +102,35 @@ jobs:
           pip install -r requirements.txt
           sleep 30
           python ./ci/check-status.py
+          popd
+
+- name: delete-cf
+  plan:
+  - get: om-release
+  - get: quickstart-repo
+    passed: [ check-status ]
+  - get: aws-pcf-concourse-state
+    passed: [integration-test]
+  - task: delete-cf
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: cfplatformeng/quickstart-ci
+      inputs:
+      - name: quickstart-repo
+      - name: aws-pcf-concourse-state
+      params:
+        AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
+        AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}
+        AWS_INTEGRATION_REGION: {{aws_integration_region}}
+      run:
+        path: bash
+        args:
+        - -exc
+        - |
+          pushd quickstart-repo
+          pip install -r requirements.txt
+          python ./ci/delete-stack.py
           popd
