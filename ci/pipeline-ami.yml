@@ -32,6 +32,7 @@ resources:
   type: pivnet
   source:
     api_token: {{pivnet_token}}
+    copy_metadata: true
     product_slug: elastic-runtime
     product_version: 1\.10\.8
 
@@ -39,6 +40,7 @@ resources:
   type: pivnet
   source:
     api_token: {{pivnet_token}}
+    copy_metadata: true
     product_slug: pcf-service-broker-for-aws
     product_version: "1.2.0"
 
@@ -46,6 +48,7 @@ resources:
   type: pivnet
   source:
     api_token: {{pivnet_token}}
+    copy_metadata: true
     product_slug: stemcells
     product_version: "3363.20"
 

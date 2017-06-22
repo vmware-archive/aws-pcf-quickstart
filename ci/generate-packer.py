@@ -17,7 +17,9 @@ def find_file(pattern):
 
 def main(argv):
     ert_file = find_file("ert-tile/*.pivotal")
+    ert_metadata_file = find_file("ert-tile/metadata.json")
     broker_file = find_file("aws-broker-tile/*.pivotal")
+    broker_metadata_file = find_file("aws-broker-tile/metadata.json")
     stemcell_file = find_file("stemcell/*.tgz")
 
     with open('./ami-version/version', 'r') as version_file:
@@ -30,8 +32,10 @@ def main(argv):
             "aws_access_key_id": os.environ['AWS_ACCESS_KEY_ID'],
             "aws_secret_access_key": os.environ['AWS_SECRET_ACCESS_KEY'],
             "ert_file": ert_file,
+            "ert_metadata_file": ert_metadata_file,
             "ami_version": ami_version,
             "broker_file": broker_file,
+            "broker_metadata_file": broker_metadata_file,
             "stemcell_file": stemcell_file
         }
 

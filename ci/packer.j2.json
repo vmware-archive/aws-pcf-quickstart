@@ -9,7 +9,6 @@
       "instance_type": "t2.micro",
       "ssh_username": "ubuntu",
       "ami_name": "pcf bootstrap {{ami_version}}",
-      "ami_groups": ["all"],
       "ami_description": "Pivotal CF bootstrap image: not useful outside of marketplace offering.",
       "launch_block_device_mappings": [
         {
@@ -36,8 +35,18 @@
       "type": "file"
     },
     {
+      "destination": "/home/ubuntu/tiles/ert-metadata.json",
+      "source": "{{ert_metadata_file}}",
+      "type": "file"
+    },
+    {
       "destination": "/home/ubuntu/tiles/",
       "source": "{{broker_file}}",
+      "type": "file"
+    },
+    {
+      "destination": "/home/ubuntu/tiles/broker-metadata.json",
+      "source": "{{broker_metadata_file}}",
       "type": "file"
     },
     {
