@@ -150,6 +150,10 @@ class Settings:
         return self.parameters["PcfCustomResourceSQSQueueUrl"]
 
     @property
+    def pcf_pcfwaithandle(self):
+        return self.parameters["PcfWaitHandle"]
+
+    @property
     def pcf_input_pivnettoken(self):
         return self.input_parameters["12PivnetToken"]
 

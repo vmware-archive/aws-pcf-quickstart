@@ -64,7 +64,7 @@ class TestSqs(unittest.TestCase):
 
         return_code = sqs.report_cr_creation_success(self.settings, 'MyCustomResource')
 
-        body = {
+        expected_body = {
             'Status': 'SUCCESS',
             'PhysicalResourceId': 'PivotalCloudFoundry',
             'RequestId': '4dd2c9a0-04cb-4218-908c-e2cdfad3c634',
@@ -72,13 +72,13 @@ class TestSqs(unittest.TestCase):
             'StackId': 'arn:aws:cloudformation:us-west-2:540420658117:stack/pcf-stack/1e820540-4c58-11e7-a965-50d5ca0184f2',
             'Data': {}
         }
-        payload = json.dumps(body)
+        expected_payload = json.dumps(expected_body)
 
         self.assertEqual(mock_put.call_count, 1)
         mock_put.assert_called_with(
             url='https://cloudformation-custom-resource-response-uswest2.s3-us-west-2.amazonaws.com/arn%3Aaws%3Acloudformation%3Aus-west-2%3A530420658117%3Astack/pcf-stack/1e820540-4c58-11e7-a965-50d5ca0184f2%7CMyCustomResource%7C4dd2c9a0-04cb-4218-908c-e3cdfad3c634',
             params='AWSAccessKeyId=AKIAI4KYMPPRGQACET5Q&Expires=1496940077&Signature=uLbeSl3rtkuDa2xf0y9oMFc1zBI%3D',
-            data=bytes(payload, 'utf-8')
+            data=bytes(expected_payload, 'utf-8')
         )
         self.assertEqual(return_code, 0)
         self.assertEqual(mock_delete_messages.call_count, 1)

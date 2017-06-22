@@ -219,6 +219,16 @@ Resources:
     - PcfOpsManagerAdminPassword
     - PcfNumberOfAZs
     - PcfCustomResourceSQSQueueUrl
+    - PcfWaitHandle
+  WaitHandle:
+    Type: "AWS::CloudFormation::WaitConditionHandle"
+  WaitCondition:
+    Type: "AWS::CloudFormation::WaitCondition"
+    Properties:
+      Handle:
+        Ref: "WaitHandle"
+      Timeout: "14400"
+      Count: 1
   ## This Policy is for Allowing the OpsManager EC2 Instance access to the Describe stack and
   ## Stored Parameters.
   PCFDescribeStackPolicy:
@@ -488,7 +498,13 @@ Resources:
       Description: Misc
       Type: String
       Value: !Ref CustomResourceSQSQueue
-
+  PcfWaitHandle:
+    Type: "AWS::SSM::Parameter"
+    Properties:
+      Name: !Sub "${AWS::StackName}.PcfWaitHandle"
+      Description: Misc
+      Type: String
+      Value: !Ref WaitHandle
   ## This is the End of our Secured Parameters
   ## This is the EC2 Ops Manager
   01OpsManagerInstance:

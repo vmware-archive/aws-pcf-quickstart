@@ -1,4 +1,3 @@
-import os
 import unittest
 
 from mock import patch, mock_open, Mock
