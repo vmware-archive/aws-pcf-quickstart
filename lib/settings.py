@@ -38,7 +38,8 @@ class Settings:
         "PcfElasticRuntimeS3ResourcesBucket",
         "PcfNumberOfAZs",
         "PcfCustomResourceSQSQueueUrl",
-        "PcfWaitHandle"
+        "PcfWaitHandle",
+        "PcfOpsManagerInstanceIP"
     ]
 
     def __init__(self):
@@ -153,6 +154,10 @@ class Settings:
     @property
     def pcf_pcfwaithandle(self):
         return self.parameters["PcfWaitHandle"]
+
+    @property
+    def pcf_pcfopsmanagerinstanceip(self):
+        return self.parameters["PcfOpsManagerInstanceIP"]
 
     @property
     def pcf_input_pivnettoken(self):

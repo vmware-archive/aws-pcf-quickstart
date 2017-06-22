@@ -1,7 +1,7 @@
 import json
-from subprocess import call
 
 from jinja2 import Template
+from subprocess import call
 
 import om_manager
 from settings import Settings

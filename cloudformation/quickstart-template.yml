@@ -505,6 +505,14 @@ Resources:
       Description: Misc
       Type: String
       Value: !Ref WaitHandle
+  PcfOpsManagerInstanceIP:
+    Type: "AWS::SSM::Parameter"
+    Properties:
+      Name: !Sub "${AWS::StackName}.PcfOpsManagerInstanceIP"
+      Description: Misc
+      Type: String
+      Value: !GetAtt 01OpsManagerInstance.PublicIp
+
   ## This is the End of our Secured Parameters
   ## This is the EC2 Ops Manager
   01OpsManagerInstance:
