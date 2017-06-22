@@ -37,7 +37,8 @@ class Settings:
         "PcfElasticRuntimeS3PackagesBucket",
         "PcfElasticRuntimeS3ResourcesBucket",
         "PcfNumberOfAZs",
-        "PcfCustomResourceSQSQueueUrl"
+        "PcfCustomResourceSQSQueueUrl",
+        "PcfWaitHandle"
     ]
 
     def __init__(self):
