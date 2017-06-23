@@ -4,7 +4,7 @@ import sys
 PATH = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, os.path.join(PATH, 'lib'))
 
-from lib import settings, om_manager, configure_opsman_director, configure_ert, sqs, wait_condition, wait_for_dns
+from lib import settings, om_manager, configure_opsman_director, configure_ert, sqs, wait_condition, wait_for_dns, accept_eula
 
 my_settings = settings.Settings()
 asset_path = '/home/ubuntu/tiles'
@@ -16,18 +16,19 @@ def check_return_code(return_code, step_name):
         sqs.report_cr_creation_failure(my_settings)
         sys.exit(1)
 
+check_return_code(accept_eula.accept_ert_eula(my_settings), 'accept_eula')
 
-check_return_code(wait_for_dns.wait_for_dns(my_settings), 'wait_for_dns')
+#check_return_code(wait_for_dns.wait_for_dns(my_settings), 'wait_for_dns')
 
-check_return_code(om_manager.config_opsman_auth(my_settings), 'config_opsman_auth')
-check_return_code(configure_opsman_director.configure_opsman_director(my_settings), 'configure_opsman_director')
-check_return_code(om_manager.apply_changes(my_settings), 'apply_changes')
+#check_return_code(om_manager.config_opsman_auth(my_settings), 'config_opsman_auth')
+#check_return_code(configure_opsman_director.configure_opsman_director(my_settings), 'configure_opsman_director')
+#check_return_code(om_manager.apply_changes(my_settings), 'apply_changes')
 
 sqs.report_cr_creation_success(my_settings, 'MyCustomBOSH')
 
-check_return_code(om_manager.upload_assets(my_settings, asset_path), 'my_settings')
-check_return_code(om_manager.upload_stemcell(my_settings, asset_path), 'my_settings')
-check_return_code(configure_ert.configure_ert(my_settings), 'configure_ert')
-check_return_code(om_manager.apply_changes(my_settings), 'apply_changes')
+#check_return_code(om_manager.upload_assets(my_settings, asset_path), 'my_settings')
+#check_return_code(om_manager.upload_stemcell(my_settings, asset_path), 'my_settings')
+#check_return_code(configure_ert.configure_ert(my_settings), 'configure_ert')
+#check_return_code(om_manager.apply_changes(my_settings), 'apply_changes')
 
 wait_condition.report_success(my_settings, "Successfully deployed Elastic Runtime")
