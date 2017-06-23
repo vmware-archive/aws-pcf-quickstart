@@ -1,7 +1,7 @@
 ---
 
 resources:
-- name: quickstart-release
+- name: quickstart-github-release
   type: github-release
   source:
     owner: cf-platform-eng
@@ -53,6 +53,16 @@ resources:
     access_key_id: {{s3_access_key_id}}
     secret_access_key: {{s3_secret_access_key}}
 
+- name: quickstart-latest-release-candidate
+  type: s3
+  source:
+    bucket: aws-pcf-quickstart-releases
+    region_name: us-west-2
+    versioned_file: quickstart-release-candidate.tgz
+    access_key_id: {{s3_access_key_id}}
+    secret_access_key: {{s3_secret_access_key}}
+
+# latest is manual
 - name: quickstart-latest-release
   type: s3
   source:
@@ -109,22 +119,31 @@ jobs:
   - put: version
     params:
       file: version/version
-  - put: quickstart-release
+  - put: quickstart-github-release
     params:
       name: version/version
       tag: version/version
       globs:
       - output/quickstart-*.tgz
 
-- name: quickstart-versioned-release
+- name: build-quickstart-release-candidate
   plan:
-  - get: quickstart-release
+  - get: quickstart-github-release
     trigger: true
     passed:
       - github-release
   - put: quickstart-versioned-release
     params:
-      file: quickstart-release/quickstart-*.tgz
+      file: quickstart-github-release/quickstart-*.tgz
+  - put: quickstart-latest-release-candidate
+    params:
+      file: quickstart-github-release/quickstart-*.tgz
+
+- name: build-quickstart-release
+  plan:
+  - get: quickstart-latest-release-candidate
+    passed:
+      - build-quickstart-release-candidate
   - put: quickstart-latest-release
     params:
-      file: quickstart-release/quickstart-*.tgz
+      file: quickstart-latest-release-candidate/quickstart-*.tgz
