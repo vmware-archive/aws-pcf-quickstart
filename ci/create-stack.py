@@ -41,7 +41,7 @@ client = boto3.client(
     aws_secret_access_key=aws_secret_access_key
 )
 
-with open('./cloudformation/quickstart-template.yml', 'r') as template_file:
+with open('./cloudformation/quickstart-template-rc.yml', 'r') as template_file:
     template = template_file.read()
 
     stack_name = "pcf-int-{}".format(int(datetime.datetime.now().timestamp()))
