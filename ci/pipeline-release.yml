@@ -128,6 +128,9 @@ jobs:
 
 - name: build-quickstart-release-candidate
   plan:
+  - get: version
+    passed:
+      - github-release
   - get: quickstart-github-release
     trigger: true
     passed:
@@ -141,6 +144,9 @@ jobs:
 
 - name: build-quickstart-release
   plan:
+  - get: version
+    passed:
+      - build-quickstart-release-candidate
   - get: quickstart-latest-release-candidate
     passed:
       - build-quickstart-release-candidate

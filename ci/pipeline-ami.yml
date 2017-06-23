@@ -151,3 +151,39 @@ jobs:
   - put: ami-mapping
     params:
       file: output/ami-mapping-*.json
+
+- name: instantiate-templates
+  plan:
+  - get: quickstart-repo
+    passed:
+      - replicate-ami
+  - task: build-release
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: python
+          tag: "3"
+      inputs:
+      - name: quickstart-repo
+      outputs:
+      - name: quickstart-updated-repo
+      run:
+        path: bash
+        args:
+        - -exc
+        - |
+          git clone quickstart-repo quickstart-updated-repo
+          pushd quickstart-updated-repo
+          pip install jinja2
+          python3 ci/instantiate-quickstart-template.py
+          git add cloudformation/quickstart-template-rc.yml
+          git add cloudformation/quickstart-template.yml
+          git config --global user.name "Concourse"
+          git config --global user.email "ci@example.com"
+          git commit -m "Adding instantiated templates"
+          popd
+  - put: quickstart-repo
+    params:
+      repository: quickstart-updated-repo
