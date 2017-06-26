@@ -2,6 +2,8 @@ import json
 import os
 import subprocess
 import time
+import requests
+
 from subprocess import Popen, PIPE
 
 import settings
@@ -26,9 +28,9 @@ def config_opsman_auth(my_settings: settings.Settings):
 def exponential_backoff(cmd, debug, attempt=0):
     out, err, returncode = run_command(cmd, debug)
     if out != "":
-        print(out)
+        print("out: {}".format(out))
     if err != "":
-        print(err)
+        print("error: {}".format(err))
 
     if attempt < max_retries and returncode != 0:
         print("Retrying, {}".format(attempt))
@@ -36,6 +38,15 @@ def exponential_backoff(cmd, debug, attempt=0):
         return exponential_backoff(cmd, debug, attempt + 1)
     else:
         return out, err, returncode
+
+
+def is_opsman_configured(my_settings: settings.Settings):
+    url = my_settings.opsman_url + "/api/v0/installations"
+    response = requests.get(url = url)
+    # if auth isn't configured yet, authenticated api endpoints give 400 rather than 401
+    if response.status_code == 400:
+        return False
+    return True
 
 
 def run_command(cmd: str, debug_mode):

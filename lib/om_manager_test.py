@@ -2,6 +2,7 @@ import subprocess
 import unittest
 from subprocess import Popen
 
+import requests
 from mock import Mock, patch
 
 import om_manager
@@ -54,17 +55,14 @@ class TestOmManager(unittest.TestCase):
             "om plus some auth curl --path /api/foo --request PUT --data '{\"foo\": \"bar\"}'", False
         )
 
-    @patch('subprocess.Popen')
+    @patch('om_manager.run_command')
+    @patch('time.sleep')
     @patch('builtins.print')
-    def test_prints_error(self, mock_print, mock_popen):
-        p = Mock(Popen)
-        mock_popen.return_value = p
-        p.returncode = 1
-        p.communicate.return_value = self.to_bytes("out: foo"), self.to_bytes("error: bar")
+    def test_prints_error(self, mock_print, mock_sleep, mock_run_command):
+        mock_run_command.return_value = "foo", "bar", 1
 
         om_manager.config_opsman_auth(self.settings)
 
-        self.assertEqual(mock_print.call_count, 2)
         mock_print.assert_called_with("error: bar")
 
     @patch('subprocess.Popen')
@@ -85,7 +83,7 @@ class TestOmManager(unittest.TestCase):
     @patch('subprocess.Popen')
     @patch('time.sleep')
     @patch('builtins.print')
-    def test_progressive_backoff(self, mock_print, mock_sleep, mock_popen):
+    def test_exponential_backoff(self, mock_print, mock_sleep, mock_popen):
         p = Mock(Popen)
         mock_popen.return_value = p
         p.returncode = 1
@@ -99,6 +97,18 @@ class TestOmManager(unittest.TestCase):
         self.assertEqual(mock_sleep.call_args_list[2][0][0], 8)
         self.assertEqual(mock_sleep.call_args_list[3][0][0], 27)
         self.assertEqual(mock_sleep.call_args_list[4][0][0], 64)
+
+    @patch('om_manager.run_command')
+    @patch('time.sleep')
+    @patch('builtins.print')
+    def test_exponential_backoff_result(self, mock_print, mock_sleep, mock_run_command):
+        mock_run_command.return_value = "foo", "bar", 42
+        # mock_popen.reset_mock()
+        out, err, status_code = om_manager.config_opsman_auth(self.settings)
+
+        self.assertEqual(status_code, 42)
+        self.assertEqual(out, "foo")
+        self.assertEqual(err, "bar")
 
     @patch('subprocess.Popen')
     @patch('builtins.print')
@@ -116,3 +126,22 @@ class TestOmManager(unittest.TestCase):
         expected_om_command = "om -k --target https://cf.example.com --username 'admin' --password 'monkey-123'"
         om_command = om_manager.get_om_with_auth(self.settings)
         self.assertEqual(om_command, expected_om_command)
+
+    @patch('requests.get')
+    def test_is_opsman_configured_true(self, mock_requests_get):
+        response = Mock(requests.Response)
+        response.status_code = 401
+        mock_requests_get.return_value = response
+        return_value = om_manager.is_opsman_configured(self.settings)
+        self.assertEquals(True, return_value)
+
+
+    @patch('requests.get')
+    def test_is_opsman_configured_false(self, mock_requests_get):
+        response = Mock(requests.Response)
+        response.status_code = 400
+        mock_requests_get.return_value = response
+        return_value = om_manager.is_opsman_configured(self.settings)
+        self.assertEquals(False, return_value)
+
+

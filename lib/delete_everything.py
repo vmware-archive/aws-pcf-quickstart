@@ -6,14 +6,15 @@ from settings import Settings
 
 
 def delete_everything(my_settings: Settings, delete_buckets=False):
-    cmd = "{om_with_auth} delete-installation".format(
-        om_with_auth=om_manager.get_om_with_auth(my_settings)
-    )
-
-    return_code = om_manager.exponential_backoff(cmd, my_settings.debug)
-    if return_code != 0:
-        print("OM cmd failed to delete installation {}".format(return_code))
-        return return_code
+    if om_manager.is_opsman_configured(my_settings):
+        cmd = "{om_with_auth} delete-installation".format(
+            om_with_auth=om_manager.get_om_with_auth(my_settings)
+        )
+        # todo: call delete twice
+        return_code = om_manager.exponential_backoff(cmd, my_settings.debug)
+        if return_code != 0:
+            print("OM cmd failed to delete installation {}".format(return_code))
+            return return_code
 
     buckets = [
         my_settings.pcf_opsmanagers3bucket,
@@ -24,7 +25,6 @@ def delete_everything(my_settings: Settings, delete_buckets=False):
     ]
 
     # todo: should we delete the keypair...?
-    # todo: call delete twice
 
     for bucket_name in buckets:
         try:
