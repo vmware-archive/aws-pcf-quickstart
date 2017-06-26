@@ -70,12 +70,12 @@ class TestOmManager(unittest.TestCase):
     @patch('subprocess.Popen')
     @patch('time.sleep')
     @patch('builtins.print')
-    def test_retries_recoverable(self, mock_print, mock_sleep, mock_popen):
-        recoverable_errors = ["out: i/o timeout", "connection refused"]
+    def test_retries(self, mock_print, mock_sleep, mock_popen):
+        errors = ["out: i/o timeout", "connection refused", "yo, no opsman for you"]
         p = Mock(Popen)
         mock_popen.return_value = p
         p.returncode = 1
-        for recoverable_error in recoverable_errors:
+        for recoverable_error in errors:
             mock_popen.reset_mock()
             p.communicate.return_value = self.to_bytes(recoverable_error), self.to_bytes("error: bar")
             om_manager.config_opsman_auth(self.settings)
@@ -99,20 +99,6 @@ class TestOmManager(unittest.TestCase):
         self.assertEqual(mock_sleep.call_args_list[2][0][0], 8)
         self.assertEqual(mock_sleep.call_args_list[3][0][0], 27)
         self.assertEqual(mock_sleep.call_args_list[4][0][0], 64)
-
-    @patch('subprocess.Popen')
-    @patch('time.sleep')
-    @patch('builtins.print')
-    def test_fails_non_recoverable(self, mock_print, mock_sleep, mock_popen):
-        p = Mock(Popen)
-        mock_popen.return_value = p
-        p.returncode = 1
-        mock_popen.reset_mock()
-        p.communicate.return_value = self.to_bytes("out: no such host"), self.to_bytes("error: bar")
-        returncode = om_manager.config_opsman_auth(self.settings)
-
-        self.assertEqual(mock_popen.call_count, 1)
-        self.assertEqual(returncode, 1)
 
     @patch('subprocess.Popen')
     @patch('builtins.print')

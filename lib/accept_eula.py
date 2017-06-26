@@ -10,24 +10,23 @@ max_retries = 5
 
 
 def exponential_backoff(my_settings: settings.Settings, release_id: int, attempt=0):
-    result = post_eula(my_settings, release_id)
+    response, result = post_eula(my_settings, release_id)
     if result != EULAResult.SUCCESS:
         if result == EULAResult.RETRY and attempt < max_retries:
             print("Retrying, {}".format(attempt))
             time.sleep(attempt ** 3)
-            result = exponential_backoff(my_settings, attempt + 1)
+            response, exponential_backoff(my_settings, attempt + 1)
 
-    return result
+    return response, result
 
 
 def accept_ert_eula(my_settings: settings.Settings):
     release_id = get_release_id()
-    result = exponential_backoff(my_settings, release_id)
+    response, result = exponential_backoff(my_settings, release_id)
     if result == EULAResult.SUCCESS:
-        return 0
+        return "Success", "", 0
     else:
-        return 1
-
+        return "Failed to accept EULA; status code from Pivotal Network {}".format(response.status_code), "", 1
 
 class EULAResult(enum.Enum):
     SUCCESS = 0,
@@ -47,10 +46,10 @@ def post_eula(my_settings: settings.Settings, release_id: int):
     )
     print(response)
     if response.status_code < 300:
-        return EULAResult.SUCCESS
+        return response, EULAResult.SUCCESS
     elif response.status_code >= 500:
-        return EULAResult.RETRY
-    return EULAResult.FAILURE
+        return response, EULAResult.RETRY
+    return response, EULAResult.FAILURE
 
 
 def get_release_id():

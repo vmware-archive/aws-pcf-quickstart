@@ -6,23 +6,23 @@ import requests
 import settings
 
 
-def report_cr_creation_success(my_settings: settings.Settings, logical_resource_id: str = ""):
-    return report_status(my_settings, 'Create', logical_resource_id, 'SUCCESS')
+def report_cr_creation_success(my_settings: settings.Settings, reason: str, logical_resource_id: str = ""):
+    return report_status(my_settings, 'Create', reason, logical_resource_id, 'SUCCESS')
 
 
-def report_cr_creation_failure(my_settings: settings.Settings, logical_resource_id: str = ""):
-    return report_status(my_settings, 'Create', logical_resource_id, 'FAILED')
+def report_cr_creation_failure(my_settings: settings.Settings, reason: str, logical_resource_id: str = ""):
+    return report_status(my_settings, 'Create', reason, logical_resource_id, 'FAILED')
 
 
-def report_cr_deletion_success(my_settings: settings.Settings, logical_resource_id: str = ""):
-    return report_status(my_settings, 'Delete', logical_resource_id, 'SUCCESS')
+def report_cr_deletion_success(my_settings: settings.Settings, reason: str, logical_resource_id: str = ""):
+    return report_status(my_settings, 'Delete', reason, logical_resource_id, 'SUCCESS')
 
 
-def report_cr_deletion_failure(my_settings: settings.Settings, logical_resource_id: str = ""):
-    return report_status(my_settings, 'Delete', logical_resource_id, 'FAILED')
+def report_cr_deletion_failure(my_settings: settings.Settings, reason: str, logical_resource_id: str = ""):
+    return report_status(my_settings, 'Delete', reason, logical_resource_id, 'FAILED')
 
 
-def report_status(my_settings: settings.Settings, request_type: str, logical_resource_id: str, status: str):
+def report_status(my_settings: settings.Settings, request_type: str, reason: str, logical_resource_id: str, status: str):
     raw_message = get_messages(my_settings)
     if len(raw_message) < 1:
         print("No message on queue... so we can't report back")
@@ -37,7 +37,7 @@ def report_status(my_settings: settings.Settings, request_type: str, logical_res
         return 1
 
     for message in filtered_messages:
-        response_for_cloud_formation = build_payload(message, status)
+        response_for_cloud_formation = build_payload(message, status, reason)
         response_url_full = message.get('ResponseURL')
         response_url, response_params = response_url_full.split('?')
         requests.put(
@@ -51,9 +51,10 @@ def report_status(my_settings: settings.Settings, request_type: str, logical_res
     return 0
 
 
-def build_payload(create_message, status):
+def build_payload(create_message, status: str, reason: str):
     return {
         'Status': status,
+        'Reason': reason,
         'PhysicalResourceId': 'PivotalCloudFoundry',
         'RequestId': create_message.get('RequestId'),
         'LogicalResourceId': create_message.get('LogicalResourceId'),

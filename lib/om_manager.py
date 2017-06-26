@@ -30,13 +30,12 @@ def exponential_backoff(cmd, debug, attempt=0):
     if err != "":
         print(err)
 
-    if returncode != 0:
-        if is_recoverable_error(out) and attempt < max_retries:
-            print("Retrying, {}".format(attempt))
-            time.sleep(attempt ** 3)
-            returncode = exponential_backoff(cmd, debug, attempt + 1)
-
-    return returncode
+    if attempt < max_retries and returncode != 0:
+        print("Retrying, {}".format(attempt))
+        time.sleep(attempt ** 3)
+        return exponential_backoff(cmd, debug, attempt + 1)
+    else:
+        return out, err, returncode
 
 
 def run_command(cmd: str, debug_mode):
@@ -72,15 +71,6 @@ def curl_payload(my_settings: settings.Settings, path: str, data: str, method: s
         method=method, data=data
     )
     return run_command(cmd, my_settings.debug)
-
-
-def is_recoverable_error(err: str):
-    recoverable_errors = ["i/o timeout", "connection refused", "received unexpected status"]
-    clean_err = err
-    for recoverable_error in recoverable_errors:
-        if clean_err.endswith(recoverable_error):
-            return True
-    return False
 
 
 def stage_product(product_name: str, my_settings: settings.Settings):

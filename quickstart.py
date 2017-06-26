@@ -10,25 +10,30 @@ my_settings = settings.Settings()
 asset_path = '/home/ubuntu/tiles'
 
 
-def check_return_code(return_code, step_name):
+def check_return_code(out, err, return_code, step_name):
     print("Running {}".format(step_name))
     if return_code != 0:
-        sqs.report_cr_creation_failure(my_settings)
+        sqs.report_cr_creation_failure(my_settings, out)
         sys.exit(1)
 
-check_return_code(accept_eula.accept_ert_eula(my_settings), 'accept_eula')
+out, err, exit_code = accept_eula.accept_ert_eula(my_settings)
+check_return_code(out, err, exit_code, 'accept_eula')
 
-#check_return_code(wait_for_dns.wait_for_dns(my_settings), 'wait_for_dns')
+exit_code = wait_for_dns.wait_for_dns(my_settings)
+check_return_code("todo", "todo", exit_code, 'wait_for_dns')
 
-#check_return_code(om_manager.config_opsman_auth(my_settings), 'config_opsman_auth')
-#check_return_code(configure_opsman_director.configure_opsman_director(my_settings), 'configure_opsman_director')
-#check_return_code(om_manager.apply_changes(my_settings), 'apply_changes')
+out, err, exit_code = om_manager.config_opsman_auth(my_settings)
+check_return_code(out, err, exit_code, 'config_opsman_auth')
 
-sqs.report_cr_creation_success(my_settings, 'MyCustomBOSH')
 
-#check_return_code(om_manager.upload_assets(my_settings, asset_path), 'my_settings')
-#check_return_code(om_manager.upload_stemcell(my_settings, asset_path), 'my_settings')
-#check_return_code(configure_ert.configure_ert(my_settings), 'configure_ert')
-#check_return_code(om_manager.apply_changes(my_settings), 'apply_changes')
-
-wait_condition.report_success(my_settings, "Successfully deployed Elastic Runtime")
+# check_return_code(configure_opsman_director.configure_opsman_director(my_settings), 'configure_opsman_director')
+# check_return_code(om_manager.apply_changes(my_settings), 'apply_changes')
+#
+# sqs.report_cr_creation_success(my_settings, 'MyCustomBOSH')
+#
+# check_return_code(om_manager.upload_assets(my_settings, asset_path), 'my_settings')
+# check_return_code(om_manager.upload_stemcell(my_settings, asset_path), 'my_settings')
+# check_return_code(configure_ert.configure_ert(my_settings), 'configure_ert')
+# check_return_code(om_manager.apply_changes(my_settings), 'apply_changes')
+#
+# wait_condition.report_success(my_settings, "Successfully deployed Elastic Runtime")
