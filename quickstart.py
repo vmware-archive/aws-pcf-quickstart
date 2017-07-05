@@ -38,14 +38,20 @@ check_return_code("todo", "todo", exit_code, 'wait_for_dns')
 out, err, exit_code = om_manager.config_opsman_auth(my_settings)
 check_return_code(out, err, exit_code, 'config_opsman_auth')
 
-# check_return_code(configure_opsman_director.configure_opsman_director(my_settings), 'configure_opsman_director')
-# check_return_code(om_manager.apply_changes(my_settings), 'apply_changes')
-#
+out, err, exit_code = configure_opsman_director.configure_opsman_director(my_settings)
+check_return_code(out, err, exit_code, 'configure_opsman_director')
+out, err, exit_code = om_manager.apply_changes(my_settings)
+check_return_code(out, err, exit_code, 'apply_changes')
+
 sqs.report_cr_creation_success(my_settings, 'MyCustomBOSH')
-#
-# check_return_code(om_manager.upload_assets(my_settings, asset_path), 'my_settings')
-# check_return_code(om_manager.upload_stemcell(my_settings, asset_path), 'my_settings')
-# check_return_code(configure_ert.configure_ert(my_settings), 'configure_ert')
-# check_return_code(om_manager.apply_changes(my_settings), 'apply_changes')
-#
+
+out, err, exit_code = om_manager.upload_assets(my_settings, asset_path)
+check_return_code(out, err, exit_code, 'upload_assets')
+out, err, exit_code = om_manager.upload_stemcell(my_settings, asset_path)
+check_return_code(out, err, exit_code, 'upload_stemcell')
+out, err, exit_code = configure_ert.configure_ert(my_settings)
+check_return_code(out, err, exit_code, 'configure_ert')
+out, err, exit_code = om_manager.apply_changes(my_settings)
+check_return_code(out, err, exit_code, 'apply_changes')
+
 wait_condition.report_success(my_settings, "Successfully deployed Elastic Runtime")
