@@ -18,6 +18,7 @@ def format_om_json_str(om_json: str):
 
 
 def config_opsman_auth(my_settings: settings.Settings):
+    # todo: get if we should ignore ssl validation (-k) out of settings
     cmd = "om -k --target {0} configure-authentication --username '{1}' --password '{2}' --decryption-passphrase '{3}'".format(
         my_settings.opsman_url, my_settings.opsman_user, my_settings.pcf_opsmanageradminpassword,
         my_settings.pcf_opsmanageradminpassword
@@ -41,8 +42,9 @@ def exponential_backoff(cmd, debug, attempt=0):
 
 
 def is_opsman_configured(my_settings: settings.Settings):
+    # todo: get if we should ignore ssl validation out of settings
     url = my_settings.opsman_url + "/api/v0/installations"
-    response = requests.get(url = url)
+    response = requests.get(url = url, verify=False)
     # if auth isn't configured yet, authenticated api endpoints give 400 rather than 401
     if response.status_code == 400:
         return False
