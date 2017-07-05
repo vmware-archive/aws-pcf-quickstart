@@ -2,6 +2,7 @@ import boto3
 import botocore.exceptions
 
 import om_manager
+import util
 from settings import Settings
 
 
@@ -11,7 +12,7 @@ def delete_everything(my_settings: Settings, delete_buckets=False):
             om_with_auth=om_manager.get_om_with_auth(my_settings)
         )
         # todo: call delete twice
-        return_code = om_manager.exponential_backoff(cmd, my_settings.debug)
+        return_code = util.exponential_backoff_cmd(cmd, my_settings.debug)
         if return_code != 0:
             print("OM cmd failed to delete installation {}".format(return_code))
             return return_code

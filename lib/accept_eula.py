@@ -1,32 +1,31 @@
 import enum
+import functools
 import json
-import time
 
 import requests
 
 import settings
+import util
 
 max_retries = 5
 
 
-def exponential_backoff(my_settings: settings.Settings, release_id: int, attempt=0):
-    response, result = post_eula(my_settings, release_id)
-    if result != EULAResult.SUCCESS:
-        if result == EULAResult.RETRY and attempt < max_retries:
-            print("Retrying, {}".format(attempt))
-            time.sleep(attempt ** 3)
-            response, exponential_backoff(my_settings, attempt + 1)
-
-    return response, result
+def check_eula_succeeded(returned):
+    response, result = returned
+    return result == EULAResult.SUCCESS
 
 
 def accept_ert_eula(my_settings: settings.Settings):
     release_id = get_release_id()
-    response, result = exponential_backoff(my_settings, release_id)
+    response, result = util.exponential_backoff(
+        functools.partial(post_eula, my_settings, release_id),
+        check_eula_succeeded
+    )
     if result == EULAResult.SUCCESS:
         return "Success", "", 0
     else:
         return "Failed to accept EULA; status code from Pivotal Network {}".format(response.status_code), "", 1
+
 
 class EULAResult(enum.Enum):
     SUCCESS = 0,

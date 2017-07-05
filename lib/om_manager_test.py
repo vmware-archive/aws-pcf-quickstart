@@ -35,7 +35,7 @@ class TestOmManager(unittest.TestCase):
         )
 
     @patch('om_manager.get_om_with_auth')
-    @patch('om_manager.run_command')
+    @patch('util.run_command')
     def test_curl_get(self, mock_run_command, mock_get_om_with_auth):
         mock_get_om_with_auth.return_value = "om plus some auth"
         om_manager.curl_get(self.settings, "/api/foo")
@@ -45,7 +45,7 @@ class TestOmManager(unittest.TestCase):
         )
 
     @patch('om_manager.get_om_with_auth')
-    @patch('om_manager.run_command')
+    @patch('util.run_command')
     def test_curl_payload(self, mock_run_command, mock_get_om_with_auth):
         mock_get_om_with_auth.return_value = "om plus some auth"
 
@@ -55,7 +55,7 @@ class TestOmManager(unittest.TestCase):
             "om plus some auth curl --path /api/foo --request PUT --data '{\"foo\": \"bar\"}'", False
         )
 
-    @patch('om_manager.run_command')
+    @patch('util.run_command')
     @patch('time.sleep')
     @patch('builtins.print')
     def test_prints_error(self, mock_print, mock_sleep, mock_run_command):
@@ -98,7 +98,7 @@ class TestOmManager(unittest.TestCase):
         self.assertEqual(mock_sleep.call_args_list[3][0][0], 27)
         self.assertEqual(mock_sleep.call_args_list[4][0][0], 64)
 
-    @patch('om_manager.run_command')
+    @patch('util.run_command')
     @patch('time.sleep')
     @patch('builtins.print')
     def test_exponential_backoff_result(self, mock_print, mock_sleep, mock_run_command):
@@ -109,18 +109,6 @@ class TestOmManager(unittest.TestCase):
         self.assertEqual(status_code, 42)
         self.assertEqual(out, "foo")
         self.assertEqual(err, "bar")
-
-    @patch('subprocess.Popen')
-    @patch('builtins.print')
-    def test_debug_flag_toggles_print(self, mock_print, mock_popen):
-        self.settings.debug = True
-
-        om_manager.config_opsman_auth(self.settings)
-
-        self.assertEqual(mock_popen.call_count, 0)
-
-        self.assertEqual(mock_print.call_count, 2)
-        self.assertEqual(mock_print.call_args_list[0][0][0], "Debug mode. Would have run command")
 
     def test_get_om_with_auth(self):
         expected_om_command = "om -k --target https://cf.example.com --username 'admin' --password 'monkey-123'"
@@ -133,8 +121,7 @@ class TestOmManager(unittest.TestCase):
         response.status_code = 401
         mock_requests_get.return_value = response
         return_value = om_manager.is_opsman_configured(self.settings)
-        self.assertEquals(True, return_value)
-
+        self.assertEqual(True, return_value)
 
     @patch('requests.get')
     def test_is_opsman_configured_false(self, mock_requests_get):
@@ -142,6 +129,4 @@ class TestOmManager(unittest.TestCase):
         response.status_code = 400
         mock_requests_get.return_value = response
         return_value = om_manager.is_opsman_configured(self.settings)
-        self.assertEquals(False, return_value)
-
-
+        self.assertEqual(False, return_value)

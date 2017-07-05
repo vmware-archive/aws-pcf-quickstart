@@ -45,7 +45,7 @@ class TestConfigureERT(unittest.TestCase):
                         mock_resources.assert_not_called()
                         self.assertEqual(1, exit_code)
 
-    @patch('om_manager.exponential_backoff')
+    @patch('util.exponential_backoff_cmd')
     @patch('om_manager.get_om_with_auth')
     def test_configure_ert_resources(self, mock_get_om_with_auth, mock_backoff):
         mock_get_om_with_auth.return_value = "foo"
@@ -54,7 +54,7 @@ class TestConfigureERT(unittest.TestCase):
         cmd = mock_backoff.call_args[0][0]
         self.assertTrue(cmd.startswith("foo configure-product -n cf -pr"))
 
-    @patch('om_manager.exponential_backoff')
+    @patch('util.exponential_backoff_cmd')
     @patch('om_manager.get_om_with_auth')
     def test_configure_ert_config(self, mock_get_om_with_auth, mock_backoff):
         mock_get_om_with_auth.return_value = "foo"

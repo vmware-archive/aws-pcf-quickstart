@@ -62,12 +62,13 @@ class TestSqs(unittest.TestCase):
     def test_report_status(self, mock_put, mock_get_messages, mock_delete_messages):
         mock_get_messages.return_value = self.response.get('Messages')
 
-        return_code = sqs.report_cr_creation_success(self.settings, 'MyCustomResource')
+        return_code = sqs.report_cr_creation_success(self.settings, '', 'MyCustomResource')
 
         expected_body = {
             'Status': 'SUCCESS',
             'PhysicalResourceId': 'PivotalCloudFoundry',
             'RequestId': '4dd2c9a0-04cb-4218-908c-e2cdfad3c634',
+            'Reason': '',
             'LogicalResourceId': 'MyCustomResource',
             'StackId': 'arn:aws:cloudformation:us-west-2:540420658117:stack/pcf-stack/1e820540-4c58-11e7-a965-50d5ca0184f2',
             'Data': {}
@@ -110,12 +111,12 @@ class TestSqs(unittest.TestCase):
 
     @patch('sqs.report_status')
     def test_report_deletion_success(self, mock_report_status):
-        sqs.report_cr_deletion_success(self.settings, 'MyCustomResource')
+        sqs.report_cr_deletion_success(self.settings, '', 'MyCustomResource')
 
-        mock_report_status.assert_called_with(self.settings, 'Delete', 'MyCustomResource', 'SUCCESS')
+        mock_report_status.assert_called_with(self.settings, 'Delete', '', 'MyCustomResource', 'SUCCESS')
 
     @patch('sqs.report_status')
     def test_report_deletion_failure(self, mock_report_status):
-        sqs.report_cr_deletion_failure(self.settings, 'MyCustomResource')
+        sqs.report_cr_deletion_failure(self.settings, '', 'MyCustomResource')
 
-        mock_report_status.assert_called_with(self.settings, 'Delete', 'MyCustomResource', 'FAILED')
+        mock_report_status.assert_called_with(self.settings, 'Delete', '', 'MyCustomResource', 'FAILED')

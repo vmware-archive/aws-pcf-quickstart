@@ -1,31 +1,17 @@
 import os
 import sys
-import time
 import functools
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, os.path.join(PATH, 'lib'))
 
-from lib import settings, om_manager, configure_opsman_director, configure_ert, sqs, wait_condition, wait_for_dns, \
-    accept_eula
+from lib import settings, om_manager, configure_opsman_director, configure_ert, sqs, wait_condition, wait_for_dns
+from lib import util, accept_eula
 
 my_settings = settings.Settings()
 asset_path = '/home/ubuntu/tiles'
 
 max_retries = 5
-
-
-# todo: pull this out
-def exponential_backoff(fun, test, attempt=0):
-    result = fun()
-    print("Running, got {}".format(result))
-    if test(result):
-        return result
-    elif attempt < max_retries:
-        print("Sleeping {}".format(attempt ** 3))
-        time.sleep(attempt ** 3)
-        exponential_backoff(fun, test, attempt + 1)
-    return result
 
 
 def test_exit_code_success(exit_code):
@@ -36,11 +22,10 @@ def test_exit_code_success(exit_code):
 def check_return_code(out, err, return_code, step_name):
     print("Running {}".format(step_name))
     if return_code != 0:
-        exponential_backoff(
+        util.exponential_backoff(
             functools.partial(sqs.report_cr_creation_failure, my_settings, out),
             test_exit_code_success
         )
-        # report_exit_code = sqs.report_cr_creation_failure(my_settings, out)
         sys.exit(1)
 
 

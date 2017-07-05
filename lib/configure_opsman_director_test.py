@@ -30,7 +30,7 @@ class TestConfigureOpsManDirector(unittest.TestCase):
     @patch('configure_opsman_director.generate_ssh_keypair')
     def test_flow(self, mock_generate_ssh_keypair):
         mock_generate_ssh_keypair.return_value = 'my-pcf-keypair', '------blah----'
-        with patch('om_manager.run_command') as mock_run_command:
+        with patch('util.run_command') as mock_run_command:
             mock_run_command.side_effect = [("", "", 0), ("", "", 0), ("", "", 1)]
             exit_code = configure_opsman_director.configure_opsman_director(self.settings)
 
@@ -42,7 +42,7 @@ class TestConfigureOpsManDirector(unittest.TestCase):
         mock_generate_ssh_keypair.return_value = 'my-pcf-keypair', '------blah----'
         with patch('om_manager.get_om_with_auth') as mock_util_get_om_with_auth:
             mock_util_get_om_with_auth.return_value = "foo"
-            with patch('om_manager.run_command') as mock_call:
+            with patch('util.run_command') as mock_call:
                 mock_call.return_value = ("", "", 0)
                 exit_code = configure_opsman_director.configure_opsman_director(self.settings)
 

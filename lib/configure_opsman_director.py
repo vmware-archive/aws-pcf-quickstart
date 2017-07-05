@@ -4,6 +4,7 @@ import om_manager
 import os
 from os.path import expanduser
 from settings import Settings
+import util
 
 
 def configure_opsman_director(my_settings: Settings):
@@ -59,7 +60,7 @@ def configure_opsman_director(my_settings: Settings):
         om_with_auth=om_manager.get_om_with_auth(my_settings), network_assignment=network_assignment_config
     ))
     for cmd in commands:
-        out, err, exit_code = om_manager.run_command(cmd, my_settings.debug)
+        out, err, exit_code = util.run_command(cmd, my_settings.debug)
         if out != "":
             print(out)
         if err != "":

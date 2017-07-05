@@ -21,21 +21,26 @@ class TestAcceptEULA(unittest.TestCase):
         self.assertEqual(5334, release_id)
         my_mock_open.assert_called_with('/home/ubuntu/tiles/ert-metadata.json', 'r')
 
-    @patch("accept_eula.exponential_backoff")
+    @patch("util.exponential_backoff")
     @patch("accept_eula.get_release_id")
     def test_accept_ert_eula_success(self, mock_get_release_id, mock_exponential_backoff):
         mock_get_release_id.return_value = 1337
-        mock_exponential_backoff.return_value = accept_eula.EULAResult.SUCCESS
+        response = Mock(requests.Response)
+        response.status_code = 200
+        mock_exponential_backoff.return_value = (response, accept_eula.EULAResult.SUCCESS)
+        result = accept_eula.accept_ert_eula(self.settings)
+        self.assertEqual(result, ("Success", "", 0))
 
-        self.assertEqual(0, accept_eula.accept_ert_eula(self.settings))
-
-    @patch("accept_eula.exponential_backoff")
+    @patch("util.exponential_backoff")
     @patch("accept_eula.get_release_id")
     def test_accept_ert_eula_fail(self, mock_get_release_id, mock_exponential_backoff):
         mock_get_release_id.return_value = 1337
-        mock_exponential_backoff.return_value = accept_eula.EULAResult.RETRY
+        response = Mock(requests.Response)
+        response.status_code = 503
+        mock_exponential_backoff.return_value = (response, accept_eula.EULAResult.RETRY)
 
-        self.assertEqual(1, accept_eula.accept_ert_eula(self.settings))
+        result = accept_eula.accept_ert_eula(self.settings)
+        self.assertEqual(result[2], 1)
 
     @patch('requests.post')
     def test_post_eula_success(self, mock_requests_post):
@@ -45,7 +50,8 @@ class TestAcceptEULA(unittest.TestCase):
 
         result = accept_eula.post_eula(self.settings, 1337)
 
-        self.assertEqual(result, accept_eula.EULAResult.SUCCESS)
+        self.assertEqual(result[0], response)
+        self.assertEqual(result[1], accept_eula.EULAResult.SUCCESS)
 
         expected_headers = {
             'Authorization': 'Token MY-TOKEN',
@@ -67,7 +73,8 @@ class TestAcceptEULA(unittest.TestCase):
 
         result = accept_eula.post_eula(self.settings, 1337)
 
-        self.assertEqual(result, accept_eula.EULAResult.FAILURE)
+        self.assertEqual(result[0], response)
+        self.assertEqual(result[1], accept_eula.EULAResult.FAILURE)
 
     @patch('requests.post')
     def test_post_eula_pivnet_failure(self, mock_requests_post):
@@ -77,21 +84,30 @@ class TestAcceptEULA(unittest.TestCase):
 
         result = accept_eula.post_eula(self.settings, 1337)
 
-        self.assertEqual(result, accept_eula.EULAResult.RETRY)
+        self.assertEqual(result[0], response)
+        self.assertEqual(result[1], accept_eula.EULAResult.RETRY)
 
+    @patch('accept_eula.get_release_id')
     @patch('accept_eula.post_eula')
     @patch('time.sleep')
-    def test_exponential_backoff(self, mock_sleep, mock_post_eula):
+    def test_exponential_backoff(self, mock_sleep, mock_post_eula, mock_get_release_id):
+        retry_response = Mock(requests.Response)
+        retry_response.status_code = 502
+        success_response = Mock(requests.Response)
+        success_response.status_code = 200
+        mock_get_release_id.return_value = 1337
+
         mock_post_eula.side_effect = [
-            accept_eula.EULAResult.RETRY,
-            accept_eula.EULAResult.RETRY,
-            accept_eula.EULAResult.SUCCESS
+            (retry_response, accept_eula.EULAResult.RETRY),
+            (retry_response, accept_eula.EULAResult.RETRY),
+            (success_response, accept_eula.EULAResult.SUCCESS)
         ]
 
-        result = accept_eula.exponential_backoff(self.settings, 1337)
+        result = accept_eula.accept_ert_eula(self.settings)
 
-        self.assertEqual(result, accept_eula.EULAResult.SUCCESS)
         self.assertEqual(mock_sleep.call_count, 2)
+        self.assertEqual(result[0], "Success")
+        self.assertEqual(result[2], 0)
 
 
 metadata_json = """
