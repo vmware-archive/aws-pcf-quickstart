@@ -1530,6 +1530,7 @@
     },
     "PcfElasticRuntimeS3BuildpacksBucket": {
       "Type": "AWS::S3::Bucket",
+      "DeletionPolicy": "Retain",
       "Properties": {
         "Tags": [
           {
@@ -1541,6 +1542,7 @@
     },
     "PcfElasticRuntimeS3DropletsBucket": {
       "Type": "AWS::S3::Bucket",
+      "DeletionPolicy": "Retain",
       "Properties": {
         "Tags": [
           {
@@ -1552,6 +1554,7 @@
     },
     "PcfElasticRuntimeS3PackagesBucket": {
       "Type": "AWS::S3::Bucket",
+      "DeletionPolicy": "Retain",
       "Properties": {
         "Tags": [
           {
@@ -1563,6 +1566,7 @@
     },
     "PcfElasticRuntimeS3ResourcesBucket": {
       "Type": "AWS::S3::Bucket",
+      "DeletionPolicy": "Retain",
       "Properties": {
         "Tags": [
           {

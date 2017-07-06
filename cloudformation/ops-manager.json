@@ -246,6 +246,7 @@
       }
     },
     "PcfOpsManagerS3Bucket": {
+      "DeletionPolicy": "Retain",
       "Type": "AWS::S3::Bucket",
       "Properties": {
         "Tags": [
