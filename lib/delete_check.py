@@ -18,7 +18,7 @@ def check(my_settings: settings.Settings):
         print("No message of type Delete")
         return
 
-    return_code = delete_everything.delete_everything(my_settings)
+    out, err, return_code = delete_everything.delete_everything(my_settings)
     for delete_message in delete_messages:
         if return_code != 0:
             sqs.report_cr_deletion_failure(my_settings, delete_message.get('LogicalResourceId'))

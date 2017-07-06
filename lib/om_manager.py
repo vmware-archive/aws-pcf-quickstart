@@ -65,7 +65,7 @@ def stage_product(product_name: str, my_settings: settings.Settings):
     out, err = p.communicate()
     if p.returncode != 0:
         print("Failed to query api")
-        return p.returncode
+        return out, err, p.returncode
 
     products = json.loads(out.decode())
     cf_version = [x['product_version'] for x in products if x['name'] == product_name][0]
@@ -86,11 +86,11 @@ def upload_stemcell(my_settings: settings.Settings, path: str):
             cmd = "{om_with_auth} upload-stemcell -s '{path}'".format(
                 om_with_auth=get_om_with_auth(my_settings), path=os.path.join(path, stemcell)
             )
-            exit_code = util.exponential_backoff_cmd(cmd, my_settings.debug)
+            out, err, exit_code = util.exponential_backoff_cmd(cmd, my_settings.debug)
             if exit_code != 0:
-                return exit_code
+                return out, err, exit_code
 
-    return 0
+    return "", "", 0
 
 
 def upload_assets(my_settings: settings.Settings, path: str):
@@ -101,11 +101,11 @@ def upload_assets(my_settings: settings.Settings, path: str):
             cmd = "{om_with_auth} -r 3600 upload-product -p '{path}'".format(
                 om_with_auth=get_om_with_auth(my_settings), path=os.path.join(path, tile))
 
-            exit_code = util.exponential_backoff_cmd(cmd, my_settings.debug)
+            out, err, exit_code = util.exponential_backoff_cmd(cmd, my_settings.debug)
             if exit_code != 0:
-                return exit_code
+                return out, err, exit_code
 
-    return 0
+    return "", "", 0
 
 
 def get_om_with_auth(settings: Settings):

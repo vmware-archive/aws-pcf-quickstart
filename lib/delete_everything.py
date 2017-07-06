@@ -12,10 +12,10 @@ def delete_everything(my_settings: Settings, delete_buckets=False):
             om_with_auth=om_manager.get_om_with_auth(my_settings)
         )
         # todo: call delete twice
-        return_code = util.exponential_backoff_cmd(cmd, my_settings.debug)
+        out, err, return_code = util.exponential_backoff_cmd(cmd, my_settings.debug)
         if return_code != 0:
             print("OM cmd failed to delete installation {}".format(return_code))
-            return return_code
+            return out, err, return_code
 
     buckets = [
         my_settings.pcf_opsmanagers3bucket,
@@ -35,8 +35,8 @@ def delete_everything(my_settings: Settings, delete_buckets=False):
                 expire_bucket(my_settings, bucket_name)
         except Exception as e:
             print(e)
-            return 1
-    return 0
+            return e, "", 1
+    return "", "", 0
 
 
 def delete_bucket(my_settings: Settings, bucket_name: str):

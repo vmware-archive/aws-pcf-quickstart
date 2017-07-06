@@ -30,14 +30,14 @@ class TestConfigureERT(unittest.TestCase):
 
     def test_flow(self):
         with patch('om_manager.stage_product') as mock_stage:
-            mock_stage.return_value = 0
+            mock_stage.return_value = "", "", 0
             with patch('configure_ert.configure_tile_az') as mock_az:
-                mock_az.return_value = 0
+                mock_az.return_value = "", "", 0
                 with patch('configure_ert.configure_ert_config') as mock_config:
-                    mock_config.return_value = 1
+                    mock_config.return_value = "Fail", "", 1
                     with patch('configure_ert.configure_ert_resources') as mock_resources:
-                        mock_resources.return_value = 0
-                        exit_code = configure_ert.configure_ert(self.settings)
+                        mock_resources.return_value = "", "", 0
+                        out, err, exit_code = configure_ert.configure_ert(self.settings)
 
                         mock_stage.assert_called()
                         mock_az.assert_called()

@@ -1,7 +1,7 @@
 import json
+from subprocess import call
 
 from jinja2 import Template
-from subprocess import call
 
 import om_manager
 import util
@@ -9,35 +9,35 @@ from settings import Settings
 
 
 def configure_ert(my_settings: Settings):
-    exit_code = om_manager.stage_product("cf", my_settings)
+    out, err, exit_code = om_manager.stage_product("cf", my_settings)
     if exit_code != 0:
         print("Failed to stage ERT")
-        return exit_code
+        return out, err, exit_code
 
-    exit_code = configure_tile_az(my_settings, 'cf')
+    out, err, exit_code = configure_tile_az(my_settings, 'cf')
     if exit_code != 0:
         print("Failed to configure az ERT")
-        return exit_code
+        return out, err, exit_code
 
-    exit_code = configure_ert_config(my_settings)
+    out, err, exit_code = configure_ert_config(my_settings)
     if exit_code != 0:
         print("Failed to configure ERT")
-        return exit_code
+        return out, err, exit_code
 
-    exit_code = modify_vm_types(my_settings)
+    out, err, exit_code = modify_vm_types(my_settings)
     if exit_code != 0:
         print("Failed to modify VM types for ERT")
-        return exit_code
+        return out, err, exit_code
 
-    exit_code = configure_ert_resources(my_settings)
+    out, err, exit_code = configure_ert_resources(my_settings)
     if exit_code != 0:
         print("Failed to configure ERT")
-        return exit_code
+        return out, err, exit_code
 
-    exit_code = configure_ert_multiaz_resources(my_settings)
+    out, err, exit_code = configure_ert_multiaz_resources(my_settings)
     if exit_code != 0:
         print("Failed to configure Multi AZ ERT")
-        return exit_code
+        return out, err, exit_code
 
     return create_required_databases(my_settings)
 
@@ -69,7 +69,7 @@ def configure_ert_multiaz_resources(my_settings: Settings):
             ert_resources=ert_resource_config
         )
         return util.exponential_backoff_cmd(cmd, my_settings.debug)
-    return 0
+    return "", "", 0
 
 
 def configure_ert_config(my_settings: Settings):
@@ -130,16 +130,15 @@ def create_required_databases(my_settings: Settings):
 
 def modify_vm_types(my_settings: Settings):
     path = '/api/v0/vm_types'
-    output, err, return_code = om_manager.curl_get(my_settings, path)
-
+    out, err, return_code = om_manager.curl_get(my_settings, path)
     if return_code != 0:
-        if output != "":
-            print(output)
+        if out != "":
+            print(out)
         if err != "":
             print(err)
-        return return_code
+        return out, err, return_code
 
-    response_json = json.loads(output)
+    response_json = json.loads(out)
     m4_exists = False
 
     for vm_type in response_json["vm_types"]:
@@ -154,15 +153,14 @@ def modify_vm_types(my_settings: Settings):
             for a in additional_types:
                 response_json["vm_types"].append(a)
 
-    output, err, return_code = om_manager.curl_payload(my_settings, path, json.dumps(response_json), 'PUT')
-
+    out, err, return_code = om_manager.curl_payload(my_settings, path, json.dumps(response_json), 'PUT')
     if return_code != 0:
-        if output != "":
-            print(output)
+        if out != "":
+            print(out)
         if err != "":
             print(err)
 
-    return return_code
+    return out, err, return_code
 
 
 def generate_ssl_cert(my_settings: Settings):

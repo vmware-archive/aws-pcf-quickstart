@@ -24,7 +24,7 @@ class TestDeleteEverything(unittest.TestCase):
     @patch('util.exponential_backoff_cmd')
     @patch('om_manager.get_om_with_auth')
     def test_om_delete_installation(self, mock_auth, mock_backoff, mock_expire_bucket, mock_is_opsman_configured):
-        mock_backoff.return_value = 0
+        mock_backoff.return_value =  "", "", 0
         mock_is_opsman_configured.return_value = True
 
         mock_auth.return_value = "om-with-auth-for-realz"
@@ -40,12 +40,13 @@ class TestDeleteEverything(unittest.TestCase):
     @patch('util.exponential_backoff_cmd')
     @patch('om_manager.get_om_with_auth')
     def test_om_delete_installation_fails(self, mock_auth, mock_backoff, mock_expire_bucket, mock_is_opsman_configured):
-        mock_backoff.return_value = 1
+        mock_backoff.return_value = "Fail", "",  1
         mock_is_opsman_configured.return_value = True
 
-        return_code = delete_everything.delete_everything(self.settings)
+        result = delete_everything.delete_everything(self.settings)
 
-        self.assertEqual(return_code, 1)
+        self.assertEqual(result[0], "Fail")
+        self.assertEqual(result[2], 1)
 
     @patch('om_manager.is_opsman_configured')
     @patch('delete_everything.delete_bucket')
@@ -53,7 +54,7 @@ class TestDeleteEverything(unittest.TestCase):
     @patch('util.exponential_backoff_cmd')
     @patch('om_manager.get_om_with_auth')
     def test_expire_buckets(self, mock_auth, mock_backoff, mock_expire_bucket, mock_delete_bucket, mock_is_opsman_configured):
-        mock_backoff.return_value = 0
+        mock_backoff.return_value = "", "", 0
         mock_is_opsman_configured.return_value = True
 
         return_code = delete_everything.delete_everything(self.settings)
@@ -71,12 +72,12 @@ class TestDeleteEverything(unittest.TestCase):
     @patch('util.exponential_backoff_cmd')
     @patch('om_manager.get_om_with_auth')
     def test_expire_buckets(self, mock_auth, mock_backoff, mock_expire_bucket, mock_delete_bucket, mock_is_opsman_configured):
-        mock_backoff.return_value = 0
+        mock_backoff.return_value = "", "", 0
         mock_is_opsman_configured.return_value = True
 
-        return_code = delete_everything.delete_everything(self.settings, True)
+        result = delete_everything.delete_everything(self.settings, True)
 
-        self.assertEqual(return_code, 0)
+        self.assertEqual(result[2], 0)
         self.assertEqual(mock_delete_bucket.call_count, 5)
         mock_delete_bucket.assert_called_with(
             self.settings, "bucket-rsc"
@@ -103,7 +104,7 @@ class TestDeleteEverything(unittest.TestCase):
     @patch('util.exponential_backoff_cmd')
     @patch('om_manager.get_om_with_auth')
     def test_delete_buckets_idempotent(self, mock_auth, mock_backoff, mock_client_constructor, mock_is_opsman_configured):
-        mock_backoff.return_value = 0
+        mock_backoff.return_value = "", "", 0
         mock_is_opsman_configured.return_value = True
 
         mock_client = Mock()

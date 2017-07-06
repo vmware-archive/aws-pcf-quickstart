@@ -46,7 +46,7 @@ class TestDeleteCheck(unittest.TestCase):
     @patch('sqs.report_cr_deletion_success')
     def test_check(self, mock_report_deletion_success, mock_delete_everything, mock_get_messages):
         mock_get_messages.return_value = self.response.get('Messages')
-        mock_delete_everything.return_value = 0
+        mock_delete_everything.return_value = "", "", 0
 
         delete_check.check(self.settings)
 
@@ -59,7 +59,7 @@ class TestDeleteCheck(unittest.TestCase):
     def test_check_delete_everything_failure(self, mock_report_deletion_failure, mock_delete_everything,
                                              mock_get_messages):
         mock_get_messages.return_value = self.response.get('Messages')
-        mock_delete_everything.return_value = 1
+        mock_delete_everything.return_value = "Fail", "", 1
 
         delete_check.check(self.settings)
 

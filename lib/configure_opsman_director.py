@@ -59,6 +59,7 @@ def configure_opsman_director(my_settings: Settings):
     commands.append("{om_with_auth} configure-bosh --network-assignment '{network_assignment}'".format(
         om_with_auth=om_manager.get_om_with_auth(my_settings), network_assignment=network_assignment_config
     ))
+    out = err = ""
     for cmd in commands:
         out, err, exit_code = util.run_command(cmd, my_settings.debug)
         if out != "":
@@ -66,9 +67,9 @@ def configure_opsman_director(my_settings: Settings):
         if err != "":
             print(err)
         if exit_code != 0:
-            return exit_code
+            return out, err, exit_code
 
-    return 0
+    return out, err, 0
 
 
 def generate_ssh_keypair(my_settings: Settings):
