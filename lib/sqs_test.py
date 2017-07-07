@@ -62,7 +62,7 @@ class TestSqs(unittest.TestCase):
     def test_report_status(self, mock_put, mock_get_messages, mock_delete_messages):
         mock_get_messages.return_value = self.response.get('Messages')
 
-        return_code = sqs.report_cr_creation_success(self.settings, '', 'MyCustomResource')
+        return_code = sqs.report_status(self.settings, 'Create', '', 'MyCustomResource', 'SUCCESS')
 
         expected_body = {
             'Status': 'SUCCESS',
@@ -76,8 +76,14 @@ class TestSqs(unittest.TestCase):
 
         self.assertEqual(mock_put.call_count, 1)
         call_args = mock_put.call_args[1]
-        self.assertEqual(call_args.get('url'), 'https://cloudformation-custom-resource-response-uswest2.s3-us-west-2.amazonaws.com/arn%3Aaws%3Acloudformation%3Aus-west-2%3A530420658117%3Astack/pcf-stack/1e820540-4c58-11e7-a965-50d5ca0184f2%7CMyCustomResource%7C4dd2c9a0-04cb-4218-908c-e3cdfad3c634')
-        self.assertEqual(call_args.get('params'), 'AWSAccessKeyId=AKIAI4KYMPPRGQACET5Q&Expires=1496940077&Signature=uLbeSl3rtkuDa2xf0y9oMFc1zBI%3D')
+        self.assertEqual(
+            call_args.get('url'),
+            'https://cloudformation-custom-resource-response-uswest2.s3-us-west-2.amazonaws.com/arn%3Aaws%3Acloudformation%3Aus-west-2%3A530420658117%3Astack/pcf-stack/1e820540-4c58-11e7-a965-50d5ca0184f2%7CMyCustomResource%7C4dd2c9a0-04cb-4218-908c-e3cdfad3c634'
+        )
+        self.assertEqual(
+            call_args.get('params'),
+            'AWSAccessKeyId=AKIAI4KYMPPRGQACET5Q&Expires=1496940077&Signature=uLbeSl3rtkuDa2xf0y9oMFc1zBI%3D'
+        )
         self.assertEqual(json.loads(call_args.get('data').decode('utf-8')), expected_body)
         self.assertEqual(return_code, 0)
         self.assertEqual(mock_delete_messages.call_count, 1)
@@ -87,9 +93,10 @@ class TestSqs(unittest.TestCase):
     def test_report_status_no_messages(self, mock_put, mock_get_messages):
         mock_get_messages.return_value = []
 
-        return_code = sqs.report_cr_creation_success(self.settings, 'MyCustomResource')
+        return_code = sqs.report_status(self.settings, '', '', 'MyCustomResource', 'SUCCESS')
 
         self.assertEqual(return_code, 1)
+        mock_put.assert_not_called()
 
     @patch('boto3.client')
     def test_delete_message(self, mock_client_constructor):
@@ -107,14 +114,46 @@ class TestSqs(unittest.TestCase):
             ReceiptHandle="AQEBCLcjvnWL65ILiE9/L6WzthEatj3punqXWcxK/VGSfOhkjbfaMoy6GHtxPr/giOjO2gIW7buTv9Mkhk7/tpgbgJEm338nzoLOxqiW4s3fzoQWrjDu0HHpcD1KrMJBeVstxnLglEOOny2KRozfsLjbeH5HoXuo+8mrb0nwVUglIK2vBkAPHLOGu64/BPOR6dt2qgYK4hzytgXQprcLlS5rYrrpYkqBKjWt9PCuwSG244LuN3brNyRIgxPR9SQ/ja9CWocx7sS3Ri6tAVU8zP4OxjRmfdMj/EEdL3Wm5m4v7+hnGDnj0LSV/3UX6C1/ozIOtHY6bqN6HQ6nM48Dk6UTEm78ApFuYmOFnh5xfcAEJHHN9meqnMsYMe0l8hTEBRHDYII/W4K5APbUNNsuoU/R3uYgqWlNMFWDvxSORKPwy/2O0Kk51+ZE/fyGEaVncoof"
         )
 
+    @patch('util.exponential_backoff')
     @patch('sqs.report_status')
-    def test_report_deletion_success(self, mock_report_status):
-        sqs.report_cr_deletion_success(self.settings, '', 'MyCustomResource')
+    def test_report_status_backoff(self, mock_report_status, mock_backoff):
+        sqs.report_cr_creation_success(self.settings, '', 'MyCustomResource')
 
-        mock_report_status.assert_called_with(self.settings, 'Delete', '', 'MyCustomResource', 'SUCCESS')
+        mock_backoff.assert_called()
 
-    @patch('sqs.report_status')
-    def test_report_deletion_failure(self, mock_report_status):
+        mock_backoff.call_args[0][0]()
+        mock_report_status.assert_called_with(
+            self.settings, 'Create', '', 'MyCustomResource', 'SUCCESS'
+        )
+
+    @patch('sqs.report_status_backoff')
+    def test_report_creation_success(self, mock_report_status_backoff):
+        sqs.report_cr_creation_success(self.settings, '', 'MyCustomResource')
+
+        mock_report_status_backoff.assert_called_with(
+            self.settings, 'Create', '', 'MyCustomResource', 'SUCCESS'
+        )
+
+    @patch('sqs.report_status_backoff')
+    def test_report_creation_failure(self, mock_report_status_backoff):
+        sqs.report_cr_creation_failure(self.settings, '', 'MyCustomResource')
+
+        mock_report_status_backoff.assert_called_with(
+            self.settings, 'Create', '', 'MyCustomResource', 'FAILED'
+        )
+
+    @patch('sqs.report_status_backoff')
+    def test_report_creation_success(self, mock_report_status_backoff):
+        sqs.report_cr_creation_success(self.settings, '', 'MyCustomResource')
+
+        mock_report_status_backoff.assert_called_with(
+            self.settings, 'Delete', '', 'MyCustomResource', 'SUCCESS'
+        )
+
+    @patch('sqs.report_status_backoff')
+    def test_report_creation_success(self, mock_report_status_backoff):
         sqs.report_cr_deletion_failure(self.settings, '', 'MyCustomResource')
 
-        mock_report_status.assert_called_with(self.settings, 'Delete', '', 'MyCustomResource', 'FAILED')
+        mock_report_status_backoff.assert_called_with(
+            self.settings, 'Delete', '', 'MyCustomResource', 'FAILED'
+        )

@@ -1,39 +1,52 @@
+import functools
 import json
 
 import boto3
 import requests
 
 import settings
+import util
 
 
-def report_cr_creation_success(my_settings: settings.Settings, reason: str, logical_resource_id: str = ""):
-    return report_status(my_settings, 'Create', reason, logical_resource_id, 'SUCCESS')
+def check_report_status(return_code):
+    return return_code == 0
 
 
-def report_cr_creation_failure(my_settings: settings.Settings, reason: str, logical_resource_id: str = ""):
-    return report_status(my_settings, 'Create', reason, logical_resource_id, 'FAILED')
+def report_cr_creation_success(my_settings: settings.Settings, reason: str, logical_res_id: str = ""):
+    return report_status_backoff(my_settings, 'Create', reason, logical_res_id, 'SUCCESS')
 
 
-def report_cr_deletion_success(my_settings: settings.Settings, reason: str, logical_resource_id: str = ""):
-    return report_status(my_settings, 'Delete', reason, logical_resource_id, 'SUCCESS')
+def report_cr_creation_failure(my_settings: settings.Settings, reason: str, logical_res_id: str = ""):
+    return report_status_backoff(my_settings, 'Create', reason, logical_res_id, 'FAILED')
 
 
-def report_cr_deletion_failure(my_settings: settings.Settings, reason: str, logical_resource_id: str = ""):
-    return report_status(my_settings, 'Delete', reason, logical_resource_id, 'FAILED')
+def report_cr_deletion_success(my_settings: settings.Settings, reason: str, logical_res_id: str = ""):
+    return report_status_backoff(my_settings, 'Delete', reason, logical_res_id, 'SUCCESS')
 
 
-def report_status(my_settings: settings.Settings, request_type: str, reason: str, logical_resource_id: str, status: str):
+def report_cr_deletion_failure(my_settings: settings.Settings, reason: str, logical_res_id: str = ""):
+    return report_status_backoff(my_settings, 'Delete', reason, logical_res_id, 'FAILED')
+
+
+def report_status_backoff(my_settings: settings.Settings, req_type: str, reason: str, logical_res_id: str, status: str):
+    return util.exponential_backoff(
+        functools.partial(report_status, my_settings, req_type, reason, logical_res_id, 'SUCCESS'),
+        check_report_status
+    )
+
+
+def report_status(my_settings: settings.Settings, req_type: str, reason: str, logical_res_id: str, status: str):
     raw_message = get_messages(my_settings)
     if len(raw_message) < 1:
         print("No message on queue... so we can't report back")
         return 1
     messages = [parse_message(m) for m in raw_message]
-    filtered_messages = [m for m in messages if m.get('RequestType') == request_type]
-    if logical_resource_id != "":
-        filtered_messages = [m for m in messages if m.get('LogicalResourceId') == logical_resource_id]
+    filtered_messages = [m for m in messages if m.get('RequestType') == req_type]
+    if logical_res_id != "":
+        filtered_messages = [m for m in messages if m.get('LogicalResourceId') == logical_res_id]
 
     if len(filtered_messages) < 1:
-        print("No message of type '{}', so unable to report back to CloudFormation".format(request_type))
+        print("No message of type '{}', so unable to report back to CloudFormation".format(req_type))
         return 1
 
     for message in filtered_messages:
