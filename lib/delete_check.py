@@ -7,7 +7,7 @@ def check(my_settings: settings.Settings):
     raw_message = sqs.get_messages(my_settings)
 
     if len(raw_message) < 1:
-        print("No message on queue... so we can't report back")
+        print("No message on queue; doing nothing since delete not triggered")
         return
     messages = [sqs.parse_message(m) for m in raw_message]
     delete_messages = [
