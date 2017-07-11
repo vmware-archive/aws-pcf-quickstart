@@ -118,6 +118,8 @@ Mappings:
     us-west-2:
       "64": "ami-483ba628"
   BootstrapAMI:
+    us-west-1:
+      "64": ami-309cb150
     us-west-2:
       "64": ami-a66c78df
 Resources:
@@ -302,7 +304,6 @@ Resources:
       Value: !GetAtt 01PCFBase.Outputs.PcfPrivateSubnet2AvailabilityZone
   PcfElasticRuntimeS3DropletsBucket:
     Type: "AWS::SSM::Parameter"
-    DeletionPolicy: Retain
     Properties:
       Name: !Sub "${AWS::StackName}.PcfElasticRuntimeS3DropletsBucket"
       Description: Misc
@@ -331,7 +332,6 @@ Resources:
       Value: !GetAtt 01PCFBase.Outputs.PcfVmsSecurityGroupId
   PcfElasticRuntimeS3BuildpacksBucket:
     Type: "AWS::SSM::Parameter"
-    DeletionPolicy: Retain
     Properties:
       Name: !Sub "${AWS::StackName}.PcfElasticRuntimeS3BuildpacksBucket"
       Description: Misc
@@ -381,7 +381,6 @@ Resources:
       Value: !GetAtt 01PCFBase.Outputs.PcfRdsDBName
   PcfOpsManagerS3Bucket:
     Type: "AWS::SSM::Parameter"
-    DeletionPolicy: Retain
     Properties:
       Name: !Sub "${AWS::StackName}.PcfOpsManagerS3Bucket"
       Description: Misc
@@ -396,7 +395,6 @@ Resources:
       Value: !GetAtt 01PCFBase.Outputs.PcfPublicSubnetId2
   PcfElasticRuntimeS3PackagesBucket:
     Type: "AWS::SSM::Parameter"
-    DeletionPolicy: Retain
     Properties:
       Name: !Sub "${AWS::StackName}.PcfElasticRuntimeS3PackagesBucket"
       Description: Misc
@@ -446,7 +444,6 @@ Resources:
       Value: !GetAtt 01PCFBase.Outputs.PcfPrivateSubnetId
   PcfElasticRuntimeS3ResourcesBucket:
     Type: "AWS::SSM::Parameter"
-    DeletionPolicy: Retain
     Properties:
       Name: !Sub "${AWS::StackName}.PcfElasticRuntimeS3ResourcesBucket"
       Description: Misc
