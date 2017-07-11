@@ -7,6 +7,12 @@ resource_types:
     repository: pivotalcf/pivnet-resource
     tag: latest-final
 
+- name: webpage
+  type: docker-image
+  source:
+    repository: cholick/concourse-webpage-resource
+    tag: latest
+
 resources:
 - name: quickstart-repo
   type: git
@@ -70,12 +76,19 @@ resources:
     access_key_id: {{s3_access_key_id}}
     secret_access_key: {{s3_secret_access_key}}
 
+- name: awslogs-agent-setup
+  type: webpage
+  source:
+    filename: awslogs-agent-setup.py
+    url: https://s3.amazonaws.com//aws-cloudwatch/downloads/latest/awslogs-agent-setup.py
+
 jobs:
 - name: build-ami
   plan:
   - get: quickstart-repo
   - get: ert-tile
   - get: aws-broker-tile
+  - get: awslogs-agent-setup
   - get: stemcell
     params:
       globs:
@@ -97,6 +110,7 @@ jobs:
       - name: aws-broker-tile
       - name: stemcell
       - name: ami-version
+      - name: awslogs-agent-setup
       outputs:
       - name: output
       params:

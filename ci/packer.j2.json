@@ -24,6 +24,7 @@
       "inline": [
         "sleep 30",
         "mkdir /home/ubuntu/tiles",
+        "mkdir /home/ubuntu/scripts",
         "sudo apt-get update -y",
         "sudo apt-get install -y python3-dev python3-pip mysql-client-core-5.7",
         "sudo pip3 install --upgrade pip awscli"
@@ -52,6 +53,11 @@
     {
       "destination": "/home/ubuntu/tiles/",
       "source": "{{stemcell_file}}",
+      "type": "file"
+    },
+    {
+      "destination": "/home/ubuntu/scripts/",
+      "source": "awslogs-agent-setup/awslogs-agent-setup.py",
       "type": "file"
     }
   ],
