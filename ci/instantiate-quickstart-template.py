@@ -1,19 +1,43 @@
+import json
+import os
+import re
+import sys
+
 import jinja2
+import yaml
 
-# todo: open ami mapping and templatize that too
+versioned_file_name = ""
+ami_mapping_dir = "../ami-mapping"
 
+for file_name in os.listdir(ami_mapping_dir):
+    if re.match(r'ami-mapping-.*\.json', file_name):
+        versioned_file_name = file_name
+
+if versioned_file_name == "":
+    print("Unable to find ami-mapping file")
+    sys.exit(1)
+
+with open(os.path.join(ami_mapping_dir, versioned_file_name)) as f:
+    raw_mapping = json.load(f)
+    mapping = {}
+    for key in raw_mapping:
+        mapping[key] = {"64": raw_mapping[key]}
+
+mapping_yaml = yaml.dump(mapping, default_flow_style=False)
 
 with open("templates/quickstart-template.j2.yml", 'r') as f:
     quickstart_template = jinja2.Template(f.read())
 
 with open("cloudformation/quickstart-template-rc.yml", 'w') as template_file:
     rc_context = {
-        "quickstart_release_tarball": "quickstart-release-candidate.tgz"
+        "quickstart_release_tarball": "quickstart-release-candidate.tgz",
+        "bootstrap_ami_mapping": mapping_yaml
     }
     template_file.write(quickstart_template.render(rc_context))
 
 with open("cloudformation/quickstart-template.yml", 'w') as template_file:
     prod_context = {
-        "quickstart_release_tarball": "quickstart-release.tgz"
+        "quickstart_release_tarball": "quickstart-release.tgz",
+        "bootstrap_ami_mapping": mapping_yaml
     }
     template_file.write(quickstart_template.render(prod_context))

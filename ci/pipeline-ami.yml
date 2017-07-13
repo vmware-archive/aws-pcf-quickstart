@@ -169,6 +169,8 @@ jobs:
 - name: instantiate-templates
   plan:
   - get: quickstart-repo
+  - get: ami-mapping
+    trigger: true
     passed:
       - replicate-ami
   - task: build-release
@@ -181,6 +183,7 @@ jobs:
           tag: "3"
       inputs:
       - name: quickstart-repo
+      - name: ami-mapping
       outputs:
       - name: quickstart-updated-repo
       run:

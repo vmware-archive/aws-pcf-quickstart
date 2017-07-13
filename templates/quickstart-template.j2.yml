@@ -127,10 +127,7 @@ Mappings:
     us-west-2:
       "64": "ami-483ba628"
   BootstrapAMI:
-    us-west-1:
-      "64": "ami-a6446ac6"
-    us-west-2:
-      "64": "ami-b2d8c5cb"
+    {{bootstrap_ami_mapping | indent }}
 Resources:
   ## cloud-formation.json
   01PCFBase:
