@@ -58,8 +58,8 @@ Parameters:
   10ElbPrefix:
     Type: String
     Default: ''
-    Description: 'Prefix for the name of the ELBs generated. NOTE: Leave empty to use
-      default prefix of AWS::StackName'
+    Description: 'Prefix for the name of the ELBs generated.'
+    MaxLength: 19
   11AllowHttpOnElb:
     Type: String
     Default: 'true'
