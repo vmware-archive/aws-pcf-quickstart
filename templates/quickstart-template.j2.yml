@@ -94,6 +94,15 @@ Parameters:
     AllowedValues: [1,2]
     Default: 1
     Description: Select number of Avalaibility Zones (either 1 or 2)
+  ForwardLogOutput:
+    Description: |
+      When true, bootstrap logs are sent to 'CloudWatch Logs'. Critical for solving failures, but
+      potentially exposes secrets output to logs as part of the bootstrap process.
+    Type: String
+    Default: 'true'
+    AllowedValues:
+    - 'true'
+    - 'false'
 Mappings:
   ## Mapping of OpsManager AMI in AWS Regions.
   01OpsManagerAMI:
@@ -119,9 +128,9 @@ Mappings:
       "64": "ami-483ba628"
   BootstrapAMI:
     us-west-1:
-      "64": ami-309cb150
+      "64": "ami-a6446ac6"
     us-west-2:
-      "64": ami-a66c78df
+      "64": "ami-b2d8c5cb"
 Resources:
   ## cloud-formation.json
   01PCFBase:
@@ -187,6 +196,7 @@ Resources:
     - PCFDescribeStackPolicy
     - PCFParameterStorePolicy
     - PCFCustomResourcePolicy
+    - PCFEmitLogsPolicy
     - PcfElbDnsName
     - PcfPublicSubnetAvailabilityZone
     - PcfPrivateSubnetAvailabilityZone
@@ -271,6 +281,22 @@ Resources:
             Action: "sqs:*"
             Resource: !GetAtt CustomResourceSQSQueue.Arn
       PolicyName: !Sub ${AWS::StackName}-custom-resource
+      Roles:
+        - !GetAtt 01PCFBase.Outputs.PcfIamRole
+  PCFEmitLogsPolicy:
+    Type: "AWS::IAM::Policy"
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+              - logs:DescribeLogStreams
+            Resource: "arn:aws:logs:*:*:*"
+      PolicyName: !Sub ${AWS::StackName}-emit-logs-plicy
       Roles:
         - !GetAtt 01PCFBase.Outputs.PcfIamRole
   ## This is the Start of our Secured Parameters
@@ -572,6 +598,30 @@ Resources:
           mkdir -p /var/local/cloudformation/
           echo "{\"StackName\":\"${AWS::StackName}\",\"StackId\":\"${AWS::StackId}\",\"Region\":\"${AWS::Region}\"}" > /var/local/cloudformation/stack-meta.json
           chmod 0755 /var/local/cloudformation/stack-meta.json
+
+          if "${ForwardLogOutput}" == "true"; then
+            echo "Setting up CloudWatch Logs."
+
+            echo "
+            [general]
+            state_file = /var/awslogs/state/agent-state
+
+            [/var/log/syslog]
+            file = /var/log/syslog
+            log_group_name = pcf_bootstrap
+            log_stream_name = syslog-{instance_id}
+            datetime_format = %b %d %H:%M:%S
+
+            [/var/log/cloud-init-output.log]
+            file = /var/log/cloud-init-output.log
+            log_group_name = pcf_bootstrap
+            log_stream_name = cloud-init-output-{instance_id}
+            " > /home/ubuntu/scripts/awslogs.config
+
+            python3 /home/ubuntu/scripts/awslogs-agent-setup.py -n -r ${AWS::Region} -c /home/ubuntu/scripts/awslogs.config || true
+          else
+            echo "Skipping CloudWatch Logs, ForwardLogOutput was false"
+          fi
 
           wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 --tries=15 \
               https://s3-us-west-2.amazonaws.com/aws-pcf-quickstart-releases/{{quickstart_release_tarball}} \

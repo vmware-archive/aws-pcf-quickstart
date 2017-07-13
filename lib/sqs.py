@@ -64,14 +64,14 @@ def report_status(my_settings: settings.Settings, req_type: str, reason: str, lo
     return 0
 
 
-def build_payload(create_message, status: str, reason: str):
+def build_payload(message, status: str, reason: str):
     return {
         'Status': status,
         'Reason': reason,
         'PhysicalResourceId': 'PivotalCloudFoundry',
-        'RequestId': create_message.get('RequestId'),
-        'LogicalResourceId': create_message.get('LogicalResourceId'),
-        'StackId': create_message.get('StackId'),
+        'RequestId': message.get('RequestId'),
+        'LogicalResourceId': message.get('LogicalResourceId'),
+        'StackId': message.get('StackId'),
         'Data': {}
     }
 
