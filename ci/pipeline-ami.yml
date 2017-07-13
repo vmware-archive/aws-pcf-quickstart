@@ -24,6 +24,16 @@ resources:
     ignore_paths:
       - ci/*.yml
 
+- name: quickstart-repo-templates
+  type: git
+  source:
+    branch: master
+    uri: https://github.com/cf-platform-eng/quickstart
+    username: cholick
+    password: {{github_access_token}}
+    paths:
+      - templates/quickstart-template.j2.yml
+
 - name: ami-version
   type: semver
   source:
@@ -168,7 +178,8 @@ jobs:
 
 - name: instantiate-templates
   plan:
-  - get: quickstart-repo
+  - get: quickstart-repo-templates
+    trigger: true
   - get: ami-mapping
     trigger: true
     passed:
