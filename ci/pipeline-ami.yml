@@ -193,7 +193,7 @@ jobs:
           repository: python
           tag: "3"
       inputs:
-      - name: quickstart-repo
+      - name: quickstart-repo-templates
       - name: ami-mapping
       outputs:
       - name: quickstart-updated-repo
@@ -202,7 +202,7 @@ jobs:
         args:
         - -exc
         - |
-          git clone quickstart-repo quickstart-updated-repo
+          git clone quickstart-repo-templates quickstart-updated-repo
           pushd quickstart-updated-repo
           pip install jinja2 PyYAML
           python3 ci/instantiate-quickstart-template.py
@@ -212,6 +212,6 @@ jobs:
           git config --global user.email "ci@example.com"
           git commit -m "Adding instantiated templates"
           popd
-  - put: quickstart-repo
+  - put: quickstart-repo-templates
     params:
       repository: quickstart-updated-repo
