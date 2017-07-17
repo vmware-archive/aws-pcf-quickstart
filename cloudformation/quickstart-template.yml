@@ -95,6 +95,13 @@ Parameters:
     AllowedValues:
     - 'true'
     - 'false'
+  SkipSSLValidation:
+    Description: |
+      When true, SSL certificates are not validated. Not appropriate for a production environment.
+    Type: String
+    AllowedValues:
+    - 'true'
+    - 'false'
 Mappings:
   ## Mapping of OpsManager AMI in AWS Regions.
   OpsManagerAMI:
