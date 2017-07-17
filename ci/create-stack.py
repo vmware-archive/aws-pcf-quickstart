@@ -33,7 +33,8 @@ parameters = [
     {"ParameterKey": "PCFKeyPair", "ParameterValue": natkeypair},
     {"ParameterKey": "RdsUsername", "ParameterValue": "admin"},
     {"ParameterKey": "AdminEmail", "ParameterValue": "noreply@pivotal.io"},
-    {"ParameterKey": "PivnetToken", "ParameterValue": pivnettoken}
+    {"ParameterKey": "PivnetToken", "ParameterValue": pivnettoken},
+    {"ParameterKey": "SkipSSLValidation", "ParameterValue": "true"}
 ]
 
 client = boto3.client(

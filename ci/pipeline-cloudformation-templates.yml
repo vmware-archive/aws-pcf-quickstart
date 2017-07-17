@@ -6,7 +6,7 @@ resources:
   source:
     branch: master
     uri: https://github.com/cf-platform-eng/quickstart
-    username: cholick
+    username: {{github_user_name}}
     password: {{github_access_token}}
     paths:
       - cloudformation/cloud-formation.json

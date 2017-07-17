@@ -19,7 +19,7 @@ resources:
   source:
     branch: master
     uri: https://github.com/cf-platform-eng/quickstart
-    username: cholick
+    username: {{github_user_name}}
     password: {{github_access_token}}
     ignore_paths:
       - ci/*.yml
@@ -29,7 +29,7 @@ resources:
   source:
     branch: master
     uri: https://github.com/cf-platform-eng/quickstart
-    username: cholick
+    username: {{github_user_name}}
     password: {{github_access_token}}
     paths:
       - templates/quickstart-template.j2.yml
@@ -41,7 +41,7 @@ resources:
     uri: https://github.com/cf-platform-eng/quickstart
     branch: ami_version
     file: ami_version
-    username: cholick
+    username: {{github_user_name}}
     password: {{github_access_token}}
 
 - name: ert-tile
