@@ -147,12 +147,9 @@
         },
         "LoadBalancerName": { "Fn::Join" : [
           "",
-          [ { "Fn::If" : [
-              "ElbPrefixProvided",
-              { "Ref" : "09ElbPrefix" },
-              { "Ref" : "AWS::StackName" }
-            ]},
-           "-pcf-elb"
+          [
+            { "Ref" : "09ElbPrefix" },
+            "-pcf-elb"
           ]
         ] },
         "Listeners": { "Fn::If" : [
@@ -239,11 +236,8 @@
         },
         "LoadBalancerName": { "Fn::Join" : [
           "",
-          [ { "Fn::If" : [
-              "ElbPrefixProvided",
-              { "Ref" : "09ElbPrefix" },
-              { "Ref" : "AWS::StackName" }
-            ]},
+          [
+            { "Ref" : "09ElbPrefix" },
             "-pcf-ssh-elb"
           ]
         ] },
@@ -905,11 +899,8 @@
         },
         "LoadBalancerName": { "Fn::Join" : [
           "",
-          [ { "Fn::If" : [
-              "ElbPrefixProvided",
-              { "Ref" : "09ElbPrefix" },
-              { "Ref" : "AWS::StackName" }
-            ]},
+          [
+            { "Ref" : "09ElbPrefix" },
             "-pcf-tcp-elb"
           ]
         ] },
