@@ -18,12 +18,13 @@ class TestOmManager(unittest.TestCase):
         self.settings.opsman_user = 'admin'
         self.settings.pcf_opsmanageradminpassword = 'monkey-123'
         self.settings.debug = False
+        self.settings.pcf_input_skipsslvalidation = "true"
 
     def to_bytes(self, str: str):
         return bytearray(str, "utf-8")
 
     @patch('subprocess.Popen')
-    def test_calls_auth(self, mock_popen):
+    def test_configure_auth(self, mock_popen):
         p = Mock(Popen)
         mock_popen.return_value = p
         p.returncode = 0
@@ -31,6 +32,19 @@ class TestOmManager(unittest.TestCase):
         om_manager.config_opsman_auth(self.settings)
         mock_popen.assert_called_with(
             "om -k --target https://cf.example.com configure-authentication --username 'admin' --password 'monkey-123' --decryption-passphrase 'monkey-123'",
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
+        )
+
+    @patch('subprocess.Popen')
+    def test_configure_auth_no_skip_ssl(self, mock_popen):
+        self.settings.pcf_input_skipsslvalidation = "false"
+        p = Mock(Popen)
+        mock_popen.return_value = p
+        p.returncode = 0
+        p.communicate.return_value = self.to_bytes("out: foo"), self.to_bytes("error: bar")
+        om_manager.config_opsman_auth(self.settings)
+        mock_popen.assert_called_with(
+            "om  --target https://cf.example.com configure-authentication --username 'admin' --password 'monkey-123' --decryption-passphrase 'monkey-123'",
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
         )
 
@@ -112,6 +126,12 @@ class TestOmManager(unittest.TestCase):
 
     def test_get_om_with_auth(self):
         expected_om_command = "om -k --target https://cf.example.com --username 'admin' --password 'monkey-123'"
+        om_command = om_manager.get_om_with_auth(self.settings)
+        self.assertEqual(om_command, expected_om_command)
+
+    def test_get_om_with_auth_with_ssl(self):
+        self.settings.pcf_input_skipsslvalidation = "false"
+        expected_om_command = "om  --target https://cf.example.com --username 'admin' --password 'monkey-123'"
         om_command = om_manager.get_om_with_auth(self.settings)
         self.assertEqual(om_command, expected_om_command)
 

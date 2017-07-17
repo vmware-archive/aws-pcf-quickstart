@@ -18,9 +18,11 @@ def format_om_json_str(om_json: str):
 
 def config_opsman_auth(my_settings: settings.Settings):
     # todo: get if we should ignore ssl validation (-k) out of settings
-    cmd = "om -k --target {0} configure-authentication --username '{1}' --password '{2}' --decryption-passphrase '{3}'".format(
-        my_settings.opsman_url, my_settings.opsman_user, my_settings.pcf_opsmanageradminpassword,
-        my_settings.pcf_opsmanageradminpassword
+    cmd = "om {sslflag} --target {url} configure-authentication --username '{user}' --password '{password}' --decryption-passphrase '{password}'".format(
+        sslflag=sslvalidation_flag(my_settings),
+        url=my_settings.opsman_url,
+        user=my_settings.opsman_user,
+        password=my_settings.pcf_opsmanageradminpassword
     )
     return util.exponential_backoff_cmd(cmd, my_settings.debug)
 
@@ -28,7 +30,7 @@ def config_opsman_auth(my_settings: settings.Settings):
 def is_opsman_configured(my_settings: settings.Settings):
     # todo: get if we should ignore ssl validation out of settings
     url = my_settings.opsman_url + "/api/v0/installations"
-    response = requests.get(url=url, verify=False)
+    response = requests.get(url=url, verify=my_settings.pcf_input_skipsslvalidation == "true")
     # if auth isn't configured yet, authenticated api endpoints give 400 rather than 401
     if response.status_code == 400:
         return False
@@ -108,9 +110,17 @@ def upload_assets(my_settings: settings.Settings, path: str):
     return "", "", 0
 
 
-def get_om_with_auth(settings: Settings):
-    return "om -k --target {url} --username '{username}' --password '{password}'".format(
-        url=settings.opsman_url,
-        username=settings.opsman_user,
-        password=settings.pcf_opsmanageradminpassword
+def get_om_with_auth(my_settings: Settings):
+    return "om {sslflag} --target {url} --username '{username}' --password '{password}'".format(
+        sslflag=sslvalidation_flag(my_settings),
+        url=my_settings.opsman_url,
+        username=my_settings.opsman_user,
+        password=my_settings.pcf_opsmanageradminpassword
     )
+
+
+def sslvalidation_flag(settings:Settings):
+    if settings.pcf_input_skipsslvalidation == "true":
+        return "-k"
+    else:
+        return ""
