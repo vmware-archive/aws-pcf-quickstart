@@ -10,27 +10,27 @@ input_params = {
             'Parameters': [
                 {
                     'ParameterValue': 'admin@example.com',
-                    'ParameterKey': '13AdminEmail'
+                    'ParameterKey': 'AdminEmail'
                 },
                 {
                     'ParameterValue': 'my-key',
-                    'ParameterKey': '14PCFKeyPair'
+                    'ParameterKey': 'PCFKeyPair'
                 },
                 {
                     'ParameterValue': 'elb-pre-yo',
-                    'ParameterKey': '10ElbPrefix'
+                    'ParameterKey': 'ElbPrefix'
                 },
                 {
                     'ParameterValue': 'abc123',
-                    'ParameterKey': '12PivnetToken'
+                    'ParameterKey': 'PivnetToken'
                 },
                 {
                     'ParameterValue': 'my-zone-id',
-                    'ParameterKey': '14HostedZoneId'
+                    'ParameterKey': 'HostedZoneId'
                 },
                 {
                     'ParameterValue': 'pcf.example.com',
-                    'ParameterKey': '15Domain'
+                    'ParameterKey': 'Domain'
                 }
             ]
         }

@@ -23,17 +23,17 @@ aws_secret_access_key = os.environ['AWS_SECRET_ACCESS_KEY']
 aws_region = os.environ['AWS_INTEGRATION_REGION']
 
 parameters = [
-    {"ParameterKey": "06RdsPassword", "ParameterValue": password},
-    {"ParameterKey": "14HostedZoneId", "ParameterValue": hostedzoneid},
-    {"ParameterKey": "01NATKeyPair", "ParameterValue": natkeypair},
-    {"ParameterKey": "07SSLCertificateARN", "ParameterValue": sslcertificatearn},
-    {"ParameterKey": "16OpsManagerAdminPassword", "ParameterValue": password},
-    {"ParameterKey": "15Domain", "ParameterValue": domain},
-    {"ParameterKey": "10ElbPrefix", "ParameterValue": "my-pcf-elb"},
-    {"ParameterKey": "14PCFKeyPair", "ParameterValue": natkeypair},
-    {"ParameterKey": "05RdsUsername", "ParameterValue": "admin"},
-    {"ParameterKey": "13AdminEmail", "ParameterValue": "noreply@pivotal.io"},
-    {"ParameterKey": "12PivnetToken", "ParameterValue": pivnettoken}
+    {"ParameterKey": "RdsPassword", "ParameterValue": password},
+    {"ParameterKey": "HostedZoneId", "ParameterValue": hostedzoneid},
+    {"ParameterKey": "NATKeyPair", "ParameterValue": natkeypair},
+    {"ParameterKey": "SSLCertificateARN", "ParameterValue": sslcertificatearn},
+    {"ParameterKey": "OpsManagerAdminPassword", "ParameterValue": password},
+    {"ParameterKey": "Domain", "ParameterValue": domain},
+    {"ParameterKey": "ElbPrefix", "ParameterValue": "my-pcf-elb"},
+    {"ParameterKey": "PCFKeyPair", "ParameterValue": natkeypair},
+    {"ParameterKey": "RdsUsername", "ParameterValue": "admin"},
+    {"ParameterKey": "AdminEmail", "ParameterValue": "noreply@pivotal.io"},
+    {"ParameterKey": "PivnetToken", "ParameterValue": pivnettoken}
 ]
 
 client = boto3.client(

@@ -161,27 +161,27 @@ class Settings:
 
     @property
     def pcf_input_pivnettoken(self):
-        return self.input_parameters["12PivnetToken"]
+        return self.input_parameters["PivnetToken"]
 
     @property
     def pcf_input_pcfkeypair(self):
-        return self.input_parameters["14PCFKeyPair"]
+        return self.input_parameters["PCFKeyPair"]
 
     @property
     def pcf_input_adminemail(self):
-        return self.input_parameters["13AdminEmail"]
+        return self.input_parameters["AdminEmail"]
 
     @property
     def pcf_input_elbprefix(self):
-        return self.input_parameters["10ElbPrefix"]
+        return self.input_parameters["ElbPrefix"]
 
     @property
     def pcf_input_hostedzoneid(self):
-        return self.input_parameters["14HostedZoneId"]
+        return self.input_parameters["HostedZoneId"]
 
     @property
     def pcf_input_domain(self):
-        return self.input_parameters["15Domain"]
+        return self.input_parameters["Domain"]
 
     @property
     def opsman_url(self):
