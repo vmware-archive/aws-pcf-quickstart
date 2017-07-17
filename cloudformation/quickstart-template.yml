@@ -6,10 +6,10 @@ Description: >
   For a detailed guide on how to deploy this template, please read the instructions here <url>
 
 Parameters:
-  01NATKeyPair:
+  NATKeyPair:
     Type: AWS::EC2::KeyPair::KeyName
     Description: Select the SSH keypair to use for the NAT vm
-  02NATInstanceType:
+  NATInstanceType:
     Type: String
     AllowedValues:
     - t2.micro
@@ -25,60 +25,60 @@ Parameters:
     ConstraintDescription: Instance Type must be of a valid EC2 type
     Default: t2.medium
     Description: Select the Instance Type to use for the NAT vm
-  03OpsManagerIngress:
+  OpsManagerIngress:
     Type: String
     Default: 0.0.0.0/0
     Description: CIDR range allowed to connect to Ops Manager instance
-  04RdsDBName:
+  RdsDBName:
     Type: String
     MinLength: '4'
     Default: bosh
     Description: BOSH database name
-  05RdsUsername:
+  RdsUsername:
     Type: String
     Description: BOSH database username
-  06RdsPassword:
+  RdsPassword:
     Type: String
     NoEcho: 'true'
     MinLength: '8'
     Default: "ThisIsAPrettyWeakPassword"
     AllowedPattern: "[\\w-_]*"
     Description: BOSH database password
-  07SSLCertificateARN:
+  SSLCertificateARN:
     Type: String
     Description: ARN for pre-uploaded SSL certificate
-  10ElbPrefix:
+  ElbPrefix:
     Type: String
     Description: 'Prefix for the name of the ELBs generated. Required.'
     MinLength: 1
     MaxLength: 19
-  11AllowHttpOnElb:
+  AllowHttpOnElb:
     Type: String
     Default: 'true'
     AllowedValues:
     - 'true'
     - 'false'
     Description: 'Allow HTTP traffic on PCF-ELB port 80. Default: true.'
-  12PivnetToken:
+  PivnetToken:
     Type: String
     Description: Using the Pivnet CLI requires a valid Pivotal Network API token. See
       https://network.pivotal.io/docs/api#how-to-authenticate
-  13AdminEmail:
+  AdminEmail:
     Type: String
     Description: Admin email used by mysql monitor, for example
-  14HostedZoneId:
+  HostedZoneId:
     Type: AWS::Route53::HostedZone::Id
     Description: Existing hosted zone to create DNS records under
-  15Domain:
+  Domain:
     Type: String
     Description: Root or subdomain for all Pivotal Cloud Foundry DNS entries (e.g. - example.com or pcf.example.com). Must match hosted zone.
-  16OpsManagerAdminPassword:
+  OpsManagerAdminPassword:
     Type: String
     NoEcho: 'true'
     MinLength: '14'
     AllowedPattern: "[\\w-_]*"
     Description: Admin password to log on to OpsManager
-  14PCFKeyPair:
+  PCFKeyPair:
     Type: AWS::EC2::KeyPair::KeyName
     Description: Select the SSH keypair to use for Ops Manager and all VMS in the deployment
   NumberOfAZs:
@@ -97,7 +97,7 @@ Parameters:
     - 'false'
 Mappings:
   ## Mapping of OpsManager AMI in AWS Regions.
-  01OpsManagerAMI:
+  OpsManagerAMI:
     ap-northeast-1:
       "64": "ami-6088a607"
     ap-northeast-2:
@@ -141,22 +141,22 @@ Mappings:
       '64': ami-b2d8c5cb
 Resources:
   ## cloud-formation.json
-  01PCFBase:
+  PCFBase:
     Type: AWS::CloudFormation::Stack
     Properties:
       Parameters:
-        01NATKeyPair: !Ref 01NATKeyPair
-        02NATInstanceType: !Ref 02NATInstanceType
-        03OpsManagerIngress: !Ref 03OpsManagerIngress
-        04RdsDBName: !Ref 04RdsDBName
-        05RdsUsername: !Ref 05RdsUsername
-        06RdsPassword: !Ref 06RdsPassword
-        07SSLCertificateARN: !Ref 07SSLCertificateARN
+        01NATKeyPair: !Ref NATKeyPair
+        02NATInstanceType: !Ref NATInstanceType
+        03OpsManagerIngress: !Ref OpsManagerIngress
+        04RdsDBName: !Ref RdsDBName
+        05RdsUsername: !Ref RdsUsername
+        06RdsPassword: !Ref RdsPassword
+        07SSLCertificateARN: !Ref SSLCertificateARN
         08OpsManagerTemplate: https://s3-us-west-2.amazonaws.com/aws-pcf-quickstart-templates/ops-manager.json
-        09ElbPrefix: !Ref 10ElbPrefix
-        10AllowHttpOnElb: !Ref 11AllowHttpOnElb
-        11PivnetToken: !Ref 12PivnetToken
-        12AdminEmail: !Ref 13AdminEmail
+        09ElbPrefix: !Ref ElbPrefix
+        10AllowHttpOnElb: !Ref AllowHttpOnElb
+        11PivnetToken: !Ref PivnetToken
+        12AdminEmail: !Ref AdminEmail
       TemplateURL: https://s3-us-west-2.amazonaws.com/aws-pcf-quickstart-templates/cloud-formation.json
   ## Custom resource stuff
   CustomResourceSQSQueue:
@@ -195,8 +195,8 @@ Resources:
     DependsOn:
     - CustomResourceSQSQueuePolicy
     - BootstrapInstance
-    - 01OpsManagerInstance
-    - 02DNSOpsMan
+    - OpsManagerInstance
+    - DNSOpsMan
     - DNSSys
     - DNSStar
     - DNS
@@ -262,7 +262,7 @@ Resources:
             Resource: !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${AWS::StackName}/*"
       PolicyName: !Sub ${AWS::StackName}-describe-stack
       Roles:
-        - !GetAtt 01PCFBase.Outputs.PcfIamRole
+        - !GetAtt PCFBase.Outputs.PcfIamRole
   PCFParameterStorePolicy:
     Type: "AWS::IAM::Policy"
     Properties:
@@ -277,7 +277,7 @@ Resources:
             Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}.*"
       PolicyName: !Sub ${AWS::StackName}-parameter-store
       Roles:
-        - !GetAtt 01PCFBase.Outputs.PcfIamRole
+        - !GetAtt PCFBase.Outputs.PcfIamRole
   PCFCustomResourcePolicy:
     Type: "AWS::IAM::Policy"
     Properties:
@@ -290,7 +290,7 @@ Resources:
             Resource: !GetAtt CustomResourceSQSQueue.Arn
       PolicyName: !Sub ${AWS::StackName}-custom-resource
       Roles:
-        - !GetAtt 01PCFBase.Outputs.PcfIamRole
+        - !GetAtt PCFBase.Outputs.PcfIamRole
   PCFEmitLogsPolicy:
     Type: "AWS::IAM::Policy"
     Properties:
@@ -306,7 +306,7 @@ Resources:
             Resource: "arn:aws:logs:*:*:*"
       PolicyName: !Sub ${AWS::StackName}-emit-logs-plicy
       Roles:
-        - !GetAtt 01PCFBase.Outputs.PcfIamRole
+        - !GetAtt PCFBase.Outputs.PcfIamRole
   ## This is the Start of our Secured Parameters
   PcfElbDnsName:
     Type: "AWS::SSM::Parameter"
@@ -314,210 +314,210 @@ Resources:
       Name: !Sub "${AWS::StackName}.PcfElbDnsName"
       Description: PCF Provisioned ELB
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfElbDnsName
+      Value: !GetAtt PCFBase.Outputs.PcfElbDnsName
   PcfPublicSubnetAvailabilityZone:
     Type: "AWS::SSM::Parameter"
     Properties:
       Name: !Sub "${AWS::StackName}.PcfPublicSubnetAvailabilityZone"
       Description: Misc
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfPublicSubnetAvailabilityZone
+      Value: !GetAtt PCFBase.Outputs.PcfPublicSubnetAvailabilityZone
   PcfPrivateSubnetAvailabilityZone:
     Type: "AWS::SSM::Parameter"
     Properties:
       Name: !Sub "${AWS::StackName}.PcfPrivateSubnetAvailabilityZone"
       Description: Misc
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfPrivateSubnetAvailabilityZone
+      Value: !GetAtt PCFBase.Outputs.PcfPrivateSubnetAvailabilityZone
   PcfPrivateSubnet2AvailabilityZone:
     Type: "AWS::SSM::Parameter"
     Properties:
       Name: !Sub "${AWS::StackName}.PcfPrivateSubnet2AvailabilityZone"
       Description: Misc
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfPrivateSubnet2AvailabilityZone
+      Value: !GetAtt PCFBase.Outputs.PcfPrivateSubnet2AvailabilityZone
   PcfElasticRuntimeS3DropletsBucket:
     Type: "AWS::SSM::Parameter"
     Properties:
       Name: !Sub "${AWS::StackName}.PcfElasticRuntimeS3DropletsBucket"
       Description: Misc
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfElasticRuntimeS3DropletsBucket
+      Value: !GetAtt PCFBase.Outputs.PcfElasticRuntimeS3DropletsBucket
   PcfIamRole:
     Type: "AWS::SSM::Parameter"
     Properties:
       Name: !Sub "${AWS::StackName}.PcfIamRole"
       Description: Misc
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfIamRole
+      Value: !GetAtt PCFBase.Outputs.PcfIamRole
   PcfElbSshDnsName:
     Type: "AWS::SSM::Parameter"
     Properties:
       Name: !Sub "${AWS::StackName}.PcfElbSshDnsName"
       Description: Misc
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfElbSshDnsName
+      Value: !GetAtt PCFBase.Outputs.PcfElbSshDnsName
   PcfVmsSecurityGroupId:
     Type: "AWS::SSM::Parameter"
     Properties:
       Name: !Sub "${AWS::StackName}.PcfVmsSecurityGroupId"
       Description: Misc
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfVmsSecurityGroupId
+      Value: !GetAtt PCFBase.Outputs.PcfVmsSecurityGroupId
   PcfElasticRuntimeS3BuildpacksBucket:
     Type: "AWS::SSM::Parameter"
     Properties:
       Name: !Sub "${AWS::StackName}.PcfElasticRuntimeS3BuildpacksBucket"
       Description: Misc
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfElasticRuntimeS3BuildpacksBucket
+      Value: !GetAtt PCFBase.Outputs.PcfElasticRuntimeS3BuildpacksBucket
   PcfVpc:
     Type: "AWS::SSM::Parameter"
     Properties:
       Name: !Sub "${AWS::StackName}.PcfVpc"
       Description: Misc
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfVpc
+      Value: !GetAtt PCFBase.Outputs.PcfVpc
   PcfPublicSubnetId:
     Type: "AWS::SSM::Parameter"
     Properties:
       Name: !Sub "${AWS::StackName}.PcfPublicSubnetId"
       Description: Misc
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfPublicSubnetId
+      Value: !GetAtt PCFBase.Outputs.PcfPublicSubnetId
   PcfRdsPassword:
     Type: "AWS::SSM::Parameter"
     Properties:
       Name: !Sub "${AWS::StackName}.PcfRdsPassword"
       Description: Misc
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfRdsPassword
+      Value: !GetAtt PCFBase.Outputs.PcfRdsPassword
   PcfIamUserName:
     Type: "AWS::SSM::Parameter"
     Properties:
       Name: !Sub "${AWS::StackName}.PcfIamUserName"
       Description: Misc
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfIamUserName
+      Value: !GetAtt PCFBase.Outputs.PcfIamUserName
   PcfPrivateSubnet2Id:
     Type: "AWS::SSM::Parameter"
     Properties:
       Name: !Sub "${AWS::StackName}.PcfPrivateSubnet2Id"
       Description: Misc
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfPrivateSubnet2Id
+      Value: !GetAtt PCFBase.Outputs.PcfPrivateSubnet2Id
   PcfRdsDBName:
     Type: "AWS::SSM::Parameter"
     Properties:
       Name: !Sub "${AWS::StackName}.PcfRdsDBName"
       Description: Misc
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfRdsDBName
+      Value: !GetAtt PCFBase.Outputs.PcfRdsDBName
   PcfOpsManagerS3Bucket:
     Type: "AWS::SSM::Parameter"
     Properties:
       Name: !Sub "${AWS::StackName}.PcfOpsManagerS3Bucket"
       Description: Misc
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfOpsManagerS3Bucket
+      Value: !GetAtt PCFBase.Outputs.PcfOpsManagerS3Bucket
   PcfPublicSubnetId2:
     Type: "AWS::SSM::Parameter"
     Properties:
       Name: !Sub "${AWS::StackName}.PcfPublicSubnetId2"
       Description: Misc
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfPublicSubnetId2
+      Value: !GetAtt PCFBase.Outputs.PcfPublicSubnetId2
   PcfElasticRuntimeS3PackagesBucket:
     Type: "AWS::SSM::Parameter"
     Properties:
       Name: !Sub "${AWS::StackName}.PcfElasticRuntimeS3PackagesBucket"
       Description: Misc
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfElasticRuntimeS3PackagesBucket
+      Value: !GetAtt PCFBase.Outputs.PcfElasticRuntimeS3PackagesBucket
   PcfIamUserSecretAccessKey:
     Type: "AWS::SSM::Parameter"
     Properties:
       Name: !Sub "${AWS::StackName}.PcfIamUserSecretAccessKey"
       Description: Misc
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfIamUserSecretAccessKey
+      Value: !GetAtt PCFBase.Outputs.PcfIamUserSecretAccessKey
   PcfIamUserAccessKey:
     Type: "AWS::SSM::Parameter"
     Properties:
       Name: !Sub "${AWS::StackName}.PcfIamUserAccessKey"
       Description: Misc
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfIamUserAccessKey
+      Value: !GetAtt PCFBase.Outputs.PcfIamUserAccessKey
   PcfRdsPort:
     Type: "AWS::SSM::Parameter"
     Properties:
       Name: !Sub "${AWS::StackName}.PcfRdsPort"
       Description: Misc
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfRdsPort
+      Value: !GetAtt PCFBase.Outputs.PcfRdsPort
   PcfRdsUsername:
     Type: "AWS::SSM::Parameter"
     Properties:
       Name: !Sub "${AWS::StackName}.PcfRdsUsername"
       Description: Misc
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfRdsUsername
+      Value: !GetAtt PCFBase.Outputs.PcfRdsUsername
   PcfElbDnsName:
     Type: "AWS::SSM::Parameter"
     Properties:
       Name: !Sub "${AWS::StackName}.PcfElbDnsName"
       Description: Misc
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfElbDnsName
+      Value: !GetAtt PCFBase.Outputs.PcfElbDnsName
   PcfPrivateSubnetId:
     Type: "AWS::SSM::Parameter"
     Properties:
       Name: !Sub "${AWS::StackName}.PcfPrivateSubnetId"
       Description: Misc
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfPrivateSubnetId
+      Value: !GetAtt PCFBase.Outputs.PcfPrivateSubnetId
   PcfElasticRuntimeS3ResourcesBucket:
     Type: "AWS::SSM::Parameter"
     Properties:
       Name: !Sub "${AWS::StackName}.PcfElasticRuntimeS3ResourcesBucket"
       Description: Misc
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfElasticRuntimeS3ResourcesBucket
+      Value: !GetAtt PCFBase.Outputs.PcfElasticRuntimeS3ResourcesBucket
   PcfRdsAddress:
     Type: "AWS::SSM::Parameter"
     Properties:
       Name: !Sub "${AWS::StackName}.PcfRdsAddress"
       Description: Misc
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfRdsAddress
+      Value: !GetAtt PCFBase.Outputs.PcfRdsAddress
   PcfElbTcpDnsName:
     Type: "AWS::SSM::Parameter"
     Properties:
       Name: !Sub "${AWS::StackName}.PcfElbTcpDnsName"
       Description: Misc
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfElbTcpDnsName
+      Value: !GetAtt PCFBase.Outputs.PcfElbTcpDnsName
   PcfOpsManagerSecurityGroupId:
     Type: "AWS::SSM::Parameter"
     Properties:
       Name: !Sub "${AWS::StackName}.PcfOpsManagerSecurityGroupId"
       Description: Misc
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfOpsManagerSecurityGroupId
+      Value: !GetAtt PCFBase.Outputs.PcfOpsManagerSecurityGroupId
   PcfPublicSubnetAvailabilityZone2:
     Type: "AWS::SSM::Parameter"
     Properties:
       Name: !Sub "${AWS::StackName}.PcfPublicSubnetAvailabilityZone2"
       Description: Misc
       Type: String
-      Value: !GetAtt 01PCFBase.Outputs.PcfPublicSubnetAvailabilityZone2
+      Value: !GetAtt PCFBase.Outputs.PcfPublicSubnetAvailabilityZone2
   PcfOpsManagerAdminPassword:
     Type: "AWS::SSM::Parameter"
     Properties:
       Name: !Sub "${AWS::StackName}.PcfOpsManagerAdminPassword"
       Description: Misc
       Type: String
-      Value: !Ref 16OpsManagerAdminPassword
+      Value: !Ref OpsManagerAdminPassword
   PcfNumberOfAZs:
     Type: "AWS::SSM::Parameter"
     Properties:
@@ -545,17 +545,17 @@ Resources:
       Name: !Sub "${AWS::StackName}.PcfOpsManagerInstanceIP"
       Description: Misc
       Type: String
-      Value: !GetAtt 01OpsManagerInstance.PublicIp
+      Value: !GetAtt OpsManagerInstance.PublicIp
 
   ## This is the End of our Secured Parameters
   ## This is the EC2 Ops Manager
-  01OpsManagerInstance:
+  OpsManagerInstance:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: !FindInMap [01OpsManagerAMI, !Ref "AWS::Region", 64]
+      ImageId: !FindInMap [OpsManagerAMI, !Ref "AWS::Region", 64]
       InstanceType: m4.large
-      IamInstanceProfile: !GetAtt 01PCFBase.Outputs.PcfIamInstanceProfile
-      KeyName: !Ref 14PCFKeyPair
+      IamInstanceProfile: !GetAtt PCFBase.Outputs.PcfIamInstanceProfile
+      KeyName: !Ref PCFKeyPair
       Monitoring: true
       BlockDeviceMappings:
         - DeviceName: "/dev/sda1"
@@ -567,20 +567,20 @@ Resources:
         - AssociatePublicIpAddress: "true"
           DeviceIndex: "0"
           GroupSet:
-            - !GetAtt 01PCFBase.Outputs.PcfOpsManagerSecurityGroupId
-          SubnetId: !GetAtt 01PCFBase.Outputs.PcfPublicSubnetId
+            - !GetAtt PCFBase.Outputs.PcfOpsManagerSecurityGroupId
+          SubnetId: !GetAtt PCFBase.Outputs.PcfPublicSubnetId
       SourceDestCheck: true
       Tags:
         - Key: Name
           Value: "PCF Ops Manager"
   BootstrapInstance:
     Type: AWS::EC2::Instance
-    DependsOn: 01OpsManagerInstance
+    DependsOn: OpsManagerInstance
     Properties:
       ImageId: !FindInMap [BootstrapAMI, !Ref "AWS::Region", 64]
       InstanceType: t2.micro
-      IamInstanceProfile: !GetAtt 01PCFBase.Outputs.PcfIamInstanceProfile
-      KeyName: !Ref 14PCFKeyPair
+      IamInstanceProfile: !GetAtt PCFBase.Outputs.PcfIamInstanceProfile
+      KeyName: !Ref PCFKeyPair
       Monitoring: true
       BlockDeviceMappings:
         - DeviceName: "/dev/sda1"
@@ -592,8 +592,8 @@ Resources:
         - AssociatePublicIpAddress: "true"
           DeviceIndex: "0"
           GroupSet:
-            - !GetAtt 01PCFBase.Outputs.PcfOpsManagerSecurityGroupId
-          SubnetId: !GetAtt 01PCFBase.Outputs.PcfPublicSubnetId
+            - !GetAtt PCFBase.Outputs.PcfOpsManagerSecurityGroupId
+          SubnetId: !GetAtt PCFBase.Outputs.PcfPublicSubnetId
       SourceDestCheck: true
       Tags:
         - Key: Name
@@ -641,20 +641,20 @@ Resources:
           /home/ubuntu/quickstart/daemon/install.sh
           su ubuntu -c /home/ubuntu/quickstart/bootstrap.sh
 
-  02DNSOpsMan:
+  DNSOpsMan:
     Type: AWS::Route53::RecordSet
     Properties:
-      HostedZoneId: !Ref 14HostedZoneId
-      Name: !Join [ "", [ "opsman.", !Ref 15Domain] ]
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Join [ "", [ "opsman.", !Ref Domain] ]
       ResourceRecords:
-        - !Sub "${01OpsManagerInstance.PublicIp}"
+        - !Sub "${OpsManagerInstance.PublicIp}"
       TTL: 60
       Type: A
   DNS:
     Type: AWS::Route53::RecordSet
     Properties:
-      HostedZoneId: !Ref 14HostedZoneId
-      Name: !Join [ "", [ "bootstrap.", !Ref 15Domain] ]
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Join [ "", [ "bootstrap.", !Ref Domain] ]
       ResourceRecords:
         - !Sub "${BootstrapInstance.PublicIp}"
       TTL: 60
@@ -662,40 +662,40 @@ Resources:
   DNSStar:
     Type: AWS::Route53::RecordSet
     Properties:
-      HostedZoneId: !Ref 14HostedZoneId
-      Name: !Join [ "", [ "*.", !Ref 15Domain] ]
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Join [ "", [ "*.", !Ref Domain] ]
       ResourceRecords:
-        - !GetAtt 01PCFBase.Outputs.PcfElbDnsName
+        - !GetAtt PCFBase.Outputs.PcfElbDnsName
       TTL: 60
       Type: CNAME
   DNSSsh:
     Type: AWS::Route53::RecordSet
     Properties:
-      HostedZoneId: !Ref 14HostedZoneId
-      Name: !Join [ "", [ "ssh.sys.", !Ref 15Domain] ]
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Join [ "", [ "ssh.sys.", !Ref Domain] ]
       ResourceRecords:
-        - !GetAtt 01PCFBase.Outputs.PcfElbSshDnsName
+        - !GetAtt PCFBase.Outputs.PcfElbSshDnsName
       TTL: 60
       Type: CNAME
   DNSSys:
     Type: AWS::Route53::RecordSet
     Properties:
-      HostedZoneId: !Ref 14HostedZoneId
-      Name: !Join [ "", [ "*.sys.", !Ref 15Domain] ]
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Join [ "", [ "*.sys.", !Ref Domain] ]
       ResourceRecords:
-        - !GetAtt 01PCFBase.Outputs.PcfElbDnsName
+        - !GetAtt PCFBase.Outputs.PcfElbDnsName
       TTL: 60
       Type: CNAME
   DNSApps:
     Type: AWS::Route53::RecordSet
     Properties:
-      HostedZoneId: !Ref 14HostedZoneId
-      Name: !Join [ "", [ "*.apps.", !Ref 15Domain] ]
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Join [ "", [ "*.apps.", !Ref Domain] ]
       ResourceRecords:
-        - !GetAtt 01PCFBase.Outputs.PcfElbDnsName
+        - !GetAtt PCFBase.Outputs.PcfElbDnsName
       TTL: 60
       Type: CNAME
 Outputs:
   OpsManager:
     Description: Url For Logging into OpsManager
-    Value: !Join [ "", [ "https://opsman.", !Ref 15Domain] ]
+    Value: !Join [ "", [ "https://opsman.", !Ref Domain] ]
