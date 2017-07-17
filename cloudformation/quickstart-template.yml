@@ -57,8 +57,8 @@ Parameters:
     Description: S3 Location for Base Deployment CloudFormation Template
   10ElbPrefix:
     Type: String
-    Default: ''
-    Description: 'Prefix for the name of the ELBs generated.'
+    Description: 'Prefix for the name of the ELBs generated. Required.'
+    MinLength: 1
     MaxLength: 19
   11AllowHttpOnElb:
     Type: String
