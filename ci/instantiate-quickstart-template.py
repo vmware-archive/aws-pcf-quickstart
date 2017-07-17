@@ -31,6 +31,8 @@ with open("templates/quickstart-template.j2.yml", 'r') as f:
 with open("cloudformation/quickstart-template-rc.yml", 'w') as template_file:
     rc_context = {
         "quickstart_release_tarball": "quickstart-release-candidate.tgz",
+        "ops_manager_template": "https://s3-us-west-2.amazonaws.com/aws-pcf-quickstart-templates/ops-manager-rc.json",
+        "cloud_formation_template": "https://s3-us-west-2.amazonaws.com/aws-pcf-quickstart-templates/cloud-formation-rc.json",
         "bootstrap_ami_mapping": mapping_yaml
     }
     template_file.write(quickstart_template.render(rc_context))
@@ -38,6 +40,9 @@ with open("cloudformation/quickstart-template-rc.yml", 'w') as template_file:
 with open("cloudformation/quickstart-template.yml", 'w') as template_file:
     prod_context = {
         "quickstart_release_tarball": "quickstart-release.tgz",
+        "ops_manager_template": "https://s3-us-west-2.amazonaws.com/aws-pcf-quickstart-templates/ops-manager.json",
+        "cloud_formation_template": "https://s3-us-west-2.amazonaws.com/aws-pcf-quickstart-templates/cloud-formation.json",
         "bootstrap_ami_mapping": mapping_yaml
+
     }
     template_file.write(quickstart_template.render(prod_context))

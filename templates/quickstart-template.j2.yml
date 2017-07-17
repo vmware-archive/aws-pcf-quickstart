@@ -47,14 +47,6 @@ Parameters:
   07SSLCertificateARN:
     Type: String
     Description: ARN for pre-uploaded SSL certificate
-  08OpsManagerTemplate:
-    Type: String
-    Default: https://s3-us-west-2.amazonaws.com/aws-pcf-quickstart-templates/ops-manager.json
-    Description: S3 Location for OpsManager CloudFormation Template
-  09CloudFoundryTemplate:
-    Type: String
-    Default: https://s3-us-west-2.amazonaws.com/aws-pcf-quickstart-templates/cloud-formation.json
-    Description: S3 Location for Base Deployment CloudFormation Template
   10ElbPrefix:
     Type: String
     Description: 'Prefix for the name of the ELBs generated. Required.'
@@ -141,12 +133,12 @@ Resources:
         05RdsUsername: !Ref 05RdsUsername
         06RdsPassword: !Ref 06RdsPassword
         07SSLCertificateARN: !Ref 07SSLCertificateARN
-        08OpsManagerTemplate: !Ref 08OpsManagerTemplate
+        08OpsManagerTemplate: {{ops_manager_template}}
         09ElbPrefix: !Ref 10ElbPrefix
         10AllowHttpOnElb: !Ref 11AllowHttpOnElb
         11PivnetToken: !Ref 12PivnetToken
         12AdminEmail: !Ref 13AdminEmail
-      TemplateURL: !Ref 09CloudFoundryTemplate
+      TemplateURL: {{cloud_formation_template}}
   ## Custom resource stuff
   CustomResourceSQSQueue:
     Type: "AWS::SQS::Queue"

@@ -1,0 +1,78 @@
+---
+
+resources:
+- name: quickstart-repo
+  type: git
+  source:
+    branch: master
+    uri: https://github.com/cf-platform-eng/quickstart
+    username: cholick
+    password: {{github_access_token}}
+    paths:
+      - cloudformation/cloud-formation.json
+      - cloudformation/ops-manager.json
+
+- name: cloud-formation-release-candiate
+  type: s3
+  source:
+    bucket: aws-pcf-quickstart-templates
+    region_name: us-west-2
+    versioned_file: cloud-formation-rc.json
+    access_key_id: {{s3_access_key_id}}
+    secret_access_key: {{s3_secret_access_key}}
+
+- name: ops-manager-release-candiate
+  type: s3
+  source:
+    bucket: aws-pcf-quickstart-templates
+    region_name: us-west-2
+    versioned_file: ops-manager-rc.json
+    access_key_id: {{s3_access_key_id}}
+    secret_access_key: {{s3_secret_access_key}}
+
+- name: cloud-formation-release
+  type: s3
+  source:
+    bucket: aws-pcf-quickstart-templates
+    region_name: us-west-2
+    versioned_file: cloud-formation.json
+    access_key_id: {{s3_access_key_id}}
+    secret_access_key: {{s3_secret_access_key}}
+
+- name: ops-manager-release
+  type: s3
+  source:
+    bucket: aws-pcf-quickstart-templates
+    region_name: us-west-2
+    versioned_file: ops-manager.json
+    access_key_id: {{s3_access_key_id}}
+    secret_access_key: {{s3_secret_access_key}}
+
+jobs:
+- name: upload-release-candidates
+  plan:
+  - get: quickstart-repo
+    trigger: true
+  - put: cloud-formation-release-candiate
+    params:
+      file: quickstart-repo/cloudformation/cloud-formation.json
+      acl: public-read
+  - put: ops-manager-release-candiate
+    params:
+      file: quickstart-repo/cloudformation/ops-manager.json
+      acl: public-read
+
+- name: promote-release-candidates
+  plan:
+  - get: cloud-formation-release-candiate
+    passed: [upload-release-candidates]
+  - get: ops-manager-release-candiate
+    passed: [upload-release-candidates]
+  - put: cloud-formation-release
+    params:
+      file: cloud-formation-release-candiate/cloud-formation-rc.json
+      acl: public-read
+  - put: ops-manager-release
+    params:
+      file: ops-manager-release-candiate/ops-manager-rc.json
+      acl: public-read
