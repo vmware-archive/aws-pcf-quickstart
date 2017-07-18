@@ -21,6 +21,7 @@ pivnettoken = os.environ['AWS_CF_PIVNETTOKEN']
 aws_access_key_id = os.environ['AWS_ACCESS_KEY_ID']
 aws_secret_access_key = os.environ['AWS_SECRET_ACCESS_KEY']
 aws_region = os.environ['AWS_INTEGRATION_REGION']
+template_path = sys.argv[1]
 
 parameters = [
     {"ParameterKey": "RdsPassword", "ParameterValue": password},
@@ -41,7 +42,7 @@ client = boto3.client(
     aws_secret_access_key=aws_secret_access_key
 )
 
-with open('./cloudformation/quickstart-template-rc.yml', 'r') as template_file:
+with open(template_path, 'r') as template_file:
     template = template_file.read()
 
     stack_name = "pcf-int-{}".format(int(datetime.datetime.now().timestamp()))
