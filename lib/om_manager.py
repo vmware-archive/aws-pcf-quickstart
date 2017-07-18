@@ -30,7 +30,7 @@ def config_opsman_auth(my_settings: settings.Settings):
 def is_opsman_configured(my_settings: settings.Settings):
     # todo: get if we should ignore ssl validation out of settings
     url = my_settings.opsman_url + "/api/v0/installations"
-    response = requests.get(url=url, verify=my_settings.pcf_input_skipsslvalidation == "true")
+    response = requests.get(url=url, verify=my_settings.pcf_input_skipsslvalidation != "true")
     # if auth isn't configured yet, authenticated api endpoints give 400 rather than 401
     if response.status_code == 400:
         return False
