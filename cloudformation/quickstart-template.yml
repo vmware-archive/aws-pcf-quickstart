@@ -6,9 +6,6 @@ Description: >
   For a detailed guide on how to deploy this template, please read the instructions here <url>
 
 Parameters:
-  NATKeyPair:
-    Type: AWS::EC2::KeyPair::KeyName
-    Description: Select the SSH keypair to use for the NAT vm
   NATInstanceType:
     Type: String
     AllowedValues:
@@ -152,7 +149,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
       Parameters:
-        01NATKeyPair: !Ref NATKeyPair
+        01NATKeyPair: !Ref PCFKeyPair
         02NATInstanceType: !Ref NATInstanceType
         03OpsManagerIngress: !Ref OpsManagerIngress
         04RdsDBName: !Ref RdsDBName
