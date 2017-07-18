@@ -7,7 +7,7 @@ max_retries = 5
 
 def exponential_backoff(fun, test, attempt=0):
     result = fun()
-    print("Running, got {}".format(result))
+    print("Running {}, got {}".format(fun, result))
     if test(result):
         return result
     elif attempt < max_retries:

@@ -20,7 +20,7 @@ def test_exit_code_success(exit_code):
 
 
 def check_return_code(out, err, return_code, step_name):
-    print("Running {}".format(step_name))
+    print("Ran: {}; exit code: {}".format(step_name, exit_code))
     if return_code != 0:
         util.exponential_backoff(
             functools.partial(sqs.report_cr_creation_failure, my_settings, out),

@@ -30,7 +30,7 @@ def report_cr_deletion_failure(my_settings: settings.Settings, reason: str, logi
 
 def report_status_backoff(my_settings: settings.Settings, req_type: str, reason: str, logical_res_id: str, status: str):
     return util.exponential_backoff(
-        functools.partial(report_status, my_settings, req_type, reason, logical_res_id, 'SUCCESS'),
+        functools.partial(report_status, my_settings, req_type, reason, logical_res_id, status),
         check_report_status
     )
 
@@ -53,10 +53,17 @@ def report_status(my_settings: settings.Settings, req_type: str, reason: str, lo
         response_for_cloud_formation = build_payload(message, status, reason)
         response_url_full = message.get('ResponseURL')
         response_url, response_params = response_url_full.split('?')
-        requests.put(
+        json_response = json.dumps(response_for_cloud_formation)
+        print("Posting SQS response\n{}".format(json_response))
+        response = requests.put(
             url=response_url, params=response_params,
-            data=str.encode(json.dumps(response_for_cloud_formation))
+            data=str.encode(json_response)
         )
+        if response.status_code != 200:
+            print("Failed posting message {}".format(response))
+            print("{}\n".format(response.text))
+
+            return 1
 
         print("Deleting message", message.get('ReceiptHandle'))
         delete_messages(my_settings, message)

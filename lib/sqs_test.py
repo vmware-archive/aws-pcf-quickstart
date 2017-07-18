@@ -1,6 +1,7 @@
 import json
 import unittest
 
+import requests
 from mock import Mock, patch
 
 import sqs
@@ -61,6 +62,9 @@ class TestSqs(unittest.TestCase):
     @patch('requests.put')
     def test_report_status(self, mock_put, mock_get_messages, mock_delete_messages):
         mock_get_messages.return_value = self.response.get('Messages')
+        put_response = Mock(requests.Response)
+        put_response.status_code = 200
+        mock_put.return_value = put_response
 
         return_code = sqs.report_status(self.settings, 'Create', '', 'MyCustomResource', 'SUCCESS')
 
@@ -87,6 +91,22 @@ class TestSqs(unittest.TestCase):
         self.assertEqual(json.loads(call_args.get('data').decode('utf-8')), expected_body)
         self.assertEqual(return_code, 0)
         self.assertEqual(mock_delete_messages.call_count, 1)
+
+    @patch('sqs.delete_messages')
+    @patch('sqs.get_messages')
+    @patch('requests.put')
+    def test_report_status_put_failure(self, mock_put, mock_get_messages, mock_delete_messages):
+        mock_get_messages.return_value = self.response.get('Messages')
+        put_response = Mock(requests.Response)
+        put_response.status_code = 301
+        mock_put.return_value = put_response
+
+        return_code = sqs.report_status(self.settings, 'Create', '', 'MyCustomResource', 'SUCCESS')
+
+        self.assertEqual(mock_put.call_count, 1)
+
+        self.assertEqual(return_code, 1)
+        self.assertEqual(mock_delete_messages.call_count, 0)
 
     @patch('sqs.get_messages')
     @patch('requests.put')

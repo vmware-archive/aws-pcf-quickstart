@@ -1,6 +1,5 @@
-import json
-import unittest
 import socket
+import unittest
 
 from mock import Mock, patch
 
