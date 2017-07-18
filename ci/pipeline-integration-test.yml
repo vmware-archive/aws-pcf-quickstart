@@ -50,7 +50,7 @@ jobs:
         AWS_CF_DOMAIN: {{aws_cf_domain}}
         AWS_CF_HOSTEDZONEID: {{aws_cf_hostedzoneid}}
         AWS_CF_SSLCERTIFICATEARN: {{aws_cf_sslcertificatearn}}
-        AWS_CF_NATKEYPAIR: {{aws_cf_natkeypair}}
+        AWS_CF_PCFKEYPAIR: {{aws_cf_pcfkeypair}}
         AWS_CF_PIVNETTOKEN: {{aws_cf_pivnettoken}}
         AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
         AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}

@@ -16,7 +16,7 @@ password = os.environ['AWS_CF_PASSWORD']
 domain = os.environ['AWS_CF_DOMAIN']
 hostedzoneid = os.environ['AWS_CF_HOSTEDZONEID']
 sslcertificatearn = os.environ['AWS_CF_SSLCERTIFICATEARN']
-natkeypair = os.environ['AWS_CF_NATKEYPAIR']
+pcfkeypair = os.environ['AWS_CF_PCFKEYPAIR']
 pivnettoken = os.environ['AWS_CF_PIVNETTOKEN']
 aws_access_key_id = os.environ['AWS_ACCESS_KEY_ID']
 aws_secret_access_key = os.environ['AWS_SECRET_ACCESS_KEY']
@@ -25,12 +25,11 @@ aws_region = os.environ['AWS_INTEGRATION_REGION']
 parameters = [
     {"ParameterKey": "RdsPassword", "ParameterValue": password},
     {"ParameterKey": "HostedZoneId", "ParameterValue": hostedzoneid},
-    {"ParameterKey": "NATKeyPair", "ParameterValue": natkeypair},
     {"ParameterKey": "SSLCertificateARN", "ParameterValue": sslcertificatearn},
     {"ParameterKey": "OpsManagerAdminPassword", "ParameterValue": password},
     {"ParameterKey": "Domain", "ParameterValue": domain},
     {"ParameterKey": "ElbPrefix", "ParameterValue": "my-pcf-elb"},
-    {"ParameterKey": "PCFKeyPair", "ParameterValue": natkeypair},
+    {"ParameterKey": "PCFKeyPair", "ParameterValue": pcfkeypair},
     {"ParameterKey": "RdsUsername", "ParameterValue": "admin"},
     {"ParameterKey": "AdminEmail", "ParameterValue": "noreply@pivotal.io"},
     {"ParameterKey": "PivnetToken", "ParameterValue": pivnettoken},
