@@ -366,6 +366,10 @@ jobs:
   - get: om-release
   - get: quickstart-repo
     trigger: true
+    params:
+      ignore_paths:
+        - cloudformation/*
+        - ci/*.yml
     passed:
       - unit-test
   - get: version

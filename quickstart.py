@@ -33,7 +33,7 @@ out, err, exit_code = accept_eula.accept_ert_eula(my_settings)
 check_return_code(out, err, exit_code, 'accept_eula')
 
 exit_code = wait_for_dns.wait_for_dns(my_settings)
-check_return_code("todo", "todo", exit_code, 'wait_for_dns')
+check_return_code("", "", exit_code, 'wait_for_dns')
 
 out, err, exit_code = om_manager.config_opsman_auth(my_settings)
 check_return_code(out, err, exit_code, 'config_opsman_auth')
