@@ -164,7 +164,7 @@ resources:
   source:
     bucket: aws-pcf-quickstart-releases
     region_name: us-west-2
-    versioned_file: quickstart-release-candidate.tgz
+    versioned_file: quickstart-rc.tgz
     access_key_id: {{s3_access_key_id}}
     secret_access_key: {{s3_secret_access_key}}
 
@@ -271,6 +271,10 @@ jobs:
   plan:
   - get: quickstart-repo
     trigger: true
+    params:
+      paths:
+      - quickstart-repo/cloudformation/cloud-formation.json
+      - quickstart-repo/cloudformation/ops-manager.json
   - put: cloud-formation-rc
     params:
       file: quickstart-repo/cloudformation/cloud-formation.json
@@ -325,8 +329,9 @@ jobs:
       - unit-test
   - get: ami-mapping
     trigger: true
-    passed:
-      - replicate-ami
+# todo: bring this back once we build an AMI in all-in-one
+#    passed:
+#      - replicate-ami
   - task: build-release
     config:
       platform: linux
@@ -336,10 +341,10 @@ jobs:
           repository: python
           tag: "3"
       inputs:
-      - name: quickstart-repo-templates
+      - name: quickstart-repo
       - name: ami-mapping
       outputs:
-      - name:
+      - name: output
       run:
         path: bash
         args:
@@ -349,9 +354,10 @@ jobs:
           pip install jinja2 PyYAML
           python3 ci/instantiate-quickstart-template.py
           popd
+          cp quickstart-repo/cloudformation/quickstart-template-rc.yml output
   - put: cloud-formation-outer-template-rc
     params:
-      file: quickstart-repo/quickstart-template-rc.yml
+      file: output/quickstart-template-rc.yml
       acl: public-read
 
 - name: github-release
@@ -449,6 +455,7 @@ jobs:
           tag: "3"
       inputs:
       - name: quickstart-repo
+      - name: cloud-formation-outer-template-rc
       outputs:
       - name: output
       params:
@@ -469,7 +476,7 @@ jobs:
           # run create stack from the template before
           pushd quickstart-repo
           pip install -r requirements.txt
-          python ./ci/create-stack.py 'cloud-formation-outer-template-rc/quickstart-template-rc.yml'
+          python ./ci/create-stack.py '../cloud-formation-outer-template-rc/quickstart-template-rc.yml'
           popd
           cp quickstart-repo/stackid output/stackid
   - put: aws-pcf-concourse-state
