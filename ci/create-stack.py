@@ -34,7 +34,10 @@ parameters = [
     {"ParameterKey": "RdsUsername", "ParameterValue": "admin"},
     {"ParameterKey": "AdminEmail", "ParameterValue": "noreply@pivotal.io"},
     {"ParameterKey": "PivnetToken", "ParameterValue": pivnettoken},
-    {"ParameterKey": "SkipSSLValidation", "ParameterValue": "true"}
+    {"ParameterKey": "SkipSSLValidation", "ParameterValue": "true"},
+    {"ParameterKey": "OpsManagerTemplate", "ParameterValue": "https://s3-us-west-2.amazonaws.com/aws-pcf-quickstart-templates/ops-manager-rc.json"},
+    {"ParameterKey": "CloudFoundryTemplate", "ParameterValue": "https://s3-us-west-2.amazonaws.com/aws-pcf-quickstart-templates/cloud-formation-rc.json"},
+    {"ParameterKey": "PCFAutomationRelease", "ParameterValue": "https://s3-us-west-2.amazonaws.com/aws-pcf-quickstart-releases/quickstart-rc.tgz"}
 ]
 
 client = boto3.client(
