@@ -54,7 +54,7 @@ Parameters:
     Description: S3 Location for Base Deployment CloudFormation Template
   PCFAutomationRelease:
     Type: String
-    Default: https://s3-us-west-2.amazonaws.com/aws-pcf-quickstart-templates/cloud-formation.json
+    Default: https://s3-us-west-2.amazonaws.com/aws-pcf-quickstart-releases/quickstart-rc.tgz
     Description: S3 Location for Base Deployment CloudFormation Template
   ElbPrefix:
     Type: String
