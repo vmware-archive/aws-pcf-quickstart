@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Cloudformation template for configuring Pivotal Cloud Foundry on AWS",
+  "Description": "Cloudformation template for configuring Pivotal Cloud Foundry on AWS QS(qs-1ngltrcp5)",
   "Parameters": {
     "01NATKeyPair": {
       "Type": "AWS::EC2::KeyPair::KeyName",

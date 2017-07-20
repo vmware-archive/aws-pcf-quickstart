@@ -3,7 +3,7 @@ AWSTemplateFormatVersion: "2010-09-09"
 
 Description: >
   This template will automatically deploy a reference architecture for the Pivotal Cloud Foundry stack.
-  For a detailed guide on how to deploy this template, please read the instructions here <url>
+  For a detailed guide on how to deploy this template, please read the instructions QS(qs-1ngltrcpf)
 
 Parameters:
   NATInstanceType:
