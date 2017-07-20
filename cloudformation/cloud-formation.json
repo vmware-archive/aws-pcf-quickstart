@@ -1655,6 +1655,6 @@
     },
     "PcfRdsDBName": {
       "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfRdsDBName" ]}
-    },
+    }
   }
 }
