@@ -23,7 +23,25 @@ resources:
     ignore_paths:
       - ci/*.yml
 
-- name: cloud-formation-outer-template-release-candidate
+- name: cloud-formation-rc
+  type: s3
+  source:
+    bucket: aws-pcf-quickstart-templates
+    region_name: us-west-2
+    versioned_file: cloud-formation-rc.json
+    access_key_id: {{s3_access_key_id}}
+    secret_access_key: {{s3_secret_access_key}}
+
+- name: ops-manager-release-candiate
+  type: s3
+  source:
+    bucket: aws-pcf-quickstart-templates
+    region_name: us-west-2
+    versioned_file: ops-manager-rc.json
+    access_key_id: {{s3_access_key_id}}
+    secret_access_key: {{s3_secret_access_key}}
+
+- name: cloud-formation-outer-template-rc
   type: s3
   source:
     bucket: aws-pcf-quickstart-templates
@@ -150,6 +168,32 @@ resources:
     access_key_id: {{s3_access_key_id}}
     secret_access_key: {{s3_secret_access_key}}
 
+- name: quickstart-latest-release
+  type: s3
+  source:
+    bucket: aws-pcf-quickstart-releases
+    region_name: us-west-2
+    versioned_file: quickstart-release.tgz
+    access_key_id: {{s3_access_key_id}}
+    secret_access_key: {{s3_secret_access_key}}
+
+- name: cloud-formation-release
+  type: s3
+  source:
+    bucket: aws-pcf-quickstart-templates
+    region_name: us-west-2
+    versioned_file: cloud-formation.json
+    access_key_id: {{s3_access_key_id}}
+    secret_access_key: {{s3_secret_access_key}}
+
+- name: ops-manager-release
+  type: s3
+  source:
+    bucket: aws-pcf-quickstart-templates
+    region_name: us-west-2
+    versioned_file: ops-manager.json
+    access_key_id: {{s3_access_key_id}}
+    secret_access_key: {{s3_secret_access_key}}
 
 jobs:
 - name: unit-test
@@ -223,6 +267,19 @@ jobs:
     params:
       file: output/packer-result-*.json
 
+- name: upload-inner-template-rcs
+  plan:
+  - get: quickstart-repo
+    trigger: true
+  - put: cloud-formation-rc
+    params:
+      file: quickstart-repo/cloudformation/cloud-formation.json
+      acl: public-read
+  - put: ops-manager-release-candiate
+    params:
+      file: quickstart-repo/cloudformation/ops-manager.json
+      acl: public-read
+
 - name: replicate-ami
   plan:
   - get: quickstart-repo
@@ -260,7 +317,7 @@ jobs:
     params:
       file: output/ami-mapping-*.json
 
-- name: instantiate-outer-template-release-candidate
+- name: instantiate-outer-template-rc
   plan:
   - get: quickstart-repo
     trigger: true
@@ -292,7 +349,7 @@ jobs:
           pip install jinja2 PyYAML
           python3 ci/instantiate-quickstart-template.py
           popd
-  - put: cloud-formation-outer-template-release-candidate
+  - put: cloud-formation-outer-template-rc
     params:
       file: quickstart-repo/quickstart-template-rc.yml
       acl: public-read
@@ -352,7 +409,7 @@ jobs:
       globs:
       - output/quickstart-*.tgz
 
-- name: build-quickstart-release-candidate
+- name: build-quickstart-rc
   plan:
   - get: version
     passed:
@@ -377,11 +434,11 @@ jobs:
   - get: quickstart-latest-release-candidate
     trigger: false
     passed:
-    - build-quickstart-release-candidate
-  - get: cloud-formation-outer-template-release-candidate
+    - build-quickstart-rc
+  - get: cloud-formation-outer-template-rc
     trigger: false
     passed:
-    - instantiate-outer-template-release-candidate
+    - instantiate-outer-template-rc
   - task: integration-test
     config:
       platform: linux
@@ -412,21 +469,21 @@ jobs:
           # run create stack from the template before
           pushd quickstart-repo
           pip install -r requirements.txt
-          python ./ci/create-stack.py 'cloud-formation-outer-template-release-candidate/quickstart-template-rc.yml'
+          python ./ci/create-stack.py 'cloud-formation-outer-template-rc/quickstart-template-rc.yml'
           popd
           cp quickstart-repo/stackid output/stackid
   - put: aws-pcf-concourse-state
     params:
       file: output/stackid
 
-- name: check-status
+- name: check-cf-status
   plan:
   - get: om-release
   - get: quickstart-repo
     passed:
     - integration-test
     trigger: true
-  - task: check-status
+  - task: check-cf-status
     attempts: 10
     config:
       platform: linux
@@ -457,6 +514,8 @@ jobs:
   plan:
   - get: om-release
   - get: quickstart-repo
+    passed:
+    - check-cf-status
   - get: aws-pcf-concourse-state
     passed:
     - integration-test
@@ -483,3 +542,46 @@ jobs:
           pip install -r requirements.txt
           python ./ci/delete-stack.py
           popd
+
+- name: manual-promote-rcs
+  plan:
+  - get: quickstart-repo
+    passed:
+    - check-cf-status
+
+- name: promote-quickstart-candidate
+  plan:
+  - get: quickstart-repo
+    trigger: true
+    passed:
+    - manual-promote-rcs
+  - get: version
+    passed:
+      - build-quickstart-rc
+  - get: quickstart-latest-release-candidate
+    passed:
+      - build-quickstart-rc
+  - put: quickstart-latest-release
+    params:
+      file: quickstart-latest-release-candidate/quickstart-*.tgz
+
+- name: promote-inner-template-candidates
+  plan:
+  - get: quickstart-repo
+    trigger: true
+    passed:
+    - manual-promote-rcs
+  - get: cloud-formation-rc
+    passed:
+    - upload-inner-template-rcs
+  - get: ops-manager-release-candiate
+    passed:
+    - upload-inner-template-rcs
+  - put: cloud-formation-release
+    params:
+      file: cloud-formation-rc/cloud-formation-rc.json
+      acl: public-read
+  - put: ops-manager-release
+    params:
+      file: ops-manager-release-candiate/ops-manager-rc.json
+      acl: public-read
