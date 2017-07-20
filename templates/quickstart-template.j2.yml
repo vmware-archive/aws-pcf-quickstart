@@ -44,6 +44,14 @@ Parameters:
   SSLCertificateARN:
     Type: String
     Description: ARN for pre-uploaded SSL certificate
+  OpsManagerTemplate:
+    Type: String
+    Default: https://s3-us-west-2.amazonaws.com/aws-pcf-quickstart-templates/ops-manager.json
+    Description: S3 Location for OpsManager CloudFormation Template
+  CloudFoundryTemplate:
+    Type: String
+    Default: https://s3-us-west-2.amazonaws.com/aws-pcf-quickstart-templates/cloud-formation.json
+    Description: S3 Location for Base Deployment CloudFormation Template
   ElbPrefix:
     Type: String
     Description: 'Prefix for the name of the ELBs generated. Required.'
