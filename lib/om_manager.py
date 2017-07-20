@@ -1,13 +1,12 @@
 import json
-import os
 from subprocess import Popen, PIPE
 
 import requests
 
 import settings
 import util
+
 # todo: spin up a class, don't use package level vars
-from settings import Settings
 
 max_retries = 5
 
@@ -81,36 +80,7 @@ def stage_product(product_name: str, my_settings: settings.Settings):
     return util.exponential_backoff_cmd(cmd, my_settings.debug)
 
 
-def upload_stemcell(my_settings: settings.Settings, path: str):
-    for stemcell in os.listdir(path):
-        if stemcell.endswith(".tgz"):
-            print("uploading stemcell {0}".format(stemcell))
-            cmd = "{om_with_auth} upload-stemcell -s '{path}'".format(
-                om_with_auth=get_om_with_auth(my_settings), path=os.path.join(path, stemcell)
-            )
-            out, err, exit_code = util.exponential_backoff_cmd(cmd, my_settings.debug)
-            if exit_code != 0:
-                return out, err, exit_code
-
-    return "", "", 0
-
-
-def upload_assets(my_settings: settings.Settings, path: str):
-    for tile in os.listdir(path):
-        if tile.endswith(".pivotal"):
-            print("uploading product {0}".format(tile))
-
-            cmd = "{om_with_auth} -r 3600 upload-product -p '{path}'".format(
-                om_with_auth=get_om_with_auth(my_settings), path=os.path.join(path, tile))
-
-            out, err, exit_code = util.exponential_backoff_cmd(cmd, my_settings.debug)
-            if exit_code != 0:
-                return out, err, exit_code
-
-    return "", "", 0
-
-
-def get_om_with_auth(my_settings: Settings):
+def get_om_with_auth(my_settings: settings.Settings):
     return "om {sslflag} --target {url} --username '{username}' --password '{password}'".format(
         sslflag=sslvalidation_flag(my_settings),
         url=my_settings.opsman_url,
@@ -119,7 +89,7 @@ def get_om_with_auth(my_settings: Settings):
     )
 
 
-def sslvalidation_flag(settings:Settings):
+def sslvalidation_flag(settings: settings.Settings):
     if settings.pcf_input_skipsslvalidation == "true":
         return "-k"
     else:
