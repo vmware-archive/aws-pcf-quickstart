@@ -6,7 +6,7 @@ PATH = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, os.path.join(PATH, 'lib'))
 
 from lib import settings, om_manager, configure_opsman_director, configure_ert, sqs, wait_condition, wait_for_dns
-from lib import util, accept_eula
+from lib import util, accept_eula, download_and_import
 
 my_settings = settings.Settings()
 asset_path = '/home/ubuntu/tiles'
@@ -45,10 +45,13 @@ check_return_code(out, err, exit_code, 'apply_changes')
 
 sqs.report_cr_creation_success(my_settings, 'MyCustomBOSH')
 
-out, err, exit_code = om_manager.upload_assets(my_settings, asset_path)
+out, err, exit_code = download_and_import.download_assets(my_settings, asset_path)
+check_return_code(out, err, exit_code, 'download_assets')
+out, err, exit_code = download_and_import.upload_assets(my_settings, asset_path)
 check_return_code(out, err, exit_code, 'upload_assets')
-out, err, exit_code = om_manager.upload_stemcell(my_settings, asset_path)
+out, err, exit_code = download_and_import.upload_stemcell(my_settings, asset_path)
 check_return_code(out, err, exit_code, 'upload_stemcell')
+
 out, err, exit_code = configure_ert.configure_ert(my_settings)
 check_return_code(out, err, exit_code, 'configure_ert')
 out, err, exit_code = om_manager.apply_changes(my_settings)
