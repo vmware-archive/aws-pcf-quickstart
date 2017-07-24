@@ -8,7 +8,6 @@
       "source_ami": "ami-73f7da13",
       "instance_type": "t2.micro",
       "ssh_username": "ubuntu",
-      "ssh_keypair_name": "packer_manual_keypair",
       "ami_name": "pcf bootstrap {{ami_version}}",
       "ami_description": "Pivotal CF bootstrap image: not useful outside of marketplace offering.",
       "launch_block_device_mappings": [
