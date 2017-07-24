@@ -31,28 +31,13 @@
       ]
     },
     {
-      "destination": "/home/ubuntu/tiles/",
-      "source": "{{ert_file}}",
-      "type": "file"
-    },
-    {
       "destination": "/home/ubuntu/tiles/ert-metadata.json",
       "source": "{{ert_metadata_file}}",
       "type": "file"
     },
     {
-      "destination": "/home/ubuntu/tiles/",
-      "source": "{{broker_file}}",
-      "type": "file"
-    },
-    {
       "destination": "/home/ubuntu/tiles/broker-metadata.json",
       "source": "{{broker_metadata_file}}",
-      "type": "file"
-    },
-    {
-      "destination": "/home/ubuntu/tiles/",
-      "source": "{{stemcell_file}}",
       "type": "file"
     },
     {
