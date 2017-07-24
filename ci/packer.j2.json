@@ -8,6 +8,7 @@
       "source_ami": "ami-73f7da13",
       "instance_type": "t2.micro",
       "ssh_username": "ubuntu",
+      "ssh_keypair_name": "packer_manual_keypair",
       "ami_name": "pcf bootstrap {{ami_version}}",
       "ami_description": "Pivotal CF bootstrap image: not useful outside of marketplace offering.",
       "launch_block_device_mappings": [
@@ -19,6 +20,11 @@
     }
   ],
   "provisioners": [
+    {
+      "destination": "/home/ubuntu/",
+      "source": "aws-cfn-bootstrap/aws-cfn-bootstrap-latest.tar.gz",
+      "type": "file"
+    },
     {
       "type": "shell",
       "inline": [
@@ -46,11 +52,6 @@
     {
       "destination": "/home/ubuntu/scripts/",
       "source": "awslogs-agent-setup/awslogs-agent-setup.py",
-      "type": "file"
-    },
-    {
-      "destination": "/home/ubuntu/",
-      "source": "aws-cfn-bootstrap/aws-cfn-bootstrap-latest.tar.gz",
       "type": "file"
     }
   ],
