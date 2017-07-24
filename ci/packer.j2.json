@@ -5,7 +5,7 @@
       "access_key": "{{aws_access_key_id}}",
       "secret_key": "{{aws_secret_access_key}}",
       "region": "us-west-1",
-      "source_ami": "ami-9fe6c7ff",
+      "source_ami": "ami-73f7da13",
       "instance_type": "t2.micro",
       "ssh_username": "ubuntu",
       "ami_name": "pcf bootstrap {{ami_version}}",
@@ -22,6 +22,7 @@
     {
       "type": "shell",
       "inline": [
+        "export DEBIAN_FRONTEND=noninteractive",
         "sleep 30",
         "mkdir /home/ubuntu/tiles",
         "mkdir /home/ubuntu/scripts",
