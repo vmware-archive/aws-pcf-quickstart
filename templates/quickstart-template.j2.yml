@@ -598,6 +598,15 @@ Resources:
       Tags:
         - Key: Name
           Value: "PCF Bootstrap"
+      UserData: !Base64
+        "Fn::Sub": |
+          #!/bin/bash
+          set -x
+
+          cfn-init -v --stack ${AWS::StackName} --resource BootstrapInstance --region ${AWS::Region}
+          cfn-signal -e $? --stack ${AWS::StackName} --resource BootstrapInstance --region ${AWS::Region}
+
+          su ubuntu -c /home/ubuntu/quickstart/bootstrap.sh
     Metadata:
       AWS::CloudFormation::Init:
         config:
@@ -660,15 +669,6 @@ Resources:
             c_install_delete_daemon:
               command: |
                 /home/ubuntu/quickstart/daemon/install.sh
-      UserData: !Base64
-        "Fn::Sub": |
-          #!/bin/bash
-          set -x
-
-          cfn-init -v --stack ${AWS::StackName} --resource BootstrapInstance --region ${AWS::Region}
-          cfn-signal -e $? --stack ${AWS::StackName} --resource BootstrapInstance --region ${AWS::Region}
-
-          su ubuntu -c /home/ubuntu/quickstart/bootstrap.sh
 
   DNSOpsMan:
     Type: AWS::Route53::RecordSet
