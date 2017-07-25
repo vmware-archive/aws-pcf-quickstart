@@ -23,7 +23,7 @@ import util
 from settings import Settings
 
 
-def delete_everything(my_settings: Settings, delete_buckets=False):
+def delete_everything(my_settings: Settings):
     if om_manager.is_opsman_configured(my_settings):
         cmd = "{om_with_auth} delete-installation".format(
             om_with_auth=om_manager.get_om_with_auth(my_settings)
@@ -46,35 +46,11 @@ def delete_everything(my_settings: Settings, delete_buckets=False):
 
     for bucket_name in buckets:
         try:
-            if delete_buckets:
-                delete_bucket(my_settings, bucket_name)
-            else:
-                expire_bucket(my_settings, bucket_name)
+            expire_bucket(my_settings, bucket_name)
         except Exception as e:
             print(e)
             return e, "", 1
     return "", "", 0
-
-
-def delete_bucket(my_settings: Settings, bucket_name: str):
-    try:
-        s3 = boto3.client(
-            service_name='s3', region_name=my_settings.region,
-            aws_access_key_id=my_settings.pcf_iamuseraccesskey,
-            aws_secret_access_key=my_settings.pcf_iamusersecretaccesskey
-        )
-        contents = s3.list_objects_v2(Bucket=bucket_name).get('Contents')
-        while contents is not None:
-            delete_keys = [{'Key': o.get('Key')} for o in contents]
-            s3.delete_objects(Bucket=bucket_name, Delete={
-                'Objects': delete_keys
-            })
-            contents = s3.list_objects_v2(Bucket=bucket_name).get('Contents')
-        s3.delete_bucket(Bucket=bucket_name)
-    except botocore.exceptions.ClientError as e:
-        error = e.response.get('Error')
-        if not error or error.get('Code') != 'NoSuchBucket':
-            raise e
 
 
 def expire_bucket(my_settings: Settings, bucket_name: str):
