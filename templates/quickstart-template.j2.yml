@@ -611,7 +611,7 @@ Resources:
       AWS::CloudFormation::Init:
         config:
           sources:
-            '/home/ubuntu/quickstart': !Ref PCFAutomationRelease
+            '/home/ubuntu': !Ref PCFAutomationRelease
           files:
             /home/ubuntu/scripts/awslogs.config:
               owner: ubuntu
