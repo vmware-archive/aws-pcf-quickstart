@@ -108,6 +108,12 @@ resources:
     filename: awslogs-agent-setup.py
     url: https://s3.amazonaws.com//aws-cloudwatch/downloads/latest/awslogs-agent-setup.py
 
+- name: aws-cfn-bootstrap
+  type: webpage
+  source:
+    filename: aws-cfn-bootstrap-latest.tar.gz
+    url: https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
+
 - name: aws-pcf-concourse-state
   type: s3
   source:
@@ -229,6 +235,7 @@ jobs:
     params:
       globs: []
   - get: awslogs-agent-setup
+  - get: aws-cfn-bootstrap
   - get: stemcell
     params:
       globs:
@@ -251,6 +258,7 @@ jobs:
       - name: stemcell
       - name: ami-version
       - name: awslogs-agent-setup
+      - name: aws-cfn-bootstrap
       outputs:
       - name: output
       params:
@@ -333,9 +341,8 @@ jobs:
       - unit-test
   - get: ami-mapping
     trigger: true
-# todo: bring this back once we build an AMI in all-in-one
-#    passed:
-#      - replicate-ami
+    passed:
+      - replicate-ami
   - task: build-release
     config:
       platform: linux
