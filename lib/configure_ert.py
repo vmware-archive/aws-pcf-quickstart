@@ -73,7 +73,7 @@ def configure_ert_resources(my_settings: Settings):
         om_with_auth=om_manager.get_om_with_auth(my_settings),
         ert_resources=ert_resource_config
     )
-    return util.exponential_backoff_cmd(cmd, my_settings.debug)
+    return util.exponential_backoff_cmd(cmd)
 
 
 def configure_ert_multiaz_resources(my_settings: Settings):
@@ -85,7 +85,7 @@ def configure_ert_multiaz_resources(my_settings: Settings):
             om_with_auth=om_manager.get_om_with_auth(my_settings),
             ert_resources=ert_resource_config
         )
-        return util.exponential_backoff_cmd(cmd, my_settings.debug)
+        return util.exponential_backoff_cmd(cmd)
     return "", "", 0
 
 
@@ -114,7 +114,7 @@ def configure_ert_config(my_settings: Settings):
         om_with_auth=om_manager.get_om_with_auth(my_settings),
         ert_config=ert_config
     )
-    return util.exponential_backoff_cmd(cmd, my_settings.debug)
+    return util.exponential_backoff_cmd(cmd)
 
 
 def configure_tile_az(my_settings: Settings, tile_name: str):
@@ -131,7 +131,7 @@ def configure_tile_az(my_settings: Settings, tile_name: str):
         az_config=az_config
     )
 
-    return util.exponential_backoff_cmd(cmd, my_settings.debug)
+    return util.exponential_backoff_cmd(cmd)
 
 
 def create_required_databases(my_settings: Settings):
@@ -142,7 +142,7 @@ def create_required_databases(my_settings: Settings):
         password=my_settings.pcf_rdspassword
     )
 
-    return util.exponential_backoff_cmd(cmd, my_settings.debug)
+    return util.exponential_backoff_cmd(cmd)
 
 
 def modify_vm_types(my_settings: Settings):

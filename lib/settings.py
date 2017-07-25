@@ -60,7 +60,6 @@ class Settings:
     ]
 
     def __init__(self):
-        self.debug = False
         self.opsman_user = 'admin'
 
         self.set_versions_and_buckets()

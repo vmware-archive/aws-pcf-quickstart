@@ -29,7 +29,6 @@ class TestWaitCondition(unittest.TestCase):
         self.settings = Mock(Settings)
         self.settings.region = 'canada-1a'
         self.settings.pcf_pcfopsmanagerinstanceip = '192.168.1.1'
-        self.settings.debug = False
 
     @patch('socket.gethostbyname')
     def test_check_dns_lookup_success(self, mock_gethostbyname):

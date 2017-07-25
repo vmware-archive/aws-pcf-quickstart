@@ -29,12 +29,10 @@ from lib import settings, om_manager, configure_opsman_director, configure_ert, 
 
 
 @click.group()
-@click.option('--debug/--no-debug', default=False)
 @click.pass_context
-def cli(ctx, debug):
+def cli(ctx):
     my_settings = settings.Settings()
     ctx.obj['settings'] = my_settings
-    my_settings.debug = debug
 
 
 @cli.command('configure-opsman-auth')

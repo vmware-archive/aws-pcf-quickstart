@@ -42,7 +42,6 @@ class TestConfigureOpsManDirector(unittest.TestCase):
         self.settings.opsman_url = "https://example123.com"
         self.settings.pcf_input_opsmanageradminpassword = "monkey123"
         self.settings.opsman_user = "testuser"
-        self.settings.debug = False
 
     @patch('configure_opsman_director.generate_ssh_keypair')
     def test_flow(self, mock_generate_ssh_keypair):

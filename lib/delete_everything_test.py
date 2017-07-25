@@ -33,30 +33,27 @@ class TestDeleteEverything(unittest.TestCase):
         self.settings.pcf_elasticruntimes3resourcesbucket = 'bucket-rsc'
         self.settings.pcf_iam_access_key_id = 'key-vale'
         self.settings.pcf_iam_secret_access_key = 'key-secret'
-        self.settings.debug = False
 
     @patch('om_manager.is_opsman_configured')
     @patch('delete_everything.expire_bucket')
     @patch('util.exponential_backoff_cmd')
     @patch('om_manager.get_om_with_auth')
     def test_om_delete_installation(self, mock_auth, mock_backoff, mock_expire_bucket, mock_is_opsman_configured):
-        mock_backoff.return_value =  "", "", 0
+        mock_backoff.return_value = "", "", 0
         mock_is_opsman_configured.return_value = True
 
         mock_auth.return_value = "om-with-auth-for-realz"
 
         delete_everything.delete_everything(self.settings)
 
-        mock_backoff.assert_called_with(
-            "om-with-auth-for-realz delete-installation", False
-        )
+        mock_backoff.assert_called_with("om-with-auth-for-realz delete-installation")
 
     @patch('om_manager.is_opsman_configured')
     @patch('delete_everything.expire_bucket')
     @patch('util.exponential_backoff_cmd')
     @patch('om_manager.get_om_with_auth')
     def test_om_delete_installation_fails(self, mock_auth, mock_backoff, mock_expire_bucket, mock_is_opsman_configured):
-        mock_backoff.return_value = "Fail", "",  1
+        mock_backoff.return_value = "Fail", "", 1
         mock_is_opsman_configured.return_value = True
 
         result = delete_everything.delete_everything(self.settings)
@@ -94,7 +91,9 @@ class TestDeleteEverything(unittest.TestCase):
     @patch('om_manager.is_opsman_configured')
     @patch('util.exponential_backoff_cmd')
     @patch('om_manager.get_om_with_auth')
-    def test_skips_delete_installation_when_opsman_not_configured(self, mock_auth, mock_exponential_backoff, mock_is_opsman_configured):
+    def test_skips_delete_installation_when_opsman_not_configured(
+            self, mock_auth, mock_exponential_backoff, mock_is_opsman_configured
+    ):
         mock_is_opsman_configured.return_value = False
 
         delete_everything.delete_everything(self.settings)

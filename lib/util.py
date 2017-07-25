@@ -44,23 +44,17 @@ def check_exit_code(result):
     return returncode == 0
 
 
-def exponential_backoff_cmd(cmd, debug):
+def exponential_backoff_cmd(cmd):
     return exponential_backoff(
-        functools.partial(run_command, cmd, debug),
+        functools.partial(run_command, cmd),
         check_exit_code,
     )
 
 
-def run_command(cmd: str, debug_mode):
+def run_command(cmd: str):
     print("Running: {}".format(cmd))
-    # todo: delete debug mode
-    if debug_mode:
-        print("Debug mode. Would have run command")
-        print("    {}".format(cmd))
-        return "", "", 0
-    else:
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        out_bytes, err_bytes = p.communicate()
-        out = out_bytes.decode("utf-8").strip()
-        err = err_bytes.decode("utf-8").strip()
-        return out, err, p.returncode
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    out_bytes, err_bytes = p.communicate()
+    out = out_bytes.decode("utf-8").strip()
+    err = err_bytes.decode("utf-8").strip()
+    return out, err, p.returncode

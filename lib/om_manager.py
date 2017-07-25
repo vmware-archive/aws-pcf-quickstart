@@ -40,7 +40,7 @@ def config_opsman_auth(my_settings: settings.Settings):
         user=my_settings.opsman_user,
         password=my_settings.pcf_opsmanageradminpassword
     )
-    return util.exponential_backoff_cmd(cmd, my_settings.debug)
+    return util.exponential_backoff_cmd(cmd)
 
 
 def is_opsman_configured(my_settings: settings.Settings):
@@ -57,14 +57,14 @@ def apply_changes(my_settings: settings.Settings):
     cmd = "{get_om_with_auth} apply-changes".format(
         get_om_with_auth=get_om_with_auth(my_settings)
     )
-    return util.exponential_backoff_cmd(cmd, my_settings.debug)
+    return util.exponential_backoff_cmd(cmd)
 
 
 def curl_get(my_settings: settings.Settings, path: str):
     cmd = "{get_om_with_auth} curl --path {path}".format(
         get_om_with_auth=get_om_with_auth(my_settings), path=path
     )
-    return util.run_command(cmd, my_settings.debug)
+    return util.run_command(cmd)
 
 
 def curl_payload(my_settings: settings.Settings, path: str, data: str, method: str):
@@ -72,7 +72,7 @@ def curl_payload(my_settings: settings.Settings, path: str, data: str, method: s
         get_om_with_auth=get_om_with_auth(my_settings), path=path,
         method=method, data=data
     )
-    return util.run_command(cmd, my_settings.debug)
+    return util.run_command(cmd)
 
 
 def stage_product(product_name: str, my_settings: settings.Settings):
@@ -94,7 +94,7 @@ def stage_product(product_name: str, my_settings: settings.Settings):
         product_name=product_name,
         version=cf_version
     )
-    return util.exponential_backoff_cmd(cmd, my_settings.debug)
+    return util.exponential_backoff_cmd(cmd)
 
 
 def get_om_with_auth(my_settings: settings.Settings):

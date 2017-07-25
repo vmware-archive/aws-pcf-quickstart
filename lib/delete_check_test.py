@@ -29,7 +29,6 @@ class TestDeleteCheck(unittest.TestCase):
         self.settings = Mock(Settings)
         self.settings.region = 'canada-1a'
         self.settings.pcf_pcfcustomresourcesqsqueueurl = 'https://queue.example.com'
-        self.settings.debug = False
 
         self.response = {'Messages':
             [

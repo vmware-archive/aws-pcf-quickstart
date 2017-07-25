@@ -78,7 +78,7 @@ def configure_opsman_director(my_settings: Settings):
     ))
     out = err = ""
     for cmd in commands:
-        out, err, exit_code = util.run_command(cmd, my_settings.debug)
+        out, err, exit_code = util.run_command(cmd)
         if out != "":
             print(out)
         if err != "":

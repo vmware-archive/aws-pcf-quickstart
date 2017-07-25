@@ -28,7 +28,6 @@ class TestAcceptEULA(unittest.TestCase):
     def setUp(self):
         self.settings = Mock(Settings)
         self.settings.region = 'canada-1a'
-        self.settings.debug = False
         self.settings.pcf_input_pivnettoken = 'MY-TOKEN'
 
     def test_get_release_id(self):

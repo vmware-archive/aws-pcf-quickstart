@@ -27,10 +27,7 @@ import settings
 
 class TestDownloadAndImport(unittest.TestCase):
     def setUp(self):
-        om_manager.debug_mode = False
-
         self.settings = Mock(settings.Settings)
-        self.settings.debug = False
 
     @patch('util.exponential_backoff_cmd')
     @patch('download_and_import.do_pivnet_download')

@@ -29,7 +29,6 @@ class TestWaitCondition(unittest.TestCase):
         self.settings = Mock(Settings)
         self.settings.region = 'canada-1a'
         self.settings.pcf_pcfwaithandle = 'https://wait.example.com?signature=foo'
-        self.settings.debug = False
 
     @patch('requests.put')
     def test_report_status(self, mock_put):

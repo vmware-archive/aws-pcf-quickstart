@@ -43,7 +43,6 @@ class TestConfigureERT(unittest.TestCase):
         self.settings.pcf_elastic_runtime_s3_resources_bucket = 'bucket-rsc'
         self.settings.pcf_iam_access_key_id = 'key-vale'
         self.settings.pcf_iam_secret_access_key = 'key-secret'
-        self.settings.debug = False
 
     def test_flow(self):
         with patch('om_manager.stage_product') as mock_stage:

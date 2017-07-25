@@ -28,13 +28,10 @@ from settings import Settings
 
 class TestOmManager(unittest.TestCase):
     def setUp(self):
-        om_manager.debug_mode = False
-
         self.settings = Mock(Settings)
         self.settings.opsman_url = 'https://cf.example.com'
         self.settings.opsman_user = 'admin'
         self.settings.pcf_opsmanageradminpassword = 'monkey-123'
-        self.settings.debug = False
         self.settings.pcf_input_skipsslvalidation = "true"
 
     def to_bytes(self, str: str):
@@ -71,9 +68,7 @@ class TestOmManager(unittest.TestCase):
         mock_get_om_with_auth.return_value = "om plus some auth"
         om_manager.curl_get(self.settings, "/api/foo")
 
-        mock_run_command.assert_called_with(
-            "om plus some auth curl --path /api/foo", False
-        )
+        mock_run_command.assert_called_with("om plus some auth curl --path /api/foo")
 
     @patch('om_manager.get_om_with_auth')
     @patch('util.run_command')
@@ -83,7 +78,7 @@ class TestOmManager(unittest.TestCase):
         om_manager.curl_payload(self.settings, "/api/foo", '{"foo": "bar"}', "PUT")
 
         mock_run_command.assert_called_with(
-            "om plus some auth curl --path /api/foo --request PUT --data '{\"foo\": \"bar\"}'", False
+            "om plus some auth curl --path /api/foo --request PUT --data '{\"foo\": \"bar\"}'"
         )
 
     @patch('util.run_command')

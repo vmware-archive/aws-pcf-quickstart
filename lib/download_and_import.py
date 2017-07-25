@@ -32,7 +32,7 @@ def upload_stemcell(my_settings: settings.Settings, path: str):
             cmd = "{om_with_auth} upload-stemcell -s '{path}'".format(
                 om_with_auth=om_manager.get_om_with_auth(my_settings), path=os.path.join(path, stemcell)
             )
-            out, err, exit_code = util.exponential_backoff_cmd(cmd, my_settings.debug)
+            out, err, exit_code = util.exponential_backoff_cmd(cmd)
             if exit_code != 0:
                 return out, err, exit_code
 
@@ -47,7 +47,7 @@ def upload_assets(my_settings: settings.Settings, path: str):
             cmd = "{om_with_auth} -r 3600 upload-product -p '{path}'".format(
                 om_with_auth=om_manager.get_om_with_auth(my_settings), path=os.path.join(path, tile))
 
-            out, err, exit_code = util.exponential_backoff_cmd(cmd, my_settings.debug)
+            out, err, exit_code = util.exponential_backoff_cmd(cmd)
             if exit_code != 0:
                 return out, err, exit_code
 
