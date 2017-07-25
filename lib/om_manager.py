@@ -23,8 +23,6 @@ import requests
 import settings
 import util
 
-# todo: spin up a class, don't use package level vars
-
 max_retries = 5
 
 
@@ -33,7 +31,6 @@ def format_om_json_str(om_json: str):
 
 
 def config_opsman_auth(my_settings: settings.Settings):
-    # todo: get if we should ignore ssl validation (-k) out of settings
     cmd = "om {sslflag} --target {url} configure-authentication --username '{user}' --password '{password}' --decryption-passphrase '{password}'".format(
         sslflag=sslvalidation_flag(my_settings),
         url=my_settings.opsman_url,
@@ -44,7 +41,6 @@ def config_opsman_auth(my_settings: settings.Settings):
 
 
 def is_opsman_configured(my_settings: settings.Settings):
-    # todo: get if we should ignore ssl validation out of settings
     url = my_settings.opsman_url + "/api/v0/installations"
     response = requests.get(url=url, verify=my_settings.pcf_input_skipsslvalidation != "true")
     # if auth isn't configured yet, authenticated api endpoints give 400 rather than 401

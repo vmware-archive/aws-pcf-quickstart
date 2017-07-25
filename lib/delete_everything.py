@@ -28,7 +28,8 @@ def delete_everything(my_settings: Settings):
         cmd = "{om_with_auth} delete-installation".format(
             om_with_auth=om_manager.get_om_with_auth(my_settings)
         )
-        # todo: call delete twice
+        # delete blocks on apply-changes, but if other apply changes in progress, doesn't queue up its own
+        util.exponential_backoff_cmd(cmd)
         out, err, return_code = util.exponential_backoff_cmd(cmd)
         if return_code != 0:
             print("OM cmd failed to delete installation {}".format(return_code))
