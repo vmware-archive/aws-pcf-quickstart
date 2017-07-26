@@ -79,7 +79,7 @@ cf_client = boto3.client(
 )
 
 with open('../aws-pcf-concourse-state/stackid', 'r') as file:
-    stackid = file.read()
+    stackid = file.read().strip()
 
 response = cf_client.describe_stacks(StackName=stackid)
 stacks = response.get('Stacks')
