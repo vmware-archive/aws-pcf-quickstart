@@ -23,6 +23,14 @@ resources:
     ignore_paths:
       - ci/*.yml
 
+- name: aws-quickstart-repo
+  type: git
+  source:
+    branch: develop
+    uri: https://github.com/cf-platform-eng/quickstart-pivotal-cloudfoundry
+    username: {{github_user_name}}
+    password: {{github_access_token}}
+
 - name: cloud-formation-rc
   type: s3
   source:
@@ -607,3 +615,74 @@ jobs:
     params:
       file: ops-manager-release-candiate/ops-manager-rc.json
       acl: public-read
+
+
+- name: commit-and-pr-aws-quickstart-repo
+  plan:
+  - get: quickstart-repo
+    trigger: false
+    passed:
+    #- manual-promote-rcs
+    - integration-test
+  - get: aws-quickstart-repo
+  - get: quickstart-latest-release-candidate #python code
+    passed:
+      - integration-test
+  - get: cloud-formation-rc
+    passed:
+    - upload-inner-template-rcs
+  - get: ops-manager-release-candiate
+    passed:
+    - upload-inner-template-rcs
+  - get: cloud-formation-outer-template-rc
+    passed:
+    - integration-test
+  - task: commit-aws-quickstart-repo
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: cfplatformeng/quickstart-ci
+      inputs:
+      - name: quickstart-repo
+      - name: aws-quickstart-repo
+      - name: quickstart-latest-release-candidate
+      - name: cloud-formation-rc
+      - name: ops-manager-release-candiate
+      - name: cloud-formation-outer-template-rc
+      outputs:
+      - name: aws-quickstart-repo-updated
+      params: {}
+      run:
+        path: bash
+        args:
+        - -exc
+        - |
+          pushd quickstart-repo
+          sha=$(git rev-parse HEAD)
+          popd
+
+          cp -r aws-quickstart-repo/. aws-quickstart-repo-updated
+
+          cp quickstart-latest-release-candidate/quickstart-rc.tgz aws-quickstart-repo-updated/scripts/quickstart.tgz
+          cp cloud-formation-rc/cloud-formation-rc.json aws-quickstart-repo-updated/templates/cloud-formation.json
+          cp ops-manager-release-candiate/ops-manager-rc.json aws-quickstart-repo-updated/templates/ops-manager.json
+          cp cloud-formation-outer-template-rc/quickstart-template-rc.yml aws-quickstart-repo-updated/templates/quickstart-template.yml
+
+          pushd aws-quickstart-repo-updated
+
+          pushd scripts/quickstart
+          git checkout $sha
+          popd
+
+          git config --global user.name "Pivotal Concourse"
+          git config --global user.email "ci@example.com" #todo: better email....
+
+          git add -A .
+          git commit -m "Commiting release candiate for PR"
+
+          popd
+  - put: aws-quickstart-repo
+    params:
+      repository: aws-quickstart-repo-updated
