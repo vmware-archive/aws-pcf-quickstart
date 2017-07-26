@@ -91,6 +91,5 @@ print("Buckets {}".format(buckets))
 for bucket in buckets:
     delete_bucket(bucket)
 
-# todo uncomment
-#print("Deleting stack {}".format(stackid))
-# client.delete_stack(StackName=stackid)
+print("Deleting stack {}".format(stackid))
+client.delete_stack(StackName=stackid)
