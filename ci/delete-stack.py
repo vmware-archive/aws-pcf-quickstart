@@ -80,14 +80,17 @@ cf_client = boto3.client(
 
 with open('../aws-pcf-concourse-state/stackid', 'r') as file:
     stackid = file.read().strip()
+print("Deleting buckets for stack {}".format(stackid))
 
 response = cf_client.describe_stacks(StackName=stackid)
 stacks = response.get('Stacks')
 stack_name = stacks[0].get('StackName')
 
 buckets = get_bucket_names(stack_name)
+print("Buckets {}".format(buckets))
 for bucket in buckets:
     delete_bucket(bucket)
 
 # todo uncomment
+#print("Deleting stack {}".format(stackid))
 # client.delete_stack(StackName=stackid)

@@ -56,7 +56,7 @@ def upload_assets(my_settings: settings.Settings, path: str):
 
 def download_assets(my_settings: settings.Settings, path: str):
     cmd = "pivnet login --api-token={token}".format(token=my_settings.pcf_input_pivnettoken)
-    util.exponential_backoff_cmd(cmd, False)
+    util.exponential_backoff_cmd(cmd)
     out, err, exit_code = do_pivnet_download('stemcells', '3363.20', '*aws*.tgz', 'ece6b9aaa4af20c180c446582bfa8e7d29681e2aac06c5d3d978a92c84432237', path)
     if exit_code != 0:
         return out, err, exit_code
@@ -67,7 +67,7 @@ def do_pivnet_download(slug: str, version: str, tile_glob: str, sha256: str, pat
     cmd = "pivnet download-product-files -p {slug} -r {version} -g '{glob}' -d '{dir}'".format(
         slug=slug, version=version, glob=tile_glob, dir=path
     )
-    out, err, exit_code = util.exponential_backoff_cmd(cmd, False)
+    out, err, exit_code = util.exponential_backoff_cmd(cmd)
     if exit_code != 0:
         return out, err, exit_code
 
