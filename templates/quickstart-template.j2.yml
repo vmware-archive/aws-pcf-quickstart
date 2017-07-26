@@ -115,25 +115,33 @@ Mappings:
   ## Mapping of OpsManager AMI in AWS Regions.
   OpsManagerAMI:
     ap-northeast-1:
-      "64": "ami-6088a607"
+      "64": ami-3b37295c
     ap-northeast-2:
-      "64": "ami-f831e396"
+      "64": ami-22a57b4c
+    ap-south-1:
+      "64": ami-ca1d64a5
     ap-southeast-1:
-      "64": "ami-06e65e65"
+      "64": ami-98f366fb
     ap-southeast-2:
-      "64": "ami-93f6fff0"
-    eu-west-1:
-      "64": "ami-cfc8cfa9"
+      "64": ami-62b5a701
+    ca-central-1:
+      "64": ami-0377c867
     eu-central-1:
-      "64": "ami-cff72aa0"
+      "64": ami-ec0aaa83
+    eu-west-1:
+      "64": ami-0eca2a77
+    eu-west-2:
+      "64": ami-fffaec9b
     sa-east-1:
-      "64": "ami-921c71fe"
+      "64": ami-ba4f3ad6
     us-east-1:
-      "64": "ami-8d48da9b"
+      "64": ami-2f000639
+    us-east-2:
+      "64": ami-f6f8d993
     us-west-1:
-      "64": "ami-915470f1"
+      "64":  ami-f7ac8397
     us-west-2:
-      "64": "ami-483ba628"
+      "64": ami-3b617342
   BootstrapAMI:
     {{bootstrap_ami_mapping | indent }}
 Resources:

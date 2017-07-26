@@ -152,7 +152,7 @@ resources:
     owner: pivotal-cf
     repository: om
     access_token: {{github_access_token}}
-    version: v0.0.22
+    version: v0.0.24
 
 - name: version
   type: semver
