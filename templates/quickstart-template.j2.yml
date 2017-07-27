@@ -309,7 +309,7 @@ Resources:
               - logs:PutLogEvents
               - logs:DescribeLogStreams
             Resource: "arn:aws:logs:*:*:*"
-      PolicyName: !Sub ${AWS::StackName}-emit-logs-plicy
+      PolicyName: !Sub ${AWS::StackName}-emit-logs-policy
       Roles:
         - !GetAtt PCFBase.Outputs.PcfIamRole
   ## This is the Start of our Secured Parameters
@@ -563,7 +563,7 @@ Resources:
       KeyName: !Ref PCFKeyPair
       Monitoring: true
       BlockDeviceMappings:
-        - DeviceName: "/dev/sda1"
+        - DeviceName: "/dev/xvda"
           Ebs:
             DeleteOnTermination: true
             VolumeSize: 100
