@@ -79,14 +79,17 @@ def configure_ert_resources(my_settings: Settings):
 def configure_ert_multiaz_resources(my_settings: Settings):
     if my_settings.pcf_pcfnumberofazs > 1:
         with open("templates/ert_multiaz_resources_config.j2.json", 'r') as f:
-            ert_resource_multiaz_template = f.read()
-        ert_resource_config = om_manager.format_om_json_str(ert_resource_multiaz_template)
-        cmd = "{om_with_auth} configure-product -n cf -pr '{ert_resources}'".format(
-            om_with_auth=om_manager.get_om_with_auth(my_settings),
-            ert_resources=ert_resource_config
-        )
-        return util.exponential_backoff_cmd(cmd)
-    return "", "", 0
+            template = f.read()
+    else:
+        with open("templates/ert_singleaz_resources_config.j2.json", 'r') as f:
+            template = f.read()
+
+    ert_resource_config = om_manager.format_om_json_str(template)
+    cmd = "{om_with_auth} configure-product -n cf -pr '{ert_resources}'".format(
+        om_with_auth=om_manager.get_om_with_auth(my_settings),
+        ert_resources=ert_resource_config
+    )
+    return util.exponential_backoff_cmd(cmd)
 
 
 def configure_ert_config(my_settings: Settings):
