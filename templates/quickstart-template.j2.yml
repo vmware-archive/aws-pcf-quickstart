@@ -674,7 +674,10 @@ Resources:
             b_chmod_stuff:
               command: |
                 chown -R ubuntu:ubuntu /home/ubuntu/quickstart
-            c_install_delete_daemon:
+            c_copy_version_confifg_to_known_location:
+              command: |
+                cp /home/ubuntu/quickstart/version_config.json /var/local/version_config.json
+            d_install_delete_daemon:
               command: |
                 /home/ubuntu/quickstart/daemon/install.sh
 

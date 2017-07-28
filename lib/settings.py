@@ -16,18 +16,11 @@
 # limitations under the License.
 
 import json
-import os
 
 import boto3
 
-output_file = "/tmp/pcf-stack.json"
 metadata_file = "/var/local/cloudformation/stack-meta.json"
-
-ops_manager_version = "1.10.4"
-ert_version = "1.10.4-build.1"
-aws_broker_version = "1.2.0.147"
-tile_bucket_s3_name = "pcf-quickstart-tiles"
-tile_bucket_region = "us-west-2"
+version_config_file_path = "/var/local/version_config.json"
 
 
 class Settings:
@@ -62,22 +55,20 @@ class Settings:
     def __init__(self):
         self.opsman_user = 'admin'
 
-        self.set_versions_and_buckets()
-        self.parse_meta()
+        self.parse_meta(read_meta())
         self.get_parameters()
         self.describe_stack()
+        self.parse_version_config(read_version_config())
 
         self.zones = [
             self.pcf_privatesubnetavailabilityzone,
             self.pcf_privatesubnet2availabilityzone
         ]
 
-    def parse_meta(self):
-        with open(metadata_file) as meta_json:
-            meta = json.load(meta_json)
-            self.stack_name = meta["StackName"]
-            self.stack_id = meta["StackId"]
-            self.region = meta["Region"]
+    def parse_meta(self, meta):
+        self.stack_name = meta["StackName"]
+        self.stack_id = meta["StackId"]
+        self.region = meta["Region"]
 
     @property
     def pcf_elbdnsname(self):
@@ -207,13 +198,6 @@ class Settings:
     def opsman_url(self):
         return "https://opsman.{}".format(self.pcf_input_domain)
 
-    def set_versions_and_buckets(self):
-        self.ops_manager_version = ops_manager_version
-        self.ert_version = ert_version
-        self.aws_broker_version = aws_broker_version
-        self.tile_bucket_region = tile_bucket_region
-        self.tile_bucket_s3_name = tile_bucket_s3_name
-
     def get_s3_endpoint(self):
         stack_region = self.region
         if stack_region == "us-east-1":
@@ -250,6 +234,26 @@ class Settings:
 
         for result in param_results:
             self.input_parameters[result.get('ParameterKey')] = result['ParameterValue']
+
+    def parse_version_config(self, version_config):
+        ert = version_config.get('ert')
+        stemcell = version_config.get('stemcell')
+
+        self.ert_release_id = ert.get('id')
+        self.ert_release_version = ert.get('version')
+        self.ert_release_sha256 = ert.get('sha256')
+
+        self.stemcell_release_version = stemcell.get('version')
+        self.stemcell_release_sha256 = stemcell.get('sha256')
+
+def read_version_config():
+    with open(version_config_file_path) as version_config_file:
+        return json.load(version_config_file)
+
+
+def read_meta():
+    with open(metadata_file) as meta_json:
+        return json.load(meta_json)
 
 
 def chunk(l, n):

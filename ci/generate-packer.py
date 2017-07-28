@@ -33,9 +33,6 @@ def find_file(pattern):
 
 
 def main(argv):
-    ert_metadata_file = find_file("ert-tile/metadata.json")
-    broker_metadata_file = find_file("aws-broker-tile/metadata.json")
-
     with open('./ami-version/version', 'r') as version_file:
         ami_version = version_file.read()
 
@@ -45,8 +42,6 @@ def main(argv):
         ctx = {
             "aws_access_key_id": os.environ['AWS_ACCESS_KEY_ID'],
             "aws_secret_access_key": os.environ['AWS_SECRET_ACCESS_KEY'],
-            "ert_metadata_file": ert_metadata_file,
-            "broker_metadata_file": broker_metadata_file,
             "ami_version": ami_version
         }
 

@@ -17,9 +17,8 @@
 
 import unittest
 
-from mock import patch, mock_open, Mock
-
-import settings
+from mock import patch, mock_open, Mock, MagicMock
+import settings, json
 
 input_params = {
     'Stacks': [
@@ -101,6 +100,7 @@ params_store_output = {
     ]
 }
 
+
 class TestSettings(unittest.TestCase):
     def setUp(self):
         self.meta_json = """
@@ -110,8 +110,23 @@ class TestSettings(unittest.TestCase):
   "Region": "canada-west-1"
 }
 """
+        self.version_config_json = """
+{
+  "stemcell": {
+    "releaseDate": "2017-04-26",
+    "sha256": "ece6b9aaa4af20c180c446582bfa8e7d29681e2aac06c5d3d978a92c84432237",
+    "version": "3363.20",
+    "id": 5200
+  },
+  "ert": {
+    "releaseDate": "2017-05-04",
+    "sha256": "70070bf22231d9971c97b8deb8c4cd5ba990d24101e5398d0ccc70778060dbea",
+    "version": "1.10.8",
+    "id": 5334
+  }
+}
+"""
 
-        my_mock_open = mock_open(read_data=self.meta_json)
         mock_client_contructor = Mock()
         settings.Settings.paramater_store_keys = [
             "PcfPrivateSubnetAvailabilityZone",
@@ -121,15 +136,20 @@ class TestSettings(unittest.TestCase):
         ]
 
         with patch('boto3.client', mock_client_contructor):
-            with patch('settings.open', my_mock_open):
-                mock_client = Mock()
-                mock_client_contructor.return_value = mock_client
-                mock_client.describe_stacks.return_value = input_params
-                mock_client.get_parameters.return_value = params_store_output
-                # foo.describe_stacks.side_effect = [input_params]
-                # foo.get_parameters.side_effect = [params_store_output]
+            with patch('settings.read_meta') as mock_read_meta:
+                mock_read_meta.return_value = json.loads(self.meta_json)
+                with patch('settings.read_version_config') as mock_read_version_config:
+                    mock_read_version_config.return_value = json.loads(self.version_config_json)
 
-                self.settings = settings.Settings()
+                    mock_client = Mock()
+                    mock_client_contructor.return_value = mock_client
+                    mock_client.describe_stacks.return_value = input_params
+                    mock_client.get_parameters.return_value = params_store_output
+                    # foo.describe_stacks.side_effect = [input_params]
+                    # foo.get_parameters.side_effect = [params_store_output]
+
+
+                    self.settings = settings.Settings()
 
     def test_pcf_input(self):
         self.assertEqual(self.settings.pcf_input_pivnettoken, "abc123")
@@ -172,3 +192,13 @@ class TestSettings(unittest.TestCase):
     def test_get_s3_endpoint_east1(self):
         self.settings.region = "us-east-1"
         self.assertEqual(self.settings.get_s3_endpoint(), "s3.amazonaws.com")
+
+    def test_parse_version_config(self):
+        self.assertEqual(self.settings.ert_release_id, 5334)
+        self.assertEqual(self.settings.ert_release_version, "1.10.8")
+        self.assertEqual(self.settings.ert_release_sha256,
+                         "70070bf22231d9971c97b8deb8c4cd5ba990d24101e5398d0ccc70778060dbea")
+
+        self.assertEqual(self.settings.stemcell_release_version, "3363.20")
+        self.assertEqual(self.settings.stemcell_release_sha256,
+                         "ece6b9aaa4af20c180c446582bfa8e7d29681e2aac06c5d3d978a92c84432237")

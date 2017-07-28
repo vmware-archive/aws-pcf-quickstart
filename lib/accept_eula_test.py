@@ -29,18 +29,10 @@ class TestAcceptEULA(unittest.TestCase):
         self.settings = Mock(Settings)
         self.settings.region = 'canada-1a'
         self.settings.pcf_input_pivnettoken = 'MY-TOKEN'
-
-    def test_get_release_id(self):
-        my_mock_open = mock_open(read_data=metadata_json)
-        with patch('accept_eula.open', my_mock_open):
-            release_id = accept_eula.get_release_id()
-        self.assertEqual(5334, release_id)
-        my_mock_open.assert_called_with('/home/ubuntu/tiles/ert-metadata.json', 'r')
+        self.settings.ert_release_id = 1337
 
     @patch("util.exponential_backoff")
-    @patch("accept_eula.get_release_id")
-    def test_accept_ert_eula_success(self, mock_get_release_id, mock_exponential_backoff):
-        mock_get_release_id.return_value = 1337
+    def test_accept_ert_eula_success(self, mock_exponential_backoff):
         response = Mock(requests.Response)
         response.status_code = 200
         mock_exponential_backoff.return_value = (response, accept_eula.EULAResult.SUCCESS)
@@ -48,9 +40,7 @@ class TestAcceptEULA(unittest.TestCase):
         self.assertEqual(result, ("Success", "", 0))
 
     @patch("util.exponential_backoff")
-    @patch("accept_eula.get_release_id")
-    def test_accept_ert_eula_fail(self, mock_get_release_id, mock_exponential_backoff):
-        mock_get_release_id.return_value = 1337
+    def test_accept_ert_eula_fail(self, mock_exponential_backoff):
         response = Mock(requests.Response)
         response.status_code = 503
         mock_exponential_backoff.return_value = (response, accept_eula.EULAResult.RETRY)
@@ -103,15 +93,13 @@ class TestAcceptEULA(unittest.TestCase):
         self.assertEqual(result[0], response)
         self.assertEqual(result[1], accept_eula.EULAResult.RETRY)
 
-    @patch('accept_eula.get_release_id')
     @patch('accept_eula.post_eula')
     @patch('time.sleep')
-    def test_exponential_backoff(self, mock_sleep, mock_post_eula, mock_get_release_id):
+    def test_exponential_backoff(self, mock_sleep, mock_post_eula):
         retry_response = Mock(requests.Response)
         retry_response.status_code = 502
         success_response = Mock(requests.Response)
         success_response.status_code = 200
-        mock_get_release_id.return_value = 1337
 
         mock_post_eula.side_effect = [
             (retry_response, accept_eula.EULAResult.RETRY),

@@ -28,6 +28,10 @@ import settings
 class TestDownloadAndImport(unittest.TestCase):
     def setUp(self):
         self.settings = Mock(settings.Settings)
+        self.settings.ert_release_version = "1.9.0"
+        self.settings.ert_release_sha256 = "xyz123"
+        self.settings.stemcell_release_version = "123"
+        self.settings.stemcell_release_sha256 = "123"
 
     @patch('util.exponential_backoff_cmd')
     @patch('download_and_import.do_pivnet_download')

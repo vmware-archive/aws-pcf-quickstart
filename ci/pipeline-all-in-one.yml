@@ -74,23 +74,7 @@ resources:
     api_token: {{pivnet_token}}
     copy_metadata: true
     product_slug: elastic-runtime
-    product_version: 1\.10\.8
-
-- name: aws-broker-tile
-  type: pivnet
-  source:
-    api_token: {{pivnet_token}}
-    copy_metadata: true
-    product_slug: pcf-service-broker-for-aws
-    product_version: "1.2.0"
-
-- name: stemcell
-  type: pivnet
-  source:
-    api_token: {{pivnet_token}}
-    copy_metadata: true
-    product_slug: stemcells
-    product_version: "3363.20"
+    product_version: 1\.11\.5
 
 - name: packer-result
   type: s3
@@ -236,18 +220,8 @@ jobs:
 - name: build-ami
   plan:
   - get: quickstart-repo
-  - get: ert-tile
-    params:
-      globs: []
-  - get: aws-broker-tile
-    params:
-      globs: []
   - get: awslogs-agent-setup
   - get: aws-cfn-bootstrap
-  - get: stemcell
-    params:
-      globs:
-      - "*-aws-*.tgz"
   - get: ami-version
     params:
       bump: patch
@@ -261,9 +235,6 @@ jobs:
           repository: cfplatformeng/quickstart-ci
       inputs:
       - name: quickstart-repo
-      - name: ert-tile
-      - name: aws-broker-tile
-      - name: stemcell
       - name: ami-version
       - name: awslogs-agent-setup
       - name: aws-cfn-bootstrap
@@ -394,6 +365,9 @@ jobs:
   - get: version
     params:
       bump: patch
+  - get: ert-tile
+    params:
+      globs: []
   - task: build-release
     config:
       platform: linux
@@ -407,6 +381,7 @@ jobs:
       - name: om-release
       - name: quickstart-repo
       - name: version
+      - name: ert-tile
       outputs:
       - name: output
       run:
@@ -421,9 +396,11 @@ jobs:
           chmod +x quickstart/bin/om
           cp pivnet-release/pivnet-linux* quickstart/bin/pivnet
           chmod +x quickstart/bin/pivnet
+
           pushd quickstart
           mkdir -p vendor
           pip download --no-binary :all: --dest vendor -r requirements.txt
+          python3 ci/build-version-config.py
           popd
 
           mkdir -p output
