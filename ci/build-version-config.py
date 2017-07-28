@@ -3,7 +3,7 @@ import os
 import sys
 import requests
 
-metadata_file = 'ert-tile/metadata.json'
+metadata_file_path = 'ert-tile/metadata.json'
 pivnet_token = os.environ['PIVNET_TOKEN']
 
 with open(metadata_file_path, 'r') as metadata_ert_raw:

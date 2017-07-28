@@ -384,6 +384,8 @@ jobs:
       - name: ert-tile
       outputs:
       - name: output
+      params:
+        PIVNET_TOKEN: {{pivnet_token}}
       run:
         path: bash
         args:
@@ -400,7 +402,10 @@ jobs:
           pushd quickstart
           mkdir -p vendor
           pip download --no-binary :all: --dest vendor -r requirements.txt
+
+          pip install requests
           python3 ci/build-version-config.py
+
           popd
 
           mkdir -p output
