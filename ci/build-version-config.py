@@ -3,13 +3,13 @@ import os
 import sys
 import requests
 
-metadata_file_path = 'ert-tile/metadata.json'
+metadata_file_path = '../ert-tile/metadata.json'
 pivnet_token = os.environ['PIVNET_TOKEN']
 
 with open(metadata_file_path, 'r') as metadata_ert_raw:
     metadata_ert = json.load(metadata_ert_raw)
-    # print("metadata:")
-    # print(json.dumps(metadata_ert, indent="  "))
+    print("metadata:")
+    print(json.dumps(metadata_ert, indent="  "))
 
     ert_product_files = metadata_ert.get("ProductFiles")
     ert_tile_product_file = None
@@ -74,5 +74,5 @@ with open(metadata_file_path, 'r') as metadata_ert_raw:
         }
     }
 
-    with("version_config.json") as config_output_file:
+    with open("version_config.json", "w") as config_output_file:
         json.dump(config, config_output_file, indent="  ")
