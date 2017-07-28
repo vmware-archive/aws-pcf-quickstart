@@ -39,10 +39,11 @@ def test_exit_code_success(exit_code):
 def check_return_code(out, err, return_code, step_name):
     print("Ran: {}; exit code: {}".format(step_name, exit_code))
     if return_code != 0:
-        util.exponential_backoff(
-            functools.partial(sqs.report_cr_creation_failure, my_settings, out),
-            test_exit_code_success
-        )
+        print("Nope!")
+        # util.exponential_backoff(
+        #     functools.partial(sqs.report_cr_creation_failure, my_settings, out),
+        #     test_exit_code_success
+        # )
         sys.exit(1)
 
 
@@ -74,4 +75,4 @@ check_return_code(out, err, exit_code, 'configure_ert')
 out, err, exit_code = om_manager.apply_changes(my_settings)
 check_return_code(out, err, exit_code, 'apply_changes')
 
-wait_condition.report_success(my_settings, "Successfully deployed Elastic Runtime")
+#wait_condition.report_success(my_settings, "Successfully deployed Elastic Runtime")

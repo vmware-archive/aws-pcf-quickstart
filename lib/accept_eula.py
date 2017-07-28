@@ -33,9 +33,8 @@ def check_eula_succeeded(returned):
 
 
 def accept_ert_eula(my_settings: settings.Settings):
-    release_id = get_release_id()
     response, result = util.exponential_backoff(
-        functools.partial(post_eula, my_settings, release_id),
+        functools.partial(post_eula, my_settings, my_settings.ert_release_id),
         check_eula_succeeded
     )
     if result == EULAResult.SUCCESS:
@@ -68,8 +67,3 @@ def post_eula(my_settings: settings.Settings, release_id: int):
     return response, EULAResult.FAILURE
 
 
-def get_release_id():
-    with open('/home/ubuntu/tiles/ert-metadata.json', 'r') as metadata_file:
-        metadata = json.loads(metadata_file.read())
-
-    return metadata["Release"]["ID"]

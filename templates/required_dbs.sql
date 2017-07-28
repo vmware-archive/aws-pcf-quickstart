@@ -8,5 +8,7 @@ CREATE database if not exists diego;
 CREATE database if not exists account;
 CREATE database if not exists nfsvolume;
 CREATE database if not exists networkpolicyserver;
+CREATE database if not exists silk;
+CREATE database if not exists locket;
 
 SHOW DATABASES;

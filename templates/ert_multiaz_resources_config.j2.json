@@ -5,11 +5,16 @@
   "diego_brain": {"instances": 2},
   "diego_cell": {"instances": 3},
   "diego_database": {"instances": 3},
-  "doppler": {"instances": 2},
+  "doppler": {"instances": 3},
   "etcd_tls_server": {"instances": 3},
   "loggregator_trafficcontroller": {"instances": 2},
   "router": {"instances": 2},
+  "syslog_adapter": {"instances": 3},
   "tcp_router": {"instances": 2},
   "nats": {"instances": 2},
-  "uaa": {"instances": 2}
+  "uaa": {"instances": 2},
+
+  "mysql": {"instances": 0},
+  "mysql_proxy": {"instances": 0},
+  "mysql_monitor": {"instances": 0}
 }
