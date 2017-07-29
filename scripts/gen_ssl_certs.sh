@@ -3,6 +3,8 @@
 set -e
 
 ROOT_DOMAIN=$1
+SYS_DOMAIN=sys.$ROOT_DOMAIN
+APPS_DOMAIN=apps.$ROOT_DOMAIN
 
 SSL_FILE=sslconf-${ROOT_DOMAIN}.conf
 
@@ -24,11 +26,10 @@ keyUsage = nonRepudiation, digitalSignature, keyEncipherment
 subjectAltName = @alt_names
 [alt_names]
 DNS.1 = *.${ROOT_DOMAIN}
-DNS.2 = *.sys.${ROOT_DOMAIN}
-DNS.3 = *.apps.${ROOT_DOMAIN}
-DNS.4 = *.login.${ROOT_DOMAIN}
-DNS.5 = *.uaa.${ROOT_DOMAIN}
-DNS.6 = login.${ROOT_DOMAIN}
+DNS.2 = *.${SYS_DOMAIN}
+DNS.3 = *.${APPS_DOMAIN}
+DNS.4 = *.login.${SYS_DOMAIN}
+DNS.5 = *.uaa.${SYS_DOMAIN}
 EOF
 fi
 
@@ -37,3 +38,5 @@ openssl req -new -out ${ROOT_DOMAIN}.csr -subj "/CN=*.${ROOT_DOMAIN}/O=Pivotal/C
 openssl req -text -noout -in ${ROOT_DOMAIN}.csr
 openssl x509 -req -days 3650 -in ${ROOT_DOMAIN}.csr -signkey ${ROOT_DOMAIN}.key -out ${ROOT_DOMAIN}.crt -extensions v3_req -extfile ${SSL_FILE}
 openssl x509 -in ${ROOT_DOMAIN}.crt -text -noout
+rm ${ROOT_DOMAIN}.csr
+
