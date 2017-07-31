@@ -111,6 +111,15 @@ Parameters:
     AllowedValues:
     - 'true'
     - 'false'
+Rules:
+  KeyPairsNotEmpty:
+    Assertions:
+    - Assert:
+        Fn::Not:
+        - Fn::EachMemberEquals:
+          - Fn::RefAll: AWS::EC2::KeyPair::KeyName
+          - ""
+    AssertDescription: All key pair parameters must not be empty
 Mappings:
   ## Mapping of OpsManager AMI in AWS Regions.
   OpsManagerAMI:
