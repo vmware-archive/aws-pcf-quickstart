@@ -119,7 +119,7 @@ Rules:
         - Fn::EachMemberEquals:
           - Fn::RefAll: AWS::EC2::KeyPair::KeyName
           - ""
-    AssertDescription: All key pair parameters must not be empty
+      AssertDescription: All key pair parameters must not be empty
 Mappings:
   ## Mapping of OpsManager AMI in AWS Regions.
   OpsManagerAMI:
