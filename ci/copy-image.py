@@ -77,6 +77,14 @@ def main(argv):
             Name="pcf bootstrap {}".format(ami_version)
         )
         new_image_id = response.get('ImageId')
+
+        client.modify_image_attribute(
+            ImageId=new_image_id,
+            LaunchPermission={
+                'Add': [{'Group': 'all'}]
+            }
+        )
+
         mapping[destination_region] = new_image_id
 
     print("Final mapping")
