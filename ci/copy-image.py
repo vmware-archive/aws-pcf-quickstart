@@ -20,6 +20,7 @@
 import json
 import os
 import sys
+import time
 
 import boto3
 
@@ -77,6 +78,29 @@ def main(argv):
             Name="pcf bootstrap {}".format(ami_version)
         )
         new_image_id = response.get('ImageId')
+        mapping[destination_region] = new_image_id
+
+    for destination_region in mapping:
+        if source_region == destination_region:
+            continue
+
+        client = boto3.client(
+            service_name='ec2',
+            region_name=destination_region,
+            aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
+            aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY']
+        )
+        new_image_id = mapping[destination_region]
+        response = client.describe_images(ImageIds=[new_image_id])
+        state = response.get('Images')[0].get('State')
+        while state == 'pending':
+            time.sleep(30)
+            response = client.describe_images(ImageIds=[new_image_id])
+            state = response.get('Images')[0].get('State')
+
+        if state != 'available':
+            print("State didn't resolve to available. Value is {}".format(state))
+            sys.exit(1)
 
         client.modify_image_attribute(
             ImageId=new_image_id,
@@ -84,8 +108,6 @@ def main(argv):
                 'Add': [{'Group': 'all'}]
             }
         )
-
-        mapping[destination_region] = new_image_id
 
     print("Final mapping")
     json.dumps(mapping, indent="  ")
