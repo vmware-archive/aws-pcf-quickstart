@@ -128,7 +128,8 @@ def create_stack(template_path: str, aws_region: str):
 
 if __name__ == "__main__":
     template_path = sys.argv[1]
-    aws_region = sys.argv[2]
-    if not aws_region:
+    if len(sys.argv) > 2:
+        aws_region = sys.argv[2]
+    else:
         aws_region = select_random_region()
     create_stack(template_path, aws_region)
