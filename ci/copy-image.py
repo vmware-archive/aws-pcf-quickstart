@@ -34,7 +34,6 @@ destination_regions = [
     'eu-central-1',
     'eu-west-1',
     'eu-west-2',
-    'sa-east-1',
     'us-east-1',
     'us-east-2',
     'us-west-1',
@@ -94,6 +93,7 @@ def main(argv):
         response = client.describe_images(ImageIds=[new_image_id])
         state = response.get('Images')[0].get('State')
         while state == 'pending':
+            print("AMI is pending, sleeping 30s")
             time.sleep(30)
             response = client.describe_images(ImageIds=[new_image_id])
             state = response.get('Images')[0].get('State')

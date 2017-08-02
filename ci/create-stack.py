@@ -15,11 +15,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import boto3
 import datetime
-import time
+import json
 import sys
+import time
+
+import boto3
 import os
+import random
+
+
+def select_random_region():
+    region_list = [
+        "us-east-1",
+        "us-east-2",
+        "us-west-2",
+        "ca-central-1",
+        "eu-central-1",
+        "eu-west-1",
+        "eu-west-2",
+        "ap-southeast-1",
+        "ap-southeast-2",
+        "ap-northeast-1",
+        "ap-northeast-2",
+        "ap-south-1"
+    ]
+    secure_random = random.SystemRandom()
+    region = secure_random.choice(region_list)
+    print("Stack will be created in {} to run integration".format(region))
+    return region
 
 
 def describe_stack_status(cloudformation_client, stack_id):
@@ -29,66 +53,82 @@ def describe_stack_status(cloudformation_client, stack_id):
     return stack.get('StackStatus')
 
 
-password = os.environ['AWS_CF_PASSWORD']
-domain = os.environ['AWS_CF_DOMAIN']
-hostedzoneid = os.environ['AWS_CF_HOSTEDZONEID']
-sslcertificatearn = os.environ['AWS_CF_SSLCERTIFICATEARN']
-pcfkeypair = os.environ['AWS_CF_PCFKEYPAIR']
-pivnettoken = os.environ['AWS_CF_PIVNETTOKEN']
-aws_access_key_id = os.environ['AWS_ACCESS_KEY_ID']
-aws_secret_access_key = os.environ['AWS_SECRET_ACCESS_KEY']
-aws_region = os.environ['AWS_INTEGRATION_REGION']
-template_path = sys.argv[1]
+def create_stack(template_path: str, aws_region: str):
+    password = os.environ['AWS_CF_PASSWORD']
+    domain = os.environ['AWS_CF_DOMAIN']
+    hostedzoneid = os.environ['AWS_CF_HOSTEDZONEID']
+    pcfkeypair = os.environ['AWS_CF_PCFKEYPAIR']
+    pivnettoken = os.environ['AWS_CF_PIVNETTOKEN']
+    aws_access_key_id = os.environ['AWS_ACCESS_KEY_ID']
+    aws_secret_access_key = os.environ['AWS_SECRET_ACCESS_KEY']
 
-parameters = [
-    {"ParameterKey": "RdsPassword", "ParameterValue": password},
-    {"ParameterKey": "HostedZoneId", "ParameterValue": hostedzoneid},
-    {"ParameterKey": "SSLCertificateARN", "ParameterValue": sslcertificatearn},
-    {"ParameterKey": "OpsManagerAdminPassword", "ParameterValue": password},
-    {"ParameterKey": "Domain", "ParameterValue": domain},
-    {"ParameterKey": "ElbPrefix", "ParameterValue": "my-pcf-elb"},
-    {"ParameterKey": "PCFKeyPair", "ParameterValue": pcfkeypair},
-    {"ParameterKey": "RdsUsername", "ParameterValue": "admin"},
-    {"ParameterKey": "AdminEmail", "ParameterValue": "noreply@pivotal.io"},
-    {"ParameterKey": "PivnetToken", "ParameterValue": pivnettoken},
-    {"ParameterKey": "SkipSSLValidation", "ParameterValue": "true"},
-    {"ParameterKey": "OpsManagerTemplate", "ParameterValue": "https://s3-us-west-2.amazonaws.com/aws-pcf-quickstart-templates/ops-manager-rc.json"},
-    {"ParameterKey": "CloudFoundryTemplate", "ParameterValue": "https://s3-us-west-2.amazonaws.com/aws-pcf-quickstart-templates/cloud-formation-rc.json"},
-    {"ParameterKey": "PCFAutomationRelease", "ParameterValue": "https://s3-us-west-2.amazonaws.com/aws-pcf-quickstart-releases/quickstart-rc.tgz"}
-]
+    sslcertificatearn = os.environ[aws_region.upper().replace('-', '_') + '_SSLCERTIFICATEARN']
 
-client = boto3.client(
-    service_name='cloudformation', region_name=aws_region, aws_access_key_id=aws_access_key_id,
-    aws_secret_access_key=aws_secret_access_key
-)
+    parameters = [
+        {"ParameterKey": "RdsPassword", "ParameterValue": password},
+        {"ParameterKey": "HostedZoneId", "ParameterValue": hostedzoneid},
+        {"ParameterKey": "SSLCertificateARN", "ParameterValue": sslcertificatearn},
+        {"ParameterKey": "OpsManagerAdminPassword", "ParameterValue": password},
+        {"ParameterKey": "Domain", "ParameterValue": domain},
+        {"ParameterKey": "ElbPrefix", "ParameterValue": "my-pcf-elb"},
+        {"ParameterKey": "PCFKeyPair", "ParameterValue": pcfkeypair},
+        {"ParameterKey": "RdsUsername", "ParameterValue": "admin"},
+        {"ParameterKey": "AdminEmail", "ParameterValue": "noreply@pivotal.io"},
+        {"ParameterKey": "PivnetToken", "ParameterValue": pivnettoken},
+        {"ParameterKey": "SkipSSLValidation", "ParameterValue": "true"},
+        {"ParameterKey": "OpsManagerTemplate",
+         "ParameterValue": "https://s3-us-west-2.amazonaws.com/aws-pcf-quickstart-templates/ops-manager-rc.json"},
+        {"ParameterKey": "CloudFoundryTemplate",
+         "ParameterValue": "https://s3-us-west-2.amazonaws.com/aws-pcf-quickstart-templates/cloud-formation-rc.json"},
+        {"ParameterKey": "PCFAutomationRelease",
+         "ParameterValue": "https://s3-us-west-2.amazonaws.com/aws-pcf-quickstart-releases/quickstart-rc.tgz"}
+    ]
 
-with open(template_path, 'r') as template_file:
-    template = template_file.read()
-
-    stack_name = "pcf-int-{}".format(int(datetime.datetime.now().timestamp()))
-    create_response = client.create_stack(
-        StackName=stack_name,
-        TemplateBody=template,
-        Parameters=parameters,
-        Capabilities=[
-            'CAPABILITY_IAM',
-        ],
+    client = boto3.client(
+        service_name='cloudformation', region_name=aws_region, aws_access_key_id=aws_access_key_id,
+        aws_secret_access_key=aws_secret_access_key
     )
-    stack_id = create_response.get("StackId")
-    print("Created stack: {}".format(stack_id))
 
-    with open('stackid', 'w') as file:
-        file.write(stack_id)
+    with open(template_path, 'r') as template_file:
+        template = template_file.read()
 
-    stack_status = describe_stack_status(client, stack_id)
-    while stack_status == 'CREATE_IN_PROGRESS':
-        time.sleep(60)
+        stack_name = "pcf-int-{}".format(int(datetime.datetime.now().timestamp()))
+        create_response = client.create_stack(
+            StackName=stack_name,
+            TemplateBody=template,
+            Parameters=parameters,
+            Capabilities=[
+                'CAPABILITY_IAM',
+            ],
+        )
+        stack_id = create_response.get("StackId")
+        print("Created stack: {}".format(stack_id))
+        stack_metadata = {
+            "stack_id": stack_id,
+            "region": aws_region,
+            "ssl_cert_arn": sslcertificatearn
+        }
+
+        with open('stackid', 'w') as file:
+            json.dump(stack_metadata, file)
+
         stack_status = describe_stack_status(client, stack_id)
-        print("Checking status got {}".format(stack_status))
+        while stack_status == 'CREATE_IN_PROGRESS':
+            time.sleep(60)
+            stack_status = describe_stack_status(client, stack_id)
+            print("Checking status got {}".format(stack_status))
 
-    print("Final status {}".format(stack_status))
-    if stack_status != "CREATE_COMPLETE":
-        print("Stack creation did not complete, exiting...")
-        sys.exit(1)
-    else:
-        sys.exit(0)
+        print("Final status {}".format(stack_status))
+        if stack_status != "CREATE_COMPLETE":
+            print("Stack creation did not complete, exiting...")
+            sys.exit(1)
+        else:
+            sys.exit(0)
+
+
+if __name__ == "__main__":
+    template_path = sys.argv[1]
+    aws_region = sys.argv[2]
+    if not aws_region:
+        aws_region = select_random_region()
+    create_stack(template_path, aws_region)

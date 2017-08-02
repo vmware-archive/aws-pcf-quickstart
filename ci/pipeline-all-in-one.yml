@@ -473,6 +473,18 @@ jobs:
         AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
         AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}
         AWS_INTEGRATION_REGION: {{aws_integration_region}}
+        US_EAST_1_SSLCERTIFICATEARN: {{us_east_1_sslcertificatearn}}
+        US_EAST_2_SSLCERTIFICATEARN: {{us_east_2_sslcertificatearn}}
+        US_WEST_2_SSLCERTIFICATEARN: {{us_west_2_sslcertificatearn}}
+        CA_CENTRAL_1_SSLCERTIFICATEARN: {{ca_central_1_sslcertificatearn}}
+        EU_WEST_1_SSLCERTIFICATEARN: {{eu_west_1_sslcertificatearn}}
+        EU_CENTRAL_1_SSLCERTIFICATEARN: {{eu_central_1_sslcertificatearn}}
+        EU_WEST_2_SSLCERTIFICATEARN: {{eu_west_2_sslcertificatearn}}
+        AP_SOUTHEAST_1_SSLCERTIFICATEARN: {{ap_southeast_1_sslcertificatearn}}
+        AP_SOUTHEAST_2_SSLCERTIFICATEARN: {{ap_southeast_2_sslcertificatearn}}
+        AP_NORTHEAST_2_SSLCERTIFICATEARN: {{ap_northeast_2_sslcertificatearn}}
+        AP_NORTHEAST_1_SSLCERTIFICATEARN: {{ap_northeast_1_sslcertificatearn}}
+        AP_SOUTH_1_SSLCERTIFICATEARN: {{ap_south_1_sslcertificatearn}}
       run:
         path: bash
         args:

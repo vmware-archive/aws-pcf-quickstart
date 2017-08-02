@@ -19,10 +19,10 @@ import boto3
 import os
 import botocore
 import botocore.exceptions
+import json
 
 aws_access_key_id = os.environ['AWS_ACCESS_KEY_ID']
 aws_secret_access_key = os.environ['AWS_SECRET_ACCESS_KEY']
-aws_region = os.environ['AWS_INTEGRATION_REGION']
 
 
 def get_bucket_names(stack_name: str):
@@ -73,16 +73,18 @@ def delete_bucket(bucket_name: str):
             raise e
 
 
+with open('../aws-pcf-concourse-state/stackid', 'r') as file:
+    stack_metadata = json.loads(file.read())
+    stack_id = stack_metadata['stack_id']
+    aws_region = stack_metadata['region']
+print("Deleting buckets for stack {}".format(stack_id))
+
 cf_client = boto3.client(
     service_name='cloudformation', region_name=aws_region, aws_access_key_id=aws_access_key_id,
     aws_secret_access_key=aws_secret_access_key
 )
 
-with open('../aws-pcf-concourse-state/stackid', 'r') as file:
-    stackid = file.read().strip()
-print("Deleting buckets for stack {}".format(stackid))
-
-response = cf_client.describe_stacks(StackName=stackid)
+response = cf_client.describe_stacks(StackName=stack_id)
 stacks = response.get('Stacks')
 stack_name = stacks[0].get('StackName')
 
@@ -91,5 +93,5 @@ print("Buckets {}".format(buckets))
 for bucket in buckets:
     delete_bucket(bucket)
 
-print("Deleting stack {}".format(stackid))
-client.delete_stack(StackName=stackid)
+print("Deleting stack {}".format(stack_id))
+cf_client.delete_stack(StackName=stack_id)
