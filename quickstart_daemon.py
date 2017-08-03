@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# pivotal-cloud-foundry-quickstart
+# aws-pcf-quickstart
 #
 # Copyright (c) 2017-Present Pivotal Software, Inc. All Rights Reserved.
 #

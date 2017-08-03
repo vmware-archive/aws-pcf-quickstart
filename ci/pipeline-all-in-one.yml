@@ -17,7 +17,7 @@ resources:
   type: git
   source:
     branch: master
-    uri: https://github.com/cf-platform-eng/quickstart
+    uri: https://github.com/cf-platform-eng/aws-pcf-quickstart
     username: {{github_user_name}}
     password: {{github_access_token}}
     ignore_paths:
@@ -62,7 +62,7 @@ resources:
   type: semver
   source:
     driver: git
-    uri: https://github.com/cf-platform-eng/quickstart
+    uri: https://github.com/cf-platform-eng/aws-pcf-quickstart
     branch: ami_version
     file: ami_version
     username: {{github_user_name}}
@@ -142,7 +142,7 @@ resources:
   type: semver
   source:
     driver: git
-    uri: https://github.com/cf-platform-eng/quickstart
+    uri: https://github.com/cf-platform-eng/aws-pcf-quickstart
     branch: quickstart_release_version
     file: quickstart_release_version
     username: {{github_user_name}}
