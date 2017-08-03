@@ -50,7 +50,6 @@ def delete_everything(my_settings: Settings):
             expire_bucket(my_settings, bucket_name)
         except Exception as e:
             print(e)
-            return e, "", 1
     return "", "", 0
 
 
