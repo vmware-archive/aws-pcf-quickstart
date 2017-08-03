@@ -38,7 +38,7 @@ def select_random_region():
         "ap-southeast-2",
         "ap-northeast-1",
         "ap-northeast-2",
-        "ap-south-1"
+        # "ap-south-1" # param store failed!
     ]
     secure_random = random.SystemRandom()
     region = secure_random.choice(region_list)
