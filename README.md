@@ -9,7 +9,7 @@ See the docs (link todo) for account and launch pre-reqs.
 1. Get the template `quickstart-template.yml` from https://github.com/cf-platform-eng/quickstart-pivotal-cloudfoundry/blob/develop/templates/
 1. Create a new stack: https://console.aws.amazon.com/cloudformation by uploading the template above
 1. View the logs https://console.aws.amazon.com/cloudwatch/ (assuming `ForwardLogOutput` is set to `true`)
-1. The full run takes ~2.5 hours. Once the `MyCustomBOSH` resource is completed, you can view installation progress from https://opsman.[template domain]  
+1. The full run takes ~2.5 hours. Once the `MyCustomBOSH` resource is completed, you can view installation progress from `https://opsman.[template domain]`
 
 # Dev
 
