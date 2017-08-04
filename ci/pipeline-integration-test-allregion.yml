@@ -1,0 +1,505 @@
+---
+
+resources:
+- name: quickstart-repo
+  type: git
+  source:
+    branch: master
+    uri: https://github.com/cf-platform-eng/aws-pcf-quickstart
+    username: {{github_user_name}}
+    password: {{github_access_token}}
+    ignore_paths:
+      - ci/*.yml
+
+- name: om-release
+  type: github-release
+  source:
+    owner: pivotal-cf
+    repository: om
+    access_token: {{github_access_token}}
+    version: v0.0.22
+
+- name: aws-pcf-concourse-state
+  type: s3
+  source:
+    bucket: aws-pcf-concourse-state
+    region_name: us-west-2
+    versioned_file: stackid
+    access_key_id: {{aws_admin_key_id}}
+    secret_access_key: {{aws_admin_secret_access_key}}
+
+- name: quickstart-latest-release-candidate
+  type: s3
+  source:
+    bucket: aws-pcf-quickstart-releases
+    region_name: us-west-2
+    versioned_file: quickstart-rc.tgz
+    access_key_id: {{s3_access_key_id}}
+    secret_access_key: {{s3_secret_access_key}}
+
+- name: cloud-formation-outer-template-rc
+  type: s3
+  source:
+    bucket: aws-pcf-quickstart-templates
+    region_name: us-west-2
+    versioned_file: quickstart-template-rc.yml
+    access_key_id: {{s3_access_key_id}}
+    secret_access_key: {{s3_secret_access_key}}
+
+
+- name: really_often
+  type: time
+  source:
+    interval: 10s
+
+templates:
+params: &some_values
+  AWS_CF_PASSWORD: {{aws_cf_password}}
+  AWS_CF_DOMAIN: {{aws_cf_domain}}
+  AWS_CF_HOSTEDZONEID: {{aws_cf_hostedzoneid}}
+  AWS_CF_SSLCERTIFICATEARN: {{aws_cf_sslcertificatearn}}
+  AWS_CF_PCFKEYPAIR: {{aws_cf_pcfkeypair}}
+  AWS_CF_PIVNETTOKEN: {{aws_cf_pivnettoken}}
+  AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
+  AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}
+  US_EAST_1_SSLCERTIFICATEARN: {{us_east_1_sslcertificatearn}}
+  US_EAST_2_SSLCERTIFICATEARN: {{us_east_2_sslcertificatearn}}
+  US_WEST_2_SSLCERTIFICATEARN: {{us_west_2_sslcertificatearn}}
+  CA_CENTRAL_1_SSLCERTIFICATEARN: {{ca_central_1_sslcertificatearn}}
+  EU_WEST_1_SSLCERTIFICATEARN: {{eu_west_1_sslcertificatearn}}
+  EU_CENTRAL_1_SSLCERTIFICATEARN: {{eu_central_1_sslcertificatearn}}
+  EU_WEST_2_SSLCERTIFICATEARN: {{eu_west_2_sslcertificatearn}}
+  AP_SOUTHEAST_1_SSLCERTIFICATEARN: {{ap_southeast_1_sslcertificatearn}}
+  AP_SOUTHEAST_2_SSLCERTIFICATEARN: {{ap_southeast_2_sslcertificatearn}}
+  AP_NORTHEAST_2_SSLCERTIFICATEARN: {{ap_northeast_2_sslcertificatearn}}
+  AP_NORTHEAST_1_SSLCERTIFICATEARN: {{ap_northeast_1_sslcertificatearn}}
+  AP_SOUTH_1_SSLCERTIFICATEARN: {{ap_south_1_sslcertificatearn}}
+
+
+run: &run
+  path: bash
+  args:
+  - -exc
+  - |
+    pushd quickstart-repo
+    pip install -r requirements.txt
+    python ./ci/create-stack.py '../cloud-formation-outer-template-rc/quickstart-template-rc.yml' ${AWS_INTEGRATION_REGION}
+    popd
+    cp quickstart-repo/stackid output/stackid
+
+image_resource: &image_resource
+  image_resource:
+    type: docker-image
+    source:
+      repository: python
+      tag: "3"
+
+check_task: &check_task
+  task: check-cf-status
+  attempts: 10
+  config:
+    platform: linux
+    image_resource:
+      type: docker-image
+      source:
+        repository: cfplatformeng/quickstart-ci
+    inputs:
+    - name: om-release
+    - name: quickstart-repo
+    params:
+      AWS_CF_PASSWORD: {{aws_cf_password}}
+      AWS_CF_DOMAIN: {{aws_cf_domain}}
+    run:
+      path: bash
+      args:
+      - -exc
+      - |
+        mv om-release/om-linux /usr/local/bin/om
+        chmod +x /usr/local/bin/om
+        pushd quickstart-repo
+        pip install -r requirements.txt
+        sleep 30
+        python ./ci/check-status.py
+        popd
+
+delete_task: &delete_task
+  task: delete-cf
+  config:
+    platform: linux
+    image_resource:
+      type: docker-image
+      source:
+        repository: cfplatformeng/quickstart-ci
+    inputs:
+    - name: quickstart-repo
+    - name: aws-pcf-concourse-state
+    params:
+      AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
+      AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}
+      AWS_INTEGRATION_REGION: {{aws_integration_region}}
+    run:
+      path: bash
+      args:
+      - -exc
+      - |
+        pushd quickstart-repo
+        pip install -r requirements.txt
+        python ./ci/delete-stack.py
+        popd
+
+
+jobs:
+- name: manual-trigger
+  plan:
+  - get: really_often
+
+- name: us-east-1
+  serial_groups: [integration]
+  plan:
+  - get: really_often
+    trigger: true
+    passed: [manual-trigger]
+  - get: quickstart-repo
+  - get: quickstart-latest-release-candidate
+  - get: cloud-formation-outer-template-rc
+  - get: aws-pcf-concourse-state
+  - get: om-release
+  - task: integration-test
+    config:
+      platform: linux
+      <<: *image_resource
+      inputs:
+      - name: quickstart-repo
+      - name: cloud-formation-outer-template-rc
+      outputs:
+      - name: output
+      params:
+        <<: *some_values
+        AWS_INTEGRATION_REGION: "us-east-1"
+      run: *run
+  - put: aws-pcf-concourse-state
+    params:
+      file: output/stackid
+  - *check_task
+  - *delete_task
+
+- name: us-east-2
+  serial_groups: [integration]
+  plan:
+  - get: really_often
+    trigger: true
+    passed: [manual-trigger]
+  - get: quickstart-repo
+  - get: quickstart-latest-release-candidate
+  - get: cloud-formation-outer-template-rc
+  - get: om-release
+  - task: integration-test
+    config:
+      platform: linux
+      <<: *image_resource
+      inputs:
+      - name: quickstart-repo
+      - name: cloud-formation-outer-template-rc
+      outputs:
+      - name: output
+      params:
+        <<: *some_values
+        AWS_INTEGRATION_REGION: "us-east-2"
+      run: *run
+  - put: aws-pcf-concourse-state
+    params:
+      file: output/stackid
+  - *check_task
+  - *delete_task
+
+- name: us-west-2
+  serial_groups: [integration]
+  plan:
+  - get: really_often
+    trigger: true
+    passed: [manual-trigger]
+  - get: quickstart-repo
+  - get: quickstart-latest-release-candidate
+  - get: cloud-formation-outer-template-rc
+  - get: om-release
+  - task: integration-test
+    config:
+      platform: linux
+      <<: *image_resource
+      inputs:
+      - name: quickstart-repo
+      - name: cloud-formation-outer-template-rc
+      outputs:
+      - name: output
+      params:
+        <<: *some_values
+        AWS_INTEGRATION_REGION: "us-west-2"
+      run: *run
+  - put: aws-pcf-concourse-state
+    params:
+      file: output/stackid
+  - *check_task
+  - *delete_task
+
+- name: ca-central-1
+  serial_groups: [integration]
+  plan:
+  - get: really_often
+    trigger: true
+    passed: [manual-trigger]
+  - get: quickstart-repo
+  - get: quickstart-latest-release-candidate
+  - get: cloud-formation-outer-template-rc
+  - get: om-release
+  - task: integration-test
+    config:
+      platform: linux
+      <<: *image_resource
+      inputs:
+      - name: quickstart-repo
+      - name: cloud-formation-outer-template-rc
+      outputs:
+      - name: output
+      params:
+        <<: *some_values
+        AWS_INTEGRATION_REGION: "ca-central-1"
+      run: *run
+  - put: aws-pcf-concourse-state
+    params:
+      file: output/stackid
+  - *check_task
+  - *delete_task
+
+- name: eu-central-1
+  serial_groups: [integration]
+  plan:
+  - get: really_often
+    trigger: true
+    passed: [manual-trigger]
+  - get: quickstart-repo
+  - get: quickstart-latest-release-candidate
+  - get: cloud-formation-outer-template-rc
+  - get: om-release
+  - task: integration-test
+    config:
+      platform: linux
+      <<: *image_resource
+      inputs:
+      - name: quickstart-repo
+      - name: cloud-formation-outer-template-rc
+      outputs:
+      - name: output
+      params:
+        <<: *some_values
+        AWS_INTEGRATION_REGION: "eu-central-1"
+      run: *run
+  - put: aws-pcf-concourse-state
+    params:
+      file: output/stackid
+  - *check_task
+  - *delete_task
+
+- name: eu-west-1
+  serial_groups: [integration]
+  plan:
+  - get: really_often
+    trigger: true
+    passed: [manual-trigger]
+  - get: quickstart-repo
+  - get: quickstart-latest-release-candidate
+  - get: cloud-formation-outer-template-rc
+  - get: om-release
+  - task: integration-test
+    config:
+      platform: linux
+      <<: *image_resource
+      inputs:
+      - name: quickstart-repo
+      - name: cloud-formation-outer-template-rc
+      outputs:
+      - name: output
+      params:
+        <<: *some_values
+        AWS_INTEGRATION_REGION: "eu-west-1"
+      run: *run
+  - put: aws-pcf-concourse-state
+    params:
+      file: output/stackid
+  - *check_task
+  - *delete_task
+
+- name: eu-west-2
+  serial_groups: [integration]
+  plan:
+  - get: really_often
+    trigger: true
+    passed: [manual-trigger]
+  - get: quickstart-repo
+  - get: quickstart-latest-release-candidate
+  - get: cloud-formation-outer-template-rc
+  - get: om-release
+  - task: integration-test
+    config:
+      platform: linux
+      <<: *image_resource
+      inputs:
+      - name: quickstart-repo
+      - name: cloud-formation-outer-template-rc
+      outputs:
+      - name: output
+      params:
+        <<: *some_values
+        AWS_INTEGRATION_REGION: "eu-west-2"
+      run: *run
+  - put: aws-pcf-concourse-state
+    params:
+      file: output/stackid
+  - *check_task
+  - *delete_task
+
+- name: ap-southeast-1
+  serial_groups: [integration]
+  plan:
+  - get: really_often
+    trigger: true
+    passed: [manual-trigger]
+  - get: quickstart-repo
+  - get: quickstart-latest-release-candidate
+  - get: cloud-formation-outer-template-rc
+  - get: om-release
+  - task: integration-test
+    config:
+      platform: linux
+      <<: *image_resource
+      inputs:
+      - name: quickstart-repo
+      - name: cloud-formation-outer-template-rc
+      outputs:
+      - name: output
+      params:
+        <<: *some_values
+        AWS_INTEGRATION_REGION: "ap-southeast-1"
+      run: *run
+  - put: aws-pcf-concourse-state
+    params:
+      file: output/stackid
+  - *check_task
+  - *delete_task
+
+- name: ap-southeast-2
+  serial_groups: [integration]
+  plan:
+  - get: really_often
+    trigger: true
+    passed: [manual-trigger]
+  - get: quickstart-repo
+  - get: quickstart-latest-release-candidate
+  - get: cloud-formation-outer-template-rc
+  - get: om-release
+  - task: integration-test
+    config:
+      platform: linux
+      <<: *image_resource
+      inputs:
+      - name: quickstart-repo
+      - name: cloud-formation-outer-template-rc
+      outputs:
+      - name: output
+      params:
+        <<: *some_values
+        AWS_INTEGRATION_REGION: "ap-southeast-2"
+      run: *run
+  - put: aws-pcf-concourse-state
+    params:
+      file: output/stackid
+  - *check_task
+  - *delete_task
+
+- name: ap-northeast-1
+  serial_groups: [integration]
+  plan:
+  - get: really_often
+    trigger: true
+    passed: [manual-trigger]
+  - get: quickstart-repo
+  - get: quickstart-latest-release-candidate
+  - get: cloud-formation-outer-template-rc
+  - get: om-release
+  - task: integration-test
+    config:
+      platform: linux
+      <<: *image_resource
+      inputs:
+      - name: quickstart-repo
+      - name: cloud-formation-outer-template-rc
+      outputs:
+      - name: output
+      params:
+        <<: *some_values
+        AWS_INTEGRATION_REGION: "ap-northeast-1"
+      run: *run
+  - put: aws-pcf-concourse-state
+    params:
+      file: output/stackid
+  - *check_task
+  - *delete_task
+
+- name: ap-northeast-2
+  serial_groups: [integration]
+  plan:
+  - get: really_often
+    trigger: true
+    passed: [manual-trigger]
+  - get: quickstart-repo
+  - get: quickstart-latest-release-candidate
+  - get: cloud-formation-outer-template-rc
+  - get: om-release
+  - task: integration-test
+    config:
+      platform: linux
+      <<: *image_resource
+      inputs:
+      - name: quickstart-repo
+      - name: cloud-formation-outer-template-rc
+      outputs:
+      - name: output
+      params:
+        <<: *some_values
+        AWS_INTEGRATION_REGION: "ap-northeast-2"
+      run: *run
+  - put: aws-pcf-concourse-state
+    params:
+      file: output/stackid
+  - *check_task
+  - *delete_task
+
+- name: ap-south-1
+  serial_groups: [integration]
+  plan:
+  - get: really_often
+    trigger: true
+    passed: [manual-trigger]
+  - get: quickstart-repo
+  - get: quickstart-latest-release-candidate
+  - get: cloud-formation-outer-template-rc
+  - get: om-release
+  - task: integration-test
+    config:
+      platform: linux
+      <<: *image_resource
+      inputs:
+      - name: quickstart-repo
+      - name: cloud-formation-outer-template-rc
+      outputs:
+      - name: output
+      params:
+        <<: *some_values
+        AWS_INTEGRATION_REGION: "ap-south-1"
+      run: *run
+  - put: aws-pcf-concourse-state
+    params:
+      file: output/stackid
+  - *check_task
+  - *delete_task
+
+

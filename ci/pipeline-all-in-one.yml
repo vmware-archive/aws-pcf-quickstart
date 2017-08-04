@@ -166,33 +166,6 @@ resources:
     access_key_id: {{s3_access_key_id}}
     secret_access_key: {{s3_secret_access_key}}
 
-- name: quickstart-latest-release
-  type: s3
-  source:
-    bucket: aws-pcf-quickstart-releases
-    region_name: us-west-2
-    versioned_file: quickstart-release.tgz
-    access_key_id: {{s3_access_key_id}}
-    secret_access_key: {{s3_secret_access_key}}
-
-- name: cloud-formation-release
-  type: s3
-  source:
-    bucket: aws-pcf-quickstart-templates
-    region_name: us-west-2
-    versioned_file: cloud-formation.json
-    access_key_id: {{s3_access_key_id}}
-    secret_access_key: {{s3_secret_access_key}}
-
-- name: ops-manager-release
-  type: s3
-  source:
-    bucket: aws-pcf-quickstart-templates
-    region_name: us-west-2
-    versioned_file: ops-manager.json
-    access_key_id: {{s3_access_key_id}}
-    secret_access_key: {{s3_secret_access_key}}
-
 jobs:
 - name: unit-test
   plan:
@@ -262,10 +235,8 @@ jobs:
   plan:
   - get: quickstart-repo
     trigger: true
-    params:
-      paths:
-      - quickstart-repo/cloudformation/cloud-formation.json
-      - quickstart-repo/cloudformation/ops-manager.json
+    passed:
+      - unit-test
   - put: cloud-formation-rc
     params:
       file: quickstart-repo/cloudformation/cloud-formation.json
@@ -442,6 +413,7 @@ jobs:
     trigger: false
     passed:
       - github-release
+      - upload-inner-template-rcs
   - get: quickstart-latest-release-candidate
     trigger: false
     passed:
@@ -567,57 +539,12 @@ jobs:
           python ./ci/delete-stack.py
           popd
 
-- name: manual-promote-rcs
-  plan:
-  - get: quickstart-repo
-    passed:
-    - check-cf-status
-
-- name: promote-quickstart-candidate
-  plan:
-  - get: quickstart-repo
-    trigger: true
-    passed:
-    - manual-promote-rcs
-  - get: version
-    passed:
-      - build-quickstart-rc
-  - get: quickstart-latest-release-candidate
-    passed:
-      - build-quickstart-rc
-  - put: quickstart-latest-release
-    params:
-      file: quickstart-latest-release-candidate/quickstart-*.tgz
-
-- name: promote-inner-template-candidates
-  plan:
-  - get: quickstart-repo
-    trigger: true
-    passed:
-    - manual-promote-rcs
-  - get: cloud-formation-rc
-    passed:
-    - upload-inner-template-rcs
-  - get: ops-manager-release-candiate
-    passed:
-    - upload-inner-template-rcs
-  - put: cloud-formation-release
-    params:
-      file: cloud-formation-rc/cloud-formation-rc.json
-      acl: public-read
-  - put: ops-manager-release
-    params:
-      file: ops-manager-release-candiate/ops-manager-rc.json
-      acl: public-read
-
-
 - name: commit-and-pr-aws-quickstart-repo
   plan:
   - get: quickstart-repo
     trigger: false
     passed:
-    #- manual-promote-rcs
-    - instantiate-outer-template-rc
+    - integration-test
   - get: aws-quickstart-repo
   - get: quickstart-latest-release-candidate #python code
     passed:
@@ -660,8 +587,8 @@ jobs:
           cp -r aws-quickstart-repo/. aws-quickstart-repo-updated
 
           cp quickstart-latest-release-candidate/quickstart-rc.tgz aws-quickstart-repo-updated/scripts/quickstart.tgz
-          cp cloud-formation-rc/cloud-formation-rc.json aws-quickstart-repo-updated/templates/cloud-formation.json
-          cp ops-manager-release-candiate/ops-manager-rc.json aws-quickstart-repo-updated/templates/ops-manager.json
+          cp cloud-formation-rc/cloud-formation-rc.json aws-quickstart-repo-updated/templates/cloud-formation.template
+          cp ops-manager-release-candiate/ops-manager-rc.json aws-quickstart-repo-updated/templates/ops-manager.template
           cp cloud-formation-outer-template-rc/quickstart-template-rc.yml aws-quickstart-repo-updated/templates/pivotal-cloudfoundry.template
 
           pushd aws-quickstart-repo-updated
