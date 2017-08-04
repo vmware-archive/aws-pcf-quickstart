@@ -119,7 +119,7 @@ resources:
   type: github-release
   source:
     owner: cf-platform-eng
-    repository: quickstart
+    repository: aws-pcf-quickstart
     access_token: {{github_access_token}}
 
 - name: pivnet-release
