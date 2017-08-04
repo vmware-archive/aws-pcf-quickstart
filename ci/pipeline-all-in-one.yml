@@ -617,7 +617,7 @@ jobs:
     trigger: false
     passed:
     #- manual-promote-rcs
-    - integration-test
+    - instantiate-outer-template-rc
   - get: aws-quickstart-repo
   - get: quickstart-latest-release-candidate #python code
     passed:
@@ -662,11 +662,12 @@ jobs:
           cp quickstart-latest-release-candidate/quickstart-rc.tgz aws-quickstart-repo-updated/scripts/quickstart.tgz
           cp cloud-formation-rc/cloud-formation-rc.json aws-quickstart-repo-updated/templates/cloud-formation.json
           cp ops-manager-release-candiate/ops-manager-rc.json aws-quickstart-repo-updated/templates/ops-manager.json
-          cp cloud-formation-outer-template-rc/quickstart-template-rc.yml aws-quickstart-repo-updated/templates/quickstart-template.yml
+          cp cloud-formation-outer-template-rc/quickstart-template-rc.yml aws-quickstart-repo-updated/templates/pivotal-cloudfoundry.template
 
           pushd aws-quickstart-repo-updated
 
           pushd scripts/quickstart
+          git checkout master && git pull
           git checkout $sha
           popd
 
@@ -680,3 +681,30 @@ jobs:
   - put: aws-quickstart-repo
     params:
       repository: aws-quickstart-repo-updated
+
+- name: make_pr_to_aws
+  plan:
+  - get: quickstart-repo
+    passed:
+    - commit-and-pr-aws-quickstart-repo
+  - get: aws-quickstart-repo
+  - get: version
+  - task: make_pr_to_aws
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: cfplatformeng/quickstart-ci
+      inputs:
+      - name: quickstart-repo
+      - name: version
+      params:
+        GITHUB_ACCESS_TOKEN: {{github_access_token}}
+      run:
+        path: bash
+        args:
+        - -exc
+        - |
+          pip install requests
+          python3 quickstart-repo/ci/github-pullrequest.py
