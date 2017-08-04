@@ -46,15 +46,15 @@ Parameters:
     Description: ARN for pre-uploaded SSL certificate
   OpsManagerTemplate:
     Type: String
-    Default: https://s3-us-west-2.amazonaws.com/aws-pcf-quickstart-templates/ops-manager.json
+    Default: https://s3.amazonaws.com/quickstart-reference/pivotal/cloudfoundry/latest/templates/ops-manager.json
     Description: S3 Location for OpsManager CloudFormation Template
   CloudFoundryTemplate:
     Type: String
-    Default: https://s3-us-west-2.amazonaws.com/aws-pcf-quickstart-templates/cloud-formation.json
+    Default: https://s3.amazonaws.com/quickstart-reference/pivotal/cloudfoundry/latest/templates/cloud-formation.json
     Description: S3 Location for Base Deployment CloudFormation Template
   PCFAutomationRelease:
     Type: String
-    Default: https://s3-us-west-2.amazonaws.com/aws-pcf-quickstart-releases/quickstart-release.tgz
+    Default: https://s3.amazonaws.com/quickstart-reference/pivotal/cloudfoundry/latest/scripts/quickstart.tgz
     Description: S3 Location for Base Deployment CloudFormation Template
   ElbPrefix:
     Type: String
