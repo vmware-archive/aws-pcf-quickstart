@@ -25,6 +25,8 @@ response = requests.post(
 )
 
 print(response.status_code)
-print(response)
 
-sys.exit(response.status_code < 300)
+if response.status_code < 300:
+    sys.exit(0)
+else:
+    sys.exit(1)
