@@ -56,7 +56,7 @@ def main(argv):
         print("OpsMan AMI mapping yaml file not found")
         sys.exit(1)
 
-    with open(opsman_ami_mapping_file_name) as opsman_mapping_file:
+    with open(os.path.join(opsman_tile_dir, opsman_ami_mapping_file_name)) as opsman_mapping_file:
         destination_regions = yaml.load(opsman_mapping_file)
 
     for destination_region in destination_regions:
