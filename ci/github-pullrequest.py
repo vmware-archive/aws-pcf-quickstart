@@ -14,7 +14,7 @@ response = requests.post(
     url='https://api.github.com/repos/aws-quickstart/quickstart-pivotal-cloudfoundry/pulls',
     data=json.dumps({
         "title": "PR via CI updating to release {}".format(version),
-        "body": "Please pull this in!",
+        "body": "Please pull this in.",
         "head": "cf-platform-eng:develop",
         "base": "develop"
     }),

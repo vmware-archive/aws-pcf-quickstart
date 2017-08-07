@@ -76,6 +76,14 @@ resources:
     product_slug: elastic-runtime
     product_version: 1\.11\.5
 
+- name: opsman-tile
+  type: pivnet
+  source:
+    api_token: {{pivnet_token}}
+    copy_metadata: true
+    product_slug: ops-manager
+    product_version: 1\.11\.5
+
 - name: packer-result
   type: s3
   source:
@@ -293,6 +301,10 @@ jobs:
     trigger: true
     passed:
       - replicate-ami
+  - get: opsman-tile
+    params:
+      globs:
+        - '*.yml'
   - task: build-release
     config:
       platform: linux
@@ -304,6 +316,7 @@ jobs:
       inputs:
       - name: quickstart-repo
       - name: ami-mapping
+      - name: opsman-tile
       outputs:
       - name: output
       run:
@@ -439,7 +452,6 @@ jobs:
         AWS_CF_PASSWORD: {{aws_cf_password}}
         AWS_CF_DOMAIN: {{aws_cf_domain}}
         AWS_CF_HOSTEDZONEID: {{aws_cf_hostedzoneid}}
-        AWS_CF_SSLCERTIFICATEARN: {{aws_cf_sslcertificatearn}}
         AWS_CF_PCFKEYPAIR: {{aws_cf_pcfkeypair}}
         AWS_CF_PIVNETTOKEN: {{aws_cf_pivnettoken}}
         AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
