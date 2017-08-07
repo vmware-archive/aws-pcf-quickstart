@@ -21,25 +21,12 @@ import json
 import os
 import sys
 import time
+import re
+import yaml
 
 import boto3
 
-destination_regions = [
-    'ap-northeast-1',
-    'ap-northeast-2',
-    'ap-south-1',
-    'ap-southeast-1',
-    'ap-southeast-2',
-    'ca-central-1',
-    'eu-central-1',
-    'eu-west-1',
-    'eu-west-2',
-    'us-east-1',
-    'us-east-2',
-    'us-west-1',
-    'us-west-2',
-]
-
+opsman_tile_dir = "../opsman-tile"
 
 def main(argv):
     with open('./ami-version/version', 'r') as version_file:
@@ -61,6 +48,17 @@ def main(argv):
     mapping = {
         source_region: source_ami_id
     }
+    opsman_ami_mapping_file_name = ""
+    for file_name in os.listdir(opsman_tile_dir):
+        if re.match(r'OpsManager.*AWS\.yml', file_name):
+            opsman_ami_mapping_file_name = file_name
+    if opsman_ami_mapping_file_name == "":
+        print("OpsMan AMI mapping yaml file not found")
+        sys.exit(1)
+
+    with open(opsman_ami_mapping_file_name) as opsman_mapping_file:
+        destination_regions = yaml.load(opsman_mapping_file)
+
     for destination_region in destination_regions:
         if source_region == destination_region:
             continue

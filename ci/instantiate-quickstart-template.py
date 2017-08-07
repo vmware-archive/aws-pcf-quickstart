@@ -51,7 +51,7 @@ with open(os.path.join(ami_mapping_dir, versioned_file_name)) as f:
 with open(os.path.join(opsman_tile_dir, opsman_ami_mapping_file_name)) as f:
     raw_mapping = yaml.load(f)
     for region_key in mapping:
-        mapping[region_key] = {"opsman": raw_mapping[region_key]}
+        mapping[region_key]["opsman"] = raw_mapping[region_key]
 
 mapping_yaml = yaml.dump(mapping, default_flow_style=False)
 
