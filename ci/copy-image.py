@@ -26,7 +26,7 @@ import yaml
 
 import boto3
 
-opsman_tile_dir = "../opsman-tile"
+opsman_tile_dir = "opsman-tile"
 
 def main(argv):
     with open('./ami-version/version', 'r') as version_file:
