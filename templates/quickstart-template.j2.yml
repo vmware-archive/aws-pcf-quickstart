@@ -588,7 +588,6 @@ Resources:
       UserData: !Base64
         "Fn::Sub": |
           #!/bin/bash
-          set -x
 
           cfn-init -v --stack ${AWS::StackName} --resource BootstrapInstance --region ${AWS::Region}
           cfn-signal -e $? --stack ${AWS::StackName} --resource BootstrapInstance --region ${AWS::Region}
@@ -664,7 +663,7 @@ Resources:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneId: !Ref HostedZoneId
-      Name: !Join [ "", [ "opsman.", !Ref Domain] ]
+      Name: !Sub opsman.${Domain}
       ResourceRecords:
         - !Sub "${OpsManagerInstance.PublicIp}"
       TTL: 60
@@ -673,7 +672,7 @@ Resources:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneId: !Ref HostedZoneId
-      Name: !Join [ "", [ "bootstrap.", !Ref Domain] ]
+      Name: !Sub bootstrap.${Domain}
       ResourceRecords:
         - !Sub "${BootstrapInstance.PublicIp}"
       TTL: 60
@@ -682,7 +681,7 @@ Resources:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneId: !Ref HostedZoneId
-      Name: !Join [ "", [ "*.", !Ref Domain] ]
+      Name: !Sub "*."${Domain}
       ResourceRecords:
         - !GetAtt PCFBase.Outputs.PcfElbDnsName
       TTL: 60
@@ -691,7 +690,7 @@ Resources:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneId: !Ref HostedZoneId
-      Name: !Join [ "", [ "ssh.sys.", !Ref Domain] ]
+      Name: !Sub ssh.sys.${Domain}
       ResourceRecords:
         - !GetAtt PCFBase.Outputs.PcfElbSshDnsName
       TTL: 60
@@ -700,7 +699,7 @@ Resources:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneId: !Ref HostedZoneId
-      Name: !Join [ "", [ "*.sys.", !Ref Domain] ]
+      Name: !Sub "*.sys."${Domain}
       ResourceRecords:
         - !GetAtt PCFBase.Outputs.PcfElbDnsName
       TTL: 60
@@ -709,7 +708,7 @@ Resources:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneId: !Ref HostedZoneId
-      Name: !Join [ "", [ "*.apps.", !Ref Domain] ]
+      Name: !Sub "*.apps."${Domain}
       ResourceRecords:
         - !GetAtt PCFBase.Outputs.PcfElbDnsName
       TTL: 60
@@ -717,5 +716,4 @@ Resources:
 Outputs:
   OpsManager:
     Description: Url For Logging into OpsManager
-    Value: !Join [ "", [ "https://opsman.", !Ref Domain] ]
-
+    Value: !Sub "https://opsman."${Domain}
