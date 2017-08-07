@@ -681,7 +681,7 @@ Resources:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneId: !Ref HostedZoneId
-      Name: !Sub "*."${Domain}
+      Name: !Sub "*.${Domain}"
       ResourceRecords:
         - !GetAtt PCFBase.Outputs.PcfElbDnsName
       TTL: 60
@@ -699,7 +699,7 @@ Resources:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneId: !Ref HostedZoneId
-      Name: !Sub "*.sys."${Domain}
+      Name: !Sub "*.sys.${Domain}"
       ResourceRecords:
         - !GetAtt PCFBase.Outputs.PcfElbDnsName
       TTL: 60
@@ -708,7 +708,7 @@ Resources:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneId: !Ref HostedZoneId
-      Name: !Sub "*.apps."${Domain}
+      Name: !Sub "*.apps.${Domain}"
       ResourceRecords:
         - !GetAtt PCFBase.Outputs.PcfElbDnsName
       TTL: 60
@@ -716,4 +716,4 @@ Resources:
 Outputs:
   OpsManager:
     Description: Url For Logging into OpsManager
-    Value: !Sub "https://opsman."${Domain}
+    Value: !Sub "https://opsman.${Domain}"
