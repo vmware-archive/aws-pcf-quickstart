@@ -543,35 +543,6 @@
         ]
       }
     },
-    "PcfNatGatewayAcl" : {
-      "Type": "AWS::EC2::NetworkAcl",
-      "Properties": {
-        "VpcId": {
-          "Ref": "PcfVpc"
-        }
-      }
-    },
-    "PcfNatGatewayAclRuleAllowAll": {
-      "Type": "AWS::EC2::NetworkAclEntry",
-      "Properties": {
-        "CidrBlock": "10.0.0.0/16",
-        "Egress": "false",
-        "Icmp": {
-          "Code": "-1",
-          "Type": "-1"
-        },
-        "NetworkAclId": {
-          "Ref": "PcfNatGatewayAcl"
-        },
-        "PortRange": {
-          "From": "1",
-          "To": "65535"
-        },
-        "Protocol": "-1",
-        "RuleAction": "allow",
-        "RuleNumber": "1"
-      }
-    },
     "PcfPublicRouteTable": {
       "Type": "AWS::EC2::RouteTable",
       "Properties": {
