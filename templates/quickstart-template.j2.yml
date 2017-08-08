@@ -287,7 +287,7 @@ Resources:
               - logs:CreateLogStream
               - logs:PutLogEvents
               - logs:DescribeLogStreams
-            Resource: "arn:aws:logs:*:*:*"
+            Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:pcf-bootstrap-${AWS::StackName}:*"
       PolicyName: !Sub ${AWS::StackName}-emit-logs-policy
       Roles:
         - !GetAtt PCFBase.Outputs.PcfIamRole
