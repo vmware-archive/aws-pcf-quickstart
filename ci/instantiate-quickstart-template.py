@@ -56,6 +56,7 @@ with open(os.path.join(opsman_tile_dir, opsman_ami_mapping_file_name)) as f:
 with open("templates/supported_regions.yml") as f:
     supported_regions = yaml.load(f).get('supported_regions')
 
+supported_regions_yaml = yaml.dump(supported_regions, default_flow_style=False)
 mapping_yaml = yaml.dump(mapping, default_flow_style=False)
 
 with open("templates/quickstart-template.j2.yml", 'r') as f:
@@ -63,7 +64,7 @@ with open("templates/quickstart-template.j2.yml", 'r') as f:
 
 context = {
     "ami_mapping": mapping_yaml,
-    "supported_regions": supported_regions
+    "supported_regions": supported_regions_yaml
 }
 
 with open("cloudformation/quickstart-template-rc.yml", 'w') as template_file:
