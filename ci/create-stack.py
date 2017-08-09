@@ -17,29 +17,19 @@
 
 import datetime
 import json
+import os
+import random
 import sys
 import time
 
 import boto3
-import os
-import random
+import yaml
 
 
 def select_random_region():
-    region_list = [
-        "us-east-1",
-        "us-east-2",
-        "us-west-2",
-        "ca-central-1",
-        "eu-central-1",
-        "eu-west-1",
-        "eu-west-2",
-        "ap-southeast-1",
-        "ap-southeast-2",
-        "ap-northeast-1",
-        "ap-northeast-2",
-        # "ap-south-1" # param store failed!
-    ]
+    with open("./templates/supported_regions.yml") as f:
+        region_list = yaml.load(f).get('supported_regions')
+
     secure_random = random.SystemRandom()
     region = secure_random.choice(region_list)
     print("Stack will be created in {} to run integration".format(region))

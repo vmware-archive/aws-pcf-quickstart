@@ -53,13 +53,17 @@ with open(os.path.join(opsman_tile_dir, opsman_ami_mapping_file_name)) as f:
     for region_key in mapping:
         mapping[region_key]["opsman"] = raw_mapping[region_key]
 
+with open("templates/supported_regions.yml") as f:
+    supported_regions = yaml.load(f)
+
 mapping_yaml = yaml.dump(mapping, default_flow_style=False)
 
 with open("templates/quickstart-template.j2.yml", 'r') as f:
     quickstart_template = jinja2.Template(f.read())
 
 context = {
-    "ami_mapping": mapping_yaml
+    "ami_mapping": mapping_yaml,
+    "supported_regions": supported_regions
 }
 
 with open("cloudformation/quickstart-template-rc.yml", 'w') as template_file:

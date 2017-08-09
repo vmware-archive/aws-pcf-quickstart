@@ -164,6 +164,12 @@
   ".properties.system_blobstore.external.endpoint": {
     "value": "https://{{s3_endpoint}}"
   },
+  ".properties.system_blobstore.external.signature_version": {
+    "value": "4"
+  },
+  ".properties.system_blobstore.external.region": {
+    "value": "{{s3_region}}"
+  },
   ".properties.system_blobstore.external.buildpacks_bucket": {
     "value": "{{pcf_elastic_runtime_s3_buildpacks_bucket}}"
   },

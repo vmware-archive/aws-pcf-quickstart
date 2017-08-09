@@ -107,6 +107,7 @@ def configure_ert_config(my_settings: Settings):
         "pcf_iam_access_key_id": my_settings.pcf_iamuseraccesskey,
         "pcf_iam_secret_access_key": my_settings.pcf_iamusersecretaccesskey,
         "s3_endpoint": my_settings.get_s3_endpoint(),
+        "s3_region": my_settings.region,
         "cert": cert.replace("\n", "\\n"),
         "key": key.replace("\n", "\\n")
     }

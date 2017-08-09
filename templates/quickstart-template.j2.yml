@@ -120,6 +120,13 @@ Rules:
           - Fn::RefAll: AWS::EC2::KeyPair::KeyName
           - ""
       AssertDescription: All key pair parameters must not be empty
+  SupportedRegionRule:
+      Assertions:
+      - Assert:
+          Fn::Contains:
+          - {{supported_regions | indent}}
+          - Fn::Ref: AWS::Region
+        AssertDescription: This Quick Start is only available in a subset of regions.
 Mappings:
   AMIMapping:
     {{ami_mapping | indent}}
