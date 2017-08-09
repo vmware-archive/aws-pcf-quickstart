@@ -125,7 +125,7 @@ Rules:
       - Assert:
           Fn::Contains:
           - {{supported_regions}}
-          - Fn::Ref: AWS::Region
+          - !Ref AWS::Region
         AssertDescription: This Quick Start is only available in a subset of regions.
 Mappings:
   AMIMapping:
