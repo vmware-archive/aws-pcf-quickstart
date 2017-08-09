@@ -54,7 +54,7 @@ with open(os.path.join(opsman_tile_dir, opsman_ami_mapping_file_name)) as f:
         mapping[region_key]["opsman"] = raw_mapping[region_key]
 
 with open("templates/supported_regions.yml") as f:
-    supported_regions = yaml.load(f)
+    supported_regions = yaml.load(f).get('supported_regions')
 
 mapping_yaml = yaml.dump(mapping, default_flow_style=False)
 
