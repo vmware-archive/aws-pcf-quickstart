@@ -124,7 +124,7 @@ Rules:
       Assertions:
       - Assert:
           Fn::Contains:
-          - {{supported_regions | indent}}
+          - {{supported_regions}}
           - Fn::Ref: AWS::Region
         AssertDescription: This Quick Start is only available in a subset of regions.
 Mappings:
