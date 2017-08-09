@@ -3,7 +3,7 @@
 # Copyright (c) 2017-Present Pivotal Software, Inc. All Rights Reserved.
 #
 # This program and the accompanying materials are made available under
-# the terms of the under the Apache License, Version 2.0 (the "License”);
+# the terms of the under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #

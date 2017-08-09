@@ -3,7 +3,7 @@
 # Copyright (c) 2017-Present Pivotal Software, Inc. All Rights Reserved.
 #
 # This program and the accompanying materials are made available under
-# the terms of the under the Apache License, Version 2.0 (the "License”);
+# the terms of the under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
@@ -27,6 +27,7 @@ class TestConfigureERT(unittest.TestCase):
     def setUp(self):
         self.settings = Mock(Settings)
         self.settings.opsman_url = 'https://cf.example.com'
+        self.settings.region = 'nz-new-zealand-1'
         self.settings.opsman_user = 'admin'
         self.settings.pcf_input_opsmanageradminpassword = 'monkey-123'
         self.settings.stack_name = 'pcf-to-the-max-stack'
