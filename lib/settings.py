@@ -211,18 +211,17 @@ class Settings:
             service_name='ssm', region_name=self.region
         )
         parameters = self.paramater_store_keys
-        parameter_names = ["{}.{}".format(self.stack_name, p) for p in parameters]
-        for parameter_name_set in chunk(parameter_names, 10):
-            response = client.get_parameters(
-                Names=parameter_name_set,
-                WithDecryption=False
-            )
+        
+        ssm_response = client.get_parameters(
+            Names= [ "{}.SSMParameterJSON".format(self.stack_name) ],
+            WithDecryption=False
+        )
 
-            param_results = response.get("Parameters")
-            for result in param_results:
-                prefix = self.stack_name + "."
-                name = result['Name'].replace(prefix, "", 1)
-                self.parameters[name] = result['Value']
+        param_results = ssm_response.get("Parameters")
+        for results in param_results:
+            params = json.loads(results['Value'])
+            for param in params:
+                self.parameters[param] = params[param]               
 
     def describe_stack(self):
         self.input_parameters = {}
