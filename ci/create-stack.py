@@ -29,9 +29,11 @@ import yaml
 def select_random_region():
     with open("./templates/supported_regions.yml") as f:
         region_list = yaml.load(f).get('supported_regions')
+        region_list.remove("us-west-1") #our prod-ish stuff is in west-1, don't use that
 
     secure_random = random.SystemRandom()
     region = secure_random.choice(region_list)
+
     print("Stack will be created in {} to run integration".format(region))
     return region
 
