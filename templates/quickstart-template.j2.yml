@@ -5,6 +5,89 @@ Description: >
   This template will automatically deploy a reference architecture for the Pivotal Cloud Foundry stack.
   For a detailed guide on how to deploy this template, please read the instructions QS(qs-1ngltrcpf)
 
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Amazon EC2 Configuration
+        Parameters:
+        - PCFKeyPair
+        - NATInstanceType
+        - SSLCertificateARN
+        - ElbPrefix
+        - AllowHttpOnElb
+        - ForwardLogOutput
+      - Label:
+          default: Network and DNS Configuration
+        Parameters:
+        - OpsManagerIngress
+        - HostedZoneId
+        - Domain
+      - Label:
+          default: Pivotal Cloud Foundry Configuration
+        Parameters:
+        - NumberOfAZs
+        - SkipSSLValidation
+        - PivnetToken
+        - AdminEmail
+        - OpsManagerAdminPassword
+      - Label:
+          default: RDS
+        Parameters:
+        - RdsDBName
+        - RdsUsername
+        - RdsPassword
+      - Label:
+          default: AWS Quick Start Configuration
+        Parameters:
+        - QSS3BucketName
+        - QSS3KeyPrefix
+      - Label:
+          default: End User License Agreement
+        Parameters:
+        - AcceptEULA
+    ParameterLabels:
+      RdsDBName:
+        default: RDS DB Name
+      RdsUsername:
+        default: RDS Username
+      RdsPassword:
+        default: RDS Password
+      NumberOfAZs:
+        default: Number of Availability Zones
+      SkipSSLValidation:
+        default: Skip SSL Validation
+      PivnetToken:
+        default: Pivotal Network Token
+      AdminEmail:
+        default: Admin Email
+      OpsManagerAdminPassword:
+        default: Ops Manager Admin Password
+      OpsManagerIngress:
+        default: Ops Manager Ingress
+      HostedZoneId:
+        default: Route 53 Hosted Zone ID
+      Domain:
+        default: Domain
+      PCFKeyPair:
+        default: Keypair
+      NATInstanceType:
+        default: NAT Instance Type
+      SSLCertificateARN:
+        default: SSL Certificate ARN
+      ElbPrefix:
+        default: ELB Prefix
+      AllowHttpOnElb:
+        default: Allow HTTP on ELB
+      ForwardLogOutput:
+        default: Forward Log Output
+      QSS3BucketName:
+        default: Quick Start S3 Bucket Name
+      QSS3KeyPrefix:
+        default: Quick Start S3 Bucket Prefix
+      AcceptEULA:
+        default: Accept EULA
+
 Parameters:
   NATInstanceType:
     Type: String
@@ -25,27 +108,27 @@ Parameters:
   OpsManagerIngress:
     Type: String
     Default: 0.0.0.0/0
-    Description: CIDR range allowed to connect to Ops Manager instance
+    Description: CIDR range allowed to connect to Pivotal Ops Manager instance
   RdsDBName:
     Type: String
     MinLength: '4'
     Default: bosh
-    Description: BOSH database name
+    Description: Database name
   RdsUsername:
     Type: String
-    Description: BOSH database username
+    Description: Database username
   RdsPassword:
     Type: String
     NoEcho: 'true'
     MinLength: '8'
     AllowedPattern: "[\\w-_]*"
-    Description: BOSH database password
+    Description: Database password
   SSLCertificateARN:
     Type: String
     Description: ARN for pre-uploaded SSL certificate
   ElbPrefix:
     Type: String
-    Description: Prefix for the name of the ELBs generated. Required.
+    Description: Prefix for the name of the ELBs provisioned. (Required)
     MinLength: 1
     MaxLength: 19
   AllowHttpOnElb:
@@ -54,17 +137,17 @@ Parameters:
     AllowedValues:
     - 'true'
     - 'false'
-    Description: 'Allow HTTP traffic on PCF-ELB port 80. Default: true.'
+    Description: Allow HTTP traffic on PCF-ELB port 80.
   PivnetToken:
     Type: String
-    Description: Using the Pivnet CLI requires a valid Pivotal Network API token. See
+    Description: Pivotal Network token to accept EULA (requires registration). To generate a token, see
       https://network.pivotal.io/docs/api#how-to-authenticate
   AdminEmail:
     Type: String
     Description: Admin email used by mysql monitor, for example
   HostedZoneId:
     Type: AWS::Route53::HostedZone::Id
-    Description: Existing hosted zone to create DNS records under
+    Description: Existing hosted zone in which to create DNS records
   Domain:
     Type: String
     Description: Root or subdomain for all Pivotal Cloud Foundry DNS entries (e.g. - example.com or pcf.example.com). Must match hosted zone.
@@ -73,19 +156,19 @@ Parameters:
     NoEcho: 'true'
     MinLength: '14'
     AllowedPattern: "[\\w-_]*"
-    Description: Admin password to log on to OpsManager. At least 14 characters from the set of alphanumeric, dashes, and underscores.
+    Description: Admin password for Pivotal Ops Manager. At least 14 characters from the set of alphanumeric, dashes, and underscores.
   PCFKeyPair:
     Type: AWS::EC2::KeyPair::KeyName
-    Description: Select the SSH keypair to use for Ops Manager and all VMS in the deployment
+    Description: Select the SSH keypair to use for Pivotal Ops Manager and NAT instance
   NumberOfAZs:
     Type: Number
     AllowedValues: [1,2]
     Default: 1
-    Description: Select number of Avalaibility Zones (either 1 or 2)
+    Description: Select number of Availability Zones. This changes the deployment size. 2 is a HA deployment, with nearly double the number of VMs
   ForwardLogOutput:
     Description: |
-      When true, bootstrap logs are sent to 'CloudWatch Logs'. Critical for solving failures, but
-      potentially exposes secrets output to logs as part of the bootstrap process.
+      When true, installation logs are sent to 'CloudWatch Logs'. Critical for solving failures, but
+      potentially exposes secrets used during the bootstrap process.
     Type: String
     Default: 'true'
     AllowedValues:
@@ -93,7 +176,7 @@ Parameters:
     - 'false'
   SkipSSLValidation:
     Description: |
-      When true, SSL certificates are not validated. Not appropriate for a production environment.
+      When true, SSL certificates are not validated. *Not recommended for a production environment*
     Type: String
     AllowedValues:
     - 'true'
@@ -110,6 +193,14 @@ Parameters:
       Default: pivotal/cloudfoundry/latest/
       Description: S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).
       Type: String
+  AcceptEULA:
+    Description: Accept Pivotal EULA
+    Type: String
+    Default: 'No'
+    AllowedValues:
+    - 'No'
+    - 'Yes'
+
 Rules:
   KeyPairsNotEmpty:
     Assertions:
@@ -126,6 +217,13 @@ Rules:
           - {{supported_regions}}
           - !Ref AWS::Region
         AssertDescription: This Quick Start is only available in a subset of regions. {{supported_regions}}
+  AcceptEULARule:
+    Assertions:
+    - Assert:
+        Fn::Equals:
+        - !Ref AcceptEULA
+        - "Yes"
+      AssertDescription: Must accept the End User License Agreement for Pivotal Products
 Mappings:
   AMIMapping:
     {{ami_mapping | indent}}

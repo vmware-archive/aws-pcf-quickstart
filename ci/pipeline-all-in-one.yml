@@ -419,9 +419,11 @@ jobs:
       - github-release
   - put: quickstart-versioned-release
     params:
+      acl: public-read
       file: quickstart-github-release/quickstart-*.tgz
   - put: quickstart-latest-release-candidate
     params:
+      acl: public-read
       file: quickstart-github-release/quickstart-*.tgz
 
 - name: integration-test
