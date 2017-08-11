@@ -183,7 +183,7 @@ class Settings:
             service_name='ssm', region_name=self.region
         )
         ssm_response = client.get_parameter(
-            Names=["{}.SSMParameterJSON".format(self.stack_name)],
+            Name="{}.SSMParameterJSON".format(self.stack_name),
             WithDecryption=False
         )
 

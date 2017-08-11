@@ -232,6 +232,7 @@ Resources:
             Action:
               - "ssm:DescribeParameters"
               - "ssm:GetParameters"
+              - "ssm:GetParameter"
             Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}.*"
       PolicyName: !Sub ${AWS::StackName}-parameter-store
       Roles:
