@@ -38,7 +38,6 @@ Parameters:
     Type: String
     NoEcho: 'true'
     MinLength: '8'
-    Default: "ThisIsAPrettyWeakPassword"
     AllowedPattern: "[\\w-_]*"
     Description: BOSH database password
   SSLCertificateARN:
@@ -86,7 +85,7 @@ Parameters:
     NoEcho: 'true'
     MinLength: '14'
     AllowedPattern: "[\\w-_]*"
-    Description: Admin password to log on to OpsManager
+    Description: Admin password to log on to OpsManager. At least 14 characters from the set of alphanumeric, dashes, and underscores.
   PCFKeyPair:
     Type: AWS::EC2::KeyPair::KeyName
     Description: Select the SSH keypair to use for Ops Manager and all VMS in the deployment
@@ -273,8 +272,42 @@ Resources:
       Name: !Sub "${AWS::StackName}.SSMParameterJSON"
       Description: JSON Array of All SSM Passed Parameters
       Type: String
-      Value: !Sub
-        "{\"PcfRdsPassword\": \"${PCFBase.Outputs.PcfRdsPassword}\", \"PcfPublicSubnetId2\": \"${PCFBase.Outputs.PcfPublicSubnetId2}\", \"PcfElasticRuntimeS3PackagesBucket\": \"${PCFBase.Outputs.PcfElasticRuntimeS3PackagesBucket}\", \"PcfNumberOfAZs\": \"${NumberOfAZs}\", \"PcfPublicSubnetAvailabilityZone\": \"${PCFBase.Outputs.PcfPublicSubnetAvailabilityZone}\", \"PcfIamRole\": \"${PCFBase.Outputs.PcfIamRole}\", \"PcfElasticRuntimeS3ResourcesBucket\": \"${PCFBase.Outputs.PcfElasticRuntimeS3ResourcesBucket}\", \"PcfRdsPort\": \"${PCFBase.Outputs.PcfRdsPort}\", \"PcfOpsManagerS3Bucket\": \"${PCFBase.Outputs.PcfOpsManagerS3Bucket}\", \"PcfIamUserName\": \"${PCFBase.Outputs.PcfIamUserName}\", \"PcfPublicSubnetAvailabilityZone2\": \"${PCFBase.Outputs.PcfPublicSubnetAvailabilityZone2}\", \"PcfPrivateSubnetId\": \"${PCFBase.Outputs.PcfPrivateSubnetId}\", \"PcfIamUserAccessKey\": \"${PCFBase.Outputs.PcfIamUserAccessKey}\", \"PcfPublicSubnetId\": \"${PCFBase.Outputs.PcfPublicSubnetId}\", \"PcfRdsDBName\": \"${PCFBase.Outputs.PcfRdsDBName}\", \"PcfVmsSecurityGroupId\": \"${PCFBase.Outputs.PcfVmsSecurityGroupId}\", \"PcfElbTcpDnsName\": \"${PCFBase.Outputs.PcfElbTcpDnsName}\", \"PcfPrivateSubnet2AvailabilityZone\": \"${PCFBase.Outputs.PcfPrivateSubnet2AvailabilityZone}\", \"PcfWaitHandle\": \"${WaitHandle}\", \"PcfOpsManagerAdminPassword\": \"${OpsManagerAdminPassword}\", \"PcfRdsAddress\": \"${PCFBase.Outputs.PcfRdsAddress}\", \"PcfElbDnsName\": \"${PCFBase.Outputs.PcfElbDnsName}\", \"PcfOpsManagerInstanceIP\": \"${OpsManagerInstance.PublicIp}\", \"PcfPrivateSubnetAvailabilityZone\": \"${PCFBase.Outputs.PcfPrivateSubnetAvailabilityZone}\", \"PcfCustomResourceSQSQueueUrl\": \"${CustomResourceSQSQueue}\", \"PcfVpc\": \"${PCFBase.Outputs.PcfVpc}\", \"PcfElasticRuntimeS3DropletsBucket\": \"${PCFBase.Outputs.PcfElasticRuntimeS3DropletsBucket}\", \"PcfPrivateSubnet2Id\": \"${PCFBase.Outputs.PcfPrivateSubnet2Id}\", \"PcfIamUserSecretAccessKey\": \"${PCFBase.Outputs.PcfIamUserSecretAccessKey}\", \"PcfElbSshDnsName\": \"${PCFBase.Outputs.PcfElbSshDnsName}\", \"PcfElasticRuntimeS3BuildpacksBucket\": \"${PCFBase.Outputs.PcfElasticRuntimeS3BuildpacksBucket}\", \"PcfOpsManagerSecurityGroupId\": \"${PCFBase.Outputs.PcfOpsManagerSecurityGroupId}\", \"PcfRdsUsername\": \"${PCFBase.Outputs.PcfRdsUsername}\"}"
+      Value: !Sub |
+        {
+        "PcfRdsPassword": "${PCFBase.Outputs.PcfRdsPassword}",
+        "PcfPublicSubnetId2": "${PCFBase.Outputs.PcfPublicSubnetId2}",
+        "PcfElasticRuntimeS3PackagesBucket": "${PCFBase.Outputs.PcfElasticRuntimeS3PackagesBucket}",
+        "PcfNumberOfAZs": "${NumberOfAZs}",
+        "PcfPublicSubnetAvailabilityZone": "${PCFBase.Outputs.PcfPublicSubnetAvailabilityZone}",
+        "PcfIamRole": "${PCFBase.Outputs.PcfIamRole}",
+        "PcfElasticRuntimeS3ResourcesBucket": "${PCFBase.Outputs.PcfElasticRuntimeS3ResourcesBucket}",
+        "PcfRdsPort": "${PCFBase.Outputs.PcfRdsPort}",
+        "PcfOpsManagerS3Bucket": "${PCFBase.Outputs.PcfOpsManagerS3Bucket}",
+        "PcfIamUserName": "${PCFBase.Outputs.PcfIamUserName}",
+        "PcfPublicSubnetAvailabilityZone2": "${PCFBase.Outputs.PcfPublicSubnetAvailabilityZone2}",
+        "PcfPrivateSubnetId": "${PCFBase.Outputs.PcfPrivateSubnetId}",
+        "PcfIamUserAccessKey": "${PCFBase.Outputs.PcfIamUserAccessKey}",
+        "PcfPublicSubnetId": "${PCFBase.Outputs.PcfPublicSubnetId}",
+        "PcfRdsDBName": "${PCFBase.Outputs.PcfRdsDBName}",
+        "PcfVmsSecurityGroupId": "${PCFBase.Outputs.PcfVmsSecurityGroupId}",
+        "PcfElbTcpDnsName": "${PCFBase.Outputs.PcfElbTcpDnsName}",
+        "PcfPrivateSubnet2AvailabilityZone": "${PCFBase.Outputs.PcfPrivateSubnet2AvailabilityZone}",
+        "PcfWaitHandle": "${WaitHandle}",
+        "PcfOpsManagerAdminPassword": "${OpsManagerAdminPassword}",
+        "PcfRdsAddress": "${PCFBase.Outputs.PcfRdsAddress}",
+        "PcfElbDnsName": "${PCFBase.Outputs.PcfElbDnsName}",
+        "PcfOpsManagerInstanceIP": "${OpsManagerInstance.PublicIp}",
+        "PcfPrivateSubnetAvailabilityZone": "${PCFBase.Outputs.PcfPrivateSubnetAvailabilityZone}",
+        "PcfCustomResourceSQSQueueUrl": "${CustomResourceSQSQueue}",
+        "PcfVpc": "${PCFBase.Outputs.PcfVpc}",
+        "PcfElasticRuntimeS3DropletsBucket": "${PCFBase.Outputs.PcfElasticRuntimeS3DropletsBucket}",
+        "PcfPrivateSubnet2Id": "${PCFBase.Outputs.PcfPrivateSubnet2Id}",
+        "PcfIamUserSecretAccessKey": "${PCFBase.Outputs.PcfIamUserSecretAccessKey}",
+        "PcfElbSshDnsName": "${PCFBase.Outputs.PcfElbSshDnsName}",
+        "PcfElasticRuntimeS3BuildpacksBucket": "${PCFBase.Outputs.PcfElasticRuntimeS3BuildpacksBucket}",
+        "PcfOpsManagerSecurityGroupId": "${PCFBase.Outputs.PcfOpsManagerSecurityGroupId}",
+        "PcfRdsUsername": "${PCFBase.Outputs.PcfRdsUsername}"
+        }
   ## This is the End of our Secured Parameters
   ## This is the EC2 Ops Manager
   OpsManagerInstance:

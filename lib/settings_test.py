@@ -17,8 +17,10 @@
 
 import unittest
 
-from mock import patch, mock_open, Mock, MagicMock
-import settings, json
+from mock import patch, Mock
+
+import json
+import settings
 
 input_params = {
     'Stacks': [
@@ -52,6 +54,18 @@ input_params = {
         }
     ]
 }
+
+param_json_doc = """
+{
+  "PcfRdsPassword": "monkey123",
+  "PcfRdsUsername": "admin",
+  "PcfPrivateSubnetAvailabilityZone": "canada-1a",
+  "PcfPrivateSubnet2AvailabilityZone": "canada-1b",
+  "PcfOpsManagerAdminPassword": "monkey123",
+  "PcfNumberOfAZs": "1"
+}
+"""
+
 params_store_output = {
     'InvalidParameters': [],
     'ResponseMetadata': {
@@ -65,39 +79,11 @@ params_store_output = {
         'RequestId': '1234-5678',
         'HTTPStatusCode': 200
     },
-    'Parameters': [
-        {
-            'Type': 'String',
-            'Value': 'monkey123',
-            'Name': 'PcfRdsPassword'
-        },
-        {
-            'Type': 'String',
-            'Value': 'admin',
-            'Name': 'PcfRdsUsername'
-        },
-        {
-            'Type': 'String',
-            'Value': 'canada-1a',
-            'Name': 'PcfPrivateSubnetAvailabilityZone'
-        },
-        {
-            'Type': 'String',
-            'Value': 'canada-1b',
-            'Name': 'PcfPrivateSubnet2AvailabilityZone'
-        },
-        {
-            'Type': 'String',
-            'Value': 'monkey123',
-            'Name': 'PcfOpsManagerAdminPassword'
-        },
-        {
-            'Type': 'String',
-            'Value': '1',
-            'Name': 'PcfNumberOfAZs'
-        }
-
-    ]
+    'Parameter': {
+        "Name": "MyStack.SSMParameterJSON",
+        "Type": "String",
+        "Value": param_json_doc
+    }
 }
 
 
@@ -128,12 +114,6 @@ class TestSettings(unittest.TestCase):
 """
 
         mock_client_contructor = Mock()
-        settings.Settings.paramater_store_keys = [
-            "PcfPrivateSubnetAvailabilityZone",
-            "PcfPrivateSubnet2AvailabilityZone",
-            "PcfRdsUsername",
-            "PcfRdsPassword",
-        ]
 
         with patch('boto3.client', mock_client_contructor):
             with patch('settings.read_meta') as mock_read_meta:
@@ -144,10 +124,7 @@ class TestSettings(unittest.TestCase):
                     mock_client = Mock()
                     mock_client_contructor.return_value = mock_client
                     mock_client.describe_stacks.return_value = input_params
-                    mock_client.get_parameters.return_value = params_store_output
-                    # foo.describe_stacks.side_effect = [input_params]
-                    # foo.get_parameters.side_effect = [params_store_output]
-
+                    mock_client.get_parameter.return_value = params_store_output
 
                     self.settings = settings.Settings()
 
@@ -196,9 +173,13 @@ class TestSettings(unittest.TestCase):
     def test_parse_version_config(self):
         self.assertEqual(self.settings.ert_release_id, 5334)
         self.assertEqual(self.settings.ert_release_version, "1.10.8")
-        self.assertEqual(self.settings.ert_release_sha256,
-                         "70070bf22231d9971c97b8deb8c4cd5ba990d24101e5398d0ccc70778060dbea")
+        self.assertEqual(
+            self.settings.ert_release_sha256,
+            "70070bf22231d9971c97b8deb8c4cd5ba990d24101e5398d0ccc70778060dbea"
+        )
 
         self.assertEqual(self.settings.stemcell_release_version, "3363.20")
-        self.assertEqual(self.settings.stemcell_release_sha256,
-                         "ece6b9aaa4af20c180c446582bfa8e7d29681e2aac06c5d3d978a92c84432237")
+        self.assertEqual(
+            self.settings.stemcell_release_sha256,
+            "ece6b9aaa4af20c180c446582bfa8e7d29681e2aac06c5d3d978a92c84432237"
+        )

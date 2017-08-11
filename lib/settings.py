@@ -24,34 +24,6 @@ version_config_file_path = "/var/local/version_config.json"
 
 
 class Settings:
-    paramater_store_keys = [
-        "PcfElbDnsName",
-        "PcfIamUserAccessKey",
-        "PcfIamUserSecretAccessKey",
-        "PcfVpc",
-        "PcfVmsSecurityGroupId",
-        "PcfOpsManagerAdminPassword",
-        "PcfOpsManagerS3Bucket",
-        "PcfPrivateSubnetAvailabilityZone",
-        "PcfPrivateSubnet2AvailabilityZone",
-        "PcfPrivateSubnetId",
-        "PcfPrivateSubnet2Id",
-        "PcfPrivateSubnetAvailabilityZone",
-        "PcfPrivateSubnet2AvailabilityZone",
-        "PcfRdsAddress",
-        "PcfRdsUsername",
-        "PcfRdsPassword",
-        "PcfRdsPort",
-        "PcfElasticRuntimeS3BuildpacksBucket",
-        "PcfElasticRuntimeS3DropletsBucket",
-        "PcfElasticRuntimeS3PackagesBucket",
-        "PcfElasticRuntimeS3ResourcesBucket",
-        "PcfNumberOfAZs",
-        "PcfCustomResourceSQSQueueUrl",
-        "PcfWaitHandle",
-        "PcfOpsManagerInstanceIP"
-    ]
-
     def __init__(self):
         self.opsman_user = 'admin'
 
@@ -210,18 +182,15 @@ class Settings:
         client = boto3.client(
             service_name='ssm', region_name=self.region
         )
-        parameters = self.paramater_store_keys
-        
-        ssm_response = client.get_parameters(
-            Names= [ "{}.SSMParameterJSON".format(self.stack_name) ],
+        ssm_response = client.get_parameter(
+            Names=["{}.SSMParameterJSON".format(self.stack_name)],
             WithDecryption=False
         )
 
-        param_results = ssm_response.get("Parameters")
-        for results in param_results:
-            params = json.loads(results['Value'])
-            for param in params:
-                self.parameters[param] = params[param]               
+        json_param_document = ssm_response.get("Parameter")
+        params = json.loads(json_param_document['Value'])
+        for param_name in params:
+            self.parameters[param_name] = params[param_name]
 
     def describe_stack(self):
         self.input_parameters = {}
@@ -244,6 +213,7 @@ class Settings:
 
         self.stemcell_release_version = stemcell.get('version')
         self.stemcell_release_sha256 = stemcell.get('sha256')
+
 
 def read_version_config():
     with open(version_config_file_path) as version_config_file:
