@@ -6,7 +6,7 @@ See the docs (link todo) for account and launch pre-reqs.
 
 # Running
 
-1. Get the template `quickstart-template.yml` from https://github.com/cf-platform-eng/quickstart-pivotal-cloudfoundry/blob/develop/templates/
+1. Get the template `pivotal-cloudfoundry.template` from https://github.com/cf-platform-eng/quickstart-pivotal-cloudfoundry/blob/develop/templates/
 1. Create a new stack: https://console.aws.amazon.com/cloudformation by uploading the template above
 1. View the logs https://console.aws.amazon.com/cloudwatch/ (assuming `ForwardLogOutput` is set to `true`)
 1. The full run takes ~2.5 hours. Once the `MyCustomBOSH` resource is completed, you can view installation progress from `https://opsman.[template domain]`
@@ -27,9 +27,9 @@ python -m unittest discover -v -s ./lib -p '*_test.py'
 ## Running
 
 To launch the quickstart locally with different source code, do the following:
-* Get the instantiated out `quickstart-template.yml` from
+* Get the instantiated out `pivotal-cloudfoundry.template` from
     * https://github.com/cf-platform-eng/quickstart-pivotal-cloudfoundry/blob/develop/templates/
-* To make changes to the OpsManagerTemplate or CloudFoundryTemplate (`ops-manager.json` & `cloud-formation.json`)
+* To make changes to the OpsManagerTemplate or CloudFoundryTemplate (`ops-manager.template` & `cloud-formation.template`)
     1. Get them from https://github.com/cf-platform-eng/quickstart-pivotal-cloudfoundry/blob/develop/templates/
     1. upload them to an s3 bucket
     1. Make them public
