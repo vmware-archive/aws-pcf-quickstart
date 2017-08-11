@@ -36,7 +36,7 @@ resources:
   source:
     bucket: aws-pcf-quickstart-templates
     region_name: us-west-2
-    versioned_file: cloud-formation-rc.json
+    versioned_file: pivotal/cloudfoundry/latest/templates/cloud-formation.template
     access_key_id: {{s3_access_key_id}}
     secret_access_key: {{s3_secret_access_key}}
 
@@ -45,7 +45,7 @@ resources:
   source:
     bucket: aws-pcf-quickstart-templates
     region_name: us-west-2
-    versioned_file: ops-manager-rc.json
+    versioned_file: pivotal/cloudfoundry/latest/templates/ops-manager.template
     access_key_id: {{s3_access_key_id}}
     secret_access_key: {{s3_secret_access_key}}
 
@@ -54,7 +54,16 @@ resources:
   source:
     bucket: aws-pcf-quickstart-templates
     region_name: us-west-2
-    versioned_file: quickstart-template-rc.yml
+    versioned_file: pivotal/cloudfoundry/latest/templates/pivotal-cloudfoundry.template
+    access_key_id: {{s3_access_key_id}}
+    secret_access_key: {{s3_secret_access_key}}
+
+- name: quickstart-latest-release-candidate
+  type: s3
+  source:
+    bucket: aws-pcf-quickstart-templates
+    region_name: us-west-2
+    versioned_file: pivotal/cloudfoundry/latest/scripts/quickstart.tgz
     access_key_id: {{s3_access_key_id}}
     secret_access_key: {{s3_secret_access_key}}
 
@@ -162,15 +171,6 @@ resources:
     bucket: aws-pcf-quickstart-releases
     region_name: us-west-2
     regexp: quickstart-(.*).tgz
-    access_key_id: {{s3_access_key_id}}
-    secret_access_key: {{s3_secret_access_key}}
-
-- name: quickstart-latest-release-candidate
-  type: s3
-  source:
-    bucket: aws-pcf-quickstart-releases
-    region_name: us-west-2
-    versioned_file: quickstart-rc.tgz
     access_key_id: {{s3_access_key_id}}
     secret_access_key: {{s3_secret_access_key}}
 
@@ -473,6 +473,7 @@ jobs:
         AP_NORTHEAST_2_SSLCERTIFICATEARN: {{ap_northeast_2_sslcertificatearn}}
         AP_NORTHEAST_1_SSLCERTIFICATEARN: {{ap_northeast_1_sslcertificatearn}}
         AP_SOUTH_1_SSLCERTIFICATEARN: {{ap_south_1_sslcertificatearn}}
+        SA_EAST_1_SSLCERTIFICATEARN: {{sa_east_1_sslcertificatearn}}
       run:
         path: bash
         args:
@@ -481,7 +482,7 @@ jobs:
           # run create stack from the template before
           pushd quickstart-repo
           pip install -r requirements.txt
-          python ./ci/create-stack.py '../cloud-formation-outer-template-rc/quickstart-template-rc.yml'
+          python ./ci/create-stack.py '../cloud-formation-outer-template-rc/pivotal-cloudfoundry.template'
           popd
           cp quickstart-repo/stackid output/stackid
   - put: aws-pcf-concourse-state
@@ -602,10 +603,11 @@ jobs:
 
           cp -r aws-quickstart-repo/. aws-quickstart-repo-updated
 
-          cp quickstart-latest-release-candidate/quickstart-rc.tgz aws-quickstart-repo-updated/scripts/quickstart.tgz
-          cp cloud-formation-rc/cloud-formation-rc.json aws-quickstart-repo-updated/templates/cloud-formation.template
-          cp ops-manager-release-candiate/ops-manager-rc.json aws-quickstart-repo-updated/templates/ops-manager.template
-          cp cloud-formation-outer-template-rc/quickstart-template-rc.yml aws-quickstart-repo-updated/templates/pivotal-cloudfoundry.template
+          #todo: are these paths actually right? What about full path in s3
+          cp quickstart-latest-release-candidate/quickstart.tgz aws-quickstart-repo-updated/scripts/quickstart.tgz
+          cp cloud-formation-rc/cloud-formation.template aws-quickstart-repo-updated/templates/cloud-formation.template
+          cp ops-manager-release-candiate/ops-manager.template aws-quickstart-repo-updated/templates/ops-manager.template
+          cp cloud-formation-outer-template-rc/pivotal-cloudfoundry.template aws-quickstart-repo-updated/templates/pivotal-cloudfoundry.template
 
           pushd aws-quickstart-repo-updated
 

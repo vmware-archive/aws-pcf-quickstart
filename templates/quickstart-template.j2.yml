@@ -142,12 +142,12 @@ Resources:
         05RdsUsername: !Ref RdsUsername
         06RdsPassword: !Ref RdsPassword
         07SSLCertificateARN: !Ref SSLCertificateARN
-        08OpsManagerTemplate: !Sub: "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/ops-manager.template"
+        08OpsManagerTemplate: !Sub "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/ops-manager.template"
         09ElbPrefix: !Ref ElbPrefix
         10AllowHttpOnElb: !Ref AllowHttpOnElb
         11PivnetToken: !Ref PivnetToken
         12AdminEmail: !Ref AdminEmail
-      TemplateURL: !Sub: "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/cloud-formation.template"
+      TemplateURL: !Sub "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/cloud-formation.template"
   ## Custom resource stuff
   CustomResourceSQSQueue:
     Type: "AWS::SQS::Queue"
@@ -375,7 +375,7 @@ Resources:
       AWS::CloudFormation::Init:
         config:
           sources:
-            '/home/ubuntu': !Sub: "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/quickstart.tgz"
+            '/home/ubuntu': !Sub "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/quickstart.tgz"
           files:
             /home/ubuntu/scripts/awslogs.config:
               owner: ubuntu
