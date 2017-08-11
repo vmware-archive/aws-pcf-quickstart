@@ -46,7 +46,7 @@ def check_return_code(out, err, return_code, step_name):
         sys.exit(1)
 
 
-out, err, exit_code = accept_eula.accept_ert_eula(my_settings)
+out, err, exit_code = accept_eula.accept_eulas(my_settings)
 check_return_code(out, err, exit_code, 'accept_eula')
 
 exit_code = wait_for_dns.wait_for_dns(my_settings)

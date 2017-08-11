@@ -32,15 +32,33 @@ def check_eula_succeeded(returned):
     return result == EULAResult.SUCCESS
 
 
+def accept_eulas(my_settings: settings.Settings):
+    out, err, exit_code = accept_ert_eula(my_settings)
+    if exit_code != 0:
+        return out, err, exit_code
+    return accept_stemcell_eula(my_settings)
+
+
 def accept_ert_eula(my_settings: settings.Settings):
     response, result = util.exponential_backoff(
-        functools.partial(post_eula, my_settings, my_settings.ert_release_id),
+        functools.partial(post_eula, my_settings, "elastic-runtime", my_settings.ert_release_id),
         check_eula_succeeded
     )
     if result == EULAResult.SUCCESS:
         return "Success", "", 0
     else:
-        return "Failed to accept EULA; status code from Pivotal Network {}".format(response.status_code), "", 1
+        return "Failed to accept ERT EULA; status code from Pivotal Network {}".format(response.status_code), "", 1
+
+
+def accept_stemcell_eula(my_settings: settings.Settings):
+    response, result = util.exponential_backoff(
+        functools.partial(post_eula, my_settings, "stemcells", my_settings.stemcell_release_id),
+        check_eula_succeeded
+    )
+    if result == EULAResult.SUCCESS:
+        return "Success", "", 0
+    else:
+        return "Failed to accept stemcell EULA; status code from Pivotal Network {}".format(response.status_code), "", 1
 
 
 class EULAResult(enum.Enum):
@@ -49,9 +67,9 @@ class EULAResult(enum.Enum):
     RETRY = 2
 
 
-def post_eula(my_settings: settings.Settings, release_id: int):
+def post_eula(my_settings: settings.Settings, slug: str, release_id: int):
     response = requests.post(
-        url='https://network.pivotal.io/api/v2/products/elastic-runtime/releases/{}/eula_acceptance'.format(release_id),
+        url='https://network.pivotal.io/api/v2/products/{}/releases/{}/eula_acceptance'.format(slug, release_id),
         headers={
             'Authorization': 'Token {}'.format(my_settings.pcf_input_pivnettoken),
             'Accept': 'application/json',
@@ -65,5 +83,3 @@ def post_eula(my_settings: settings.Settings, release_id: int):
     elif response.status_code >= 500:
         return response, EULAResult.RETRY
     return response, EULAResult.FAILURE
-
-

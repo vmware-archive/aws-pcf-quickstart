@@ -211,6 +211,7 @@ class Settings:
         self.ert_release_version = ert.get('version')
         self.ert_release_sha256 = ert.get('sha256')
 
+        self.stemcell_release_id = stemcell.get('id')
         self.stemcell_release_version = stemcell.get('version')
         self.stemcell_release_sha256 = stemcell.get('sha256')
 

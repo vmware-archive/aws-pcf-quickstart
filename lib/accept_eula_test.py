@@ -54,7 +54,7 @@ class TestAcceptEULA(unittest.TestCase):
         response.status_code = 200
         mock_requests_post.return_value = response
 
-        result = accept_eula.post_eula(self.settings, 1337)
+        result = accept_eula.post_eula(self.settings, 'my-awesome-product', 1337)
 
         self.assertEqual(result[0], response)
         self.assertEqual(result[1], accept_eula.EULAResult.SUCCESS)
@@ -67,7 +67,7 @@ class TestAcceptEULA(unittest.TestCase):
         }
 
         mock_requests_post.assert_called_with(
-            url='https://network.pivotal.io/api/v2/products/elastic-runtime/releases/1337/eula_acceptance',
+            url='https://network.pivotal.io/api/v2/products/my-awesome-product/releases/1337/eula_acceptance',
             headers=expected_headers
         )
 
@@ -77,7 +77,7 @@ class TestAcceptEULA(unittest.TestCase):
         response.status_code = 401
         mock_requests_post.return_value = response
 
-        result = accept_eula.post_eula(self.settings, 1337)
+        result = accept_eula.post_eula(self.settings, 'my-awesome-product', 1337)
 
         self.assertEqual(result[0], response)
         self.assertEqual(result[1], accept_eula.EULAResult.FAILURE)
@@ -88,7 +88,7 @@ class TestAcceptEULA(unittest.TestCase):
         response.status_code = 502
         mock_requests_post.return_value = response
 
-        result = accept_eula.post_eula(self.settings, 1337)
+        result = accept_eula.post_eula(self.settings, 'my-awesome-product', 1337)
 
         self.assertEqual(result[0], response)
         self.assertEqual(result[1], accept_eula.EULAResult.RETRY)
@@ -112,6 +112,31 @@ class TestAcceptEULA(unittest.TestCase):
         self.assertEqual(mock_sleep.call_count, 2)
         self.assertEqual(result[0], "Success")
         self.assertEqual(result[2], 0)
+
+    @patch('accept_eula.accept_stemcell_eula')
+    @patch('accept_eula.accept_ert_eula')
+    def test_accept_eulas_accepts_both_eulas(self, mock_accept_ert_eula, mock_accept_stemcell_eula):
+        mock_accept_ert_eula.return_value = ("foo", "bar", 0)
+        mock_accept_stemcell_eula.return_value = ("bar", "baz", 42)
+
+        out, err, exit_code = accept_eula.accept_eulas(self.settings)
+
+        self.assertEqual(mock_accept_ert_eula.call_count, 1)
+        self.assertEqual(mock_accept_stemcell_eula.call_count, 1)
+
+        self.assertEqual(out, "bar")
+        self.assertEqual(err, "baz")
+        self.assertEqual(exit_code, 42)
+
+    @patch('accept_eula.accept_stemcell_eula')
+    @patch('accept_eula.accept_ert_eula')
+    def test_accept_eulas_elevates_error(self, mock_accept_ert_eula, mock_accept_stemcell_eula):
+        mock_accept_ert_eula.return_value = ("foo", "bar", 1)
+
+        accept_eula.accept_eulas(self.settings)
+
+        self.assertEqual(mock_accept_ert_eula.call_count, 1)
+        self.assertEqual(mock_accept_stemcell_eula.call_count, 0)
 
 
 metadata_json = """
