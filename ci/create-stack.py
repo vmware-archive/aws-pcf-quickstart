@@ -68,6 +68,7 @@ def create_stack(template_path: str, aws_region: str):
         {"ParameterKey": "AdminEmail", "ParameterValue": "noreply@pivotal.io"},
         {"ParameterKey": "PivnetToken", "ParameterValue": pivnettoken},
         {"ParameterKey": "SkipSSLValidation", "ParameterValue": "true"},
+        {"ParameterKey": "AcceptEULA", "ParameterValue": "Yes"},
         {"ParameterKey": "QSS3BucketName", "ParameterValue": "aws-pcf-quickstart-templates"}
     ]
 
