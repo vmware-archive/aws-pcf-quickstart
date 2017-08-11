@@ -43,21 +43,9 @@ Parameters:
   SSLCertificateARN:
     Type: String
     Description: ARN for pre-uploaded SSL certificate
-  OpsManagerTemplate:
-    Type: String
-    Default: https://s3.amazonaws.com/quickstart-reference/pivotal/cloudfoundry/latest/templates/ops-manager.json
-    Description: S3 Location for OpsManager CloudFormation Template
-  CloudFoundryTemplate:
-    Type: String
-    Default: https://s3.amazonaws.com/quickstart-reference/pivotal/cloudfoundry/latest/templates/cloud-formation.json
-    Description: S3 Location for Base Deployment CloudFormation Template
-  PCFAutomationRelease:
-    Type: String
-    Default: https://s3.amazonaws.com/quickstart-reference/pivotal/cloudfoundry/latest/scripts/quickstart.tgz
-    Description: S3 Location for Base Deployment CloudFormation Template
   ElbPrefix:
     Type: String
-    Description: 'Prefix for the name of the ELBs generated. Required.'
+    Description: Prefix for the name of the ELBs generated. Required.
     MinLength: 1
     MaxLength: 19
   AllowHttpOnElb:
@@ -110,6 +98,18 @@ Parameters:
     AllowedValues:
     - 'true'
     - 'false'
+  QSS3BucketName:
+      AllowedPattern: "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$"
+      ConstraintDescription: Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).
+      Default: quickstart-reference
+      Description: S3 bucket name for the Quick Start assets. This string can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).
+      Type: String
+  QSS3KeyPrefix:
+      AllowedPattern: "^[0-9a-zA-Z-/]*$"
+      ConstraintDescription: Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).
+      Default: pivotal/cloudfoundry/latest/
+      Description: S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).
+      Type: String
 Rules:
   KeyPairsNotEmpty:
     Assertions:
@@ -142,12 +142,12 @@ Resources:
         05RdsUsername: !Ref RdsUsername
         06RdsPassword: !Ref RdsPassword
         07SSLCertificateARN: !Ref SSLCertificateARN
-        08OpsManagerTemplate: !Ref OpsManagerTemplate
+        08OpsManagerTemplate: !Sub: "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/ops-manager.template"
         09ElbPrefix: !Ref ElbPrefix
         10AllowHttpOnElb: !Ref AllowHttpOnElb
         11PivnetToken: !Ref PivnetToken
         12AdminEmail: !Ref AdminEmail
-      TemplateURL: !Ref CloudFoundryTemplate
+      TemplateURL: !Sub: "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/cloud-formation.template"
   ## Custom resource stuff
   CustomResourceSQSQueue:
     Type: "AWS::SQS::Queue"
@@ -374,7 +374,7 @@ Resources:
       AWS::CloudFormation::Init:
         config:
           sources:
-            '/home/ubuntu': !Ref PCFAutomationRelease
+            '/home/ubuntu': !Sub: "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/quickstart.tgz"
           files:
             /home/ubuntu/scripts/awslogs.config:
               owner: ubuntu
