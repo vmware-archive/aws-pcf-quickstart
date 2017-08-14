@@ -114,7 +114,7 @@ while stack_status == 'DELETE_IN_PROGRESS':
 
 print("Final status {}".format(stack_status))
 if stack_status != 'DELETE_COMPLETE':
-    print("Stack deletion did not complete, exiting...")
+    print("Stack deletion did not complete, exiting. Final status was {}".format(stack_status))
     sys.exit(1)
 else:
     sys.exit(0)
