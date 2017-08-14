@@ -64,7 +64,7 @@ Metadata:
       OpsManagerAdminPassword:
         default: Ops Manager Admin Password
       OpsManagerIngress:
-        default: Ops Manager Ingress
+        default: Ops Manager & Bootstrap Ingress
       HostedZoneId:
         default: Route 53 Hosted Zone ID
       Domain:
@@ -107,8 +107,7 @@ Parameters:
     Description: Select the Instance Type to use for the NAT vm
   OpsManagerIngress:
     Type: String
-    Default: 0.0.0.0/0
-    Description: CIDR range allowed to connect to Pivotal Ops Manager instance
+    Description: CIDR range allowed to connect to Pivotal Ops Manager and Bootstrap instances
   RdsDBName:
     Type: String
     MinLength: '4'

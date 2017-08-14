@@ -62,6 +62,7 @@ def create_stack(template_path: str, aws_region: str):
         {"ParameterKey": "SSLCertificateARN", "ParameterValue": sslcertificatearn},
         {"ParameterKey": "OpsManagerAdminPassword", "ParameterValue": password},
         {"ParameterKey": "Domain", "ParameterValue": domain},
+        {"ParameterKey": "OpsManagerIngress", "ParameterValue": "0.0.0.0/0"},
         {"ParameterKey": "ElbPrefix", "ParameterValue": "my-pcf-elb"},
         {"ParameterKey": "PCFKeyPair", "ParameterValue": pcfkeypair},
         {"ParameterKey": "RdsUsername", "ParameterValue": "admin"},
