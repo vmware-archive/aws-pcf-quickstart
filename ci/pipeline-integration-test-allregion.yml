@@ -46,18 +46,110 @@ resources:
     access_key_id: {{s3_access_key_id}}
     secret_access_key: {{s3_secret_access_key}}
 
-
-- name: really_often
-  type: time
+- name: aws-pcf-pointless-semver
+  type: s3
   source:
-    interval: 10s
+    bucket: aws-pcf-concourse-state
+    region_name: us-west-2
+    versioned_file: pointless_semver
+    access_key_id: {{aws_admin_key_id}}
+    secret_access_key: {{aws_admin_secret_access_key}}
+
+- name: cancel-us-east-1-resource
+  type: s3
+  source:
+    bucket: aws-pcf-concourse-state
+    region_name: us-west-2
+    versioned_file: cancel-us-east-1-state/state
+    access_key_id: {{aws_admin_key_id}}
+    secret_access_key: {{aws_admin_secret_access_key}}
+
+- name: cancel-us-west-1-resource
+  type: s3
+  source:
+    bucket: aws-pcf-concourse-state
+    region_name: us-west-2
+    versioned_file: cancel-us-west-1-state/state
+    access_key_id: {{aws_admin_key_id}}
+    secret_access_key: {{aws_admin_secret_access_key}}
+
+- name: cancel-us-west-2-resource
+  type: s3
+  source:
+    bucket: aws-pcf-concourse-state
+    region_name: us-west-2
+    versioned_file: cancel-us-west-2-state/state
+    access_key_id: {{aws_admin_key_id}}
+    secret_access_key: {{aws_admin_secret_access_key}}
+
+- name: cancel-eu-central-1-resource
+  type: s3
+  source:
+    bucket: aws-pcf-concourse-state
+    region_name: us-west-2
+    versioned_file: cancel-eu-central-1-state/state
+    access_key_id: {{aws_admin_key_id}}
+    secret_access_key: {{aws_admin_secret_access_key}}
+
+- name: cancel-eu-west-1-resource
+  type: s3
+  source:
+    bucket: aws-pcf-concourse-state
+    region_name: us-west-2
+    versioned_file: cancel-eu-west-1-state/state
+    access_key_id: {{aws_admin_key_id}}
+    secret_access_key: {{aws_admin_secret_access_key}}
+
+- name: cancel-ap-southeast-1-resource
+  type: s3
+  source:
+    bucket: aws-pcf-concourse-state
+    region_name: us-west-2
+    versioned_file: cancel-ap-southeast-1-state/state
+    access_key_id: {{aws_admin_key_id}}
+    secret_access_key: {{aws_admin_secret_access_key}}
+
+- name: cancel-ap-southeast-2-resource
+  type: s3
+  source:
+    bucket: aws-pcf-concourse-state
+    region_name: us-west-2
+    versioned_file: cancel-ap-southeast-2-state/state
+    access_key_id: {{aws_admin_key_id}}
+    secret_access_key: {{aws_admin_secret_access_key}}
+
+- name: cancel-ap-northeast-1-resource
+  type: s3
+  source:
+    bucket: aws-pcf-concourse-state
+    region_name: us-west-2
+    versioned_file: cancel-ap-northeast-1-state/state
+    access_key_id: {{aws_admin_key_id}}
+    secret_access_key: {{aws_admin_secret_access_key}}
+
+- name: cancel-ap-northeast-2-resource
+  type: s3
+  source:
+    bucket: aws-pcf-concourse-state
+    region_name: us-west-2
+    versioned_file: cancel-ap-northeast-2-state/state
+    access_key_id: {{aws_admin_key_id}}
+    secret_access_key: {{aws_admin_secret_access_key}}
+
+- name: cancel-sa-east-1-resource
+  type: s3
+  source:
+    bucket: aws-pcf-concourse-state
+    region_name: us-west-2
+    versioned_file: cancel-sa-east-1-state/state
+    access_key_id: {{aws_admin_key_id}}
+    secret_access_key: {{aws_admin_secret_access_key}}
 
 templates:
 params: &some_values
   AWS_CF_PASSWORD: {{aws_cf_password}}
   AWS_CF_DOMAIN: {{aws_cf_domain}}
   AWS_CF_HOSTEDZONEID: {{aws_cf_hostedzoneid}}
-  AWS_CF_SSLCERTIFICATEARN: {{aws_cf_sslcertificatearn}}
   AWS_CF_PCFKEYPAIR: {{aws_cf_pcfkeypair}}
   AWS_CF_PIVNETTOKEN: {{aws_cf_pivnettoken}}
   AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
@@ -66,21 +158,25 @@ params: &some_values
   US_EAST_2_SSLCERTIFICATEARN: {{us_east_2_sslcertificatearn}}
   US_WEST_2_SSLCERTIFICATEARN: {{us_west_2_sslcertificatearn}}
   CA_CENTRAL_1_SSLCERTIFICATEARN: {{ca_central_1_sslcertificatearn}}
-  EU_WEST_1_SSLCERTIFICATEARN: {{eu_west_1_sslcertificatearn}}
   EU_CENTRAL_1_SSLCERTIFICATEARN: {{eu_central_1_sslcertificatearn}}
+  EU_WEST_1_SSLCERTIFICATEARN: {{eu_west_1_sslcertificatearn}}
   EU_WEST_2_SSLCERTIFICATEARN: {{eu_west_2_sslcertificatearn}}
   AP_SOUTHEAST_1_SSLCERTIFICATEARN: {{ap_southeast_1_sslcertificatearn}}
   AP_SOUTHEAST_2_SSLCERTIFICATEARN: {{ap_southeast_2_sslcertificatearn}}
   AP_NORTHEAST_2_SSLCERTIFICATEARN: {{ap_northeast_2_sslcertificatearn}}
   AP_NORTHEAST_1_SSLCERTIFICATEARN: {{ap_northeast_1_sslcertificatearn}}
   AP_SOUTH_1_SSLCERTIFICATEARN: {{ap_south_1_sslcertificatearn}}
-
+  SA_EAST_1_SSLCERTIFICATEARN: {{sa_east_1_sslcertificatearn}}
 
 run: &run
   path: bash
   args:
   - -exc
   - |
+    if [ $(cat cancel-check/state) == true ]; then
+      exit 1
+    fi
+
     pushd quickstart-repo
     pip install -r requirements.txt
     python ./ci/create-stack.py '../cloud-formation-outer-template-rc/quickstart-template-rc.yml' ${AWS_INTEGRATION_REGION}
@@ -147,23 +243,171 @@ delete_task: &delete_task
         python ./ci/delete-stack.py
         popd
 
+toggle_cancel_task: &toggle_cancel_task
+  task: toggle_cancel_task
+  config:
+    platform: linux
+    image_resource:
+      type: docker-image
+      source:
+        repository: cfplatformeng/quickstart-ci
+    outputs:
+    - name: output
+    params:
+      AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
+      AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}
+    run:
+      path: bash
+      args:
+      - -exc
+      - |
+        echo "true" > output/state
+
+
+job_trigger: &job_trigger
+  get: aws-pcf-pointless-semver
+  trigger: true
+  passed: [manual-trigger]
+
 
 jobs:
 - name: manual-trigger
   plan:
-  - get: really_often
+  - get: aws-pcf-pointless-semver
+    params:
+      bump: patch
+  - task: toggle
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: cfplatformeng/quickstart-ci
+      outputs:
+      - name: output
+      params:
+        AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
+        AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}
+      run:
+        path: bash
+        args:
+        - -exc
+        - |
+          echo "false" > output/state
+  - put: aws-pcf-pointless-semver
+    params:
+      file: aws-pcf-pointless-semver/version
+  - put: cancel-us-east-1-resource
+    params:
+      file: output/state
+  - put: cancel-us-west-1-resource
+    params:
+      file: output/state
+  - put: cancel-us-west-2-resource
+    params:
+      file: output/state
+  - put: cancel-eu-central-1-resource
+    params:
+      file: output/state
+  - put: cancel-eu-west-1-resource
+    params:
+      file: output/state
+  - put: cancel-ap-southeast-1-resource
+    params:
+      file: output/state
+  - put: cancel-ap-southeast-2-resource
+    params:
+      file: output/state
+  - put: cancel-ap-northeast-1-resource
+    params:
+      file: output/state
+  - put: cancel-ap-northeast-2-resource
+    params:
+      file: output/state
+  - put: cancel-sa-east-1-resource
+    params:
+      file: output/state
+
+- name: cancel-us-east-1
+  plan:
+  - *toggle_cancel_task
+  - put: cancel-us-east-1-resource
+    params:
+      file: output/state
+
+- name: cancel-us-west-1
+  plan:
+  - *toggle_cancel_task
+  - put: cancel-us-west-1-resource
+    params:
+      file: output/state
+
+- name: cancel-us-west-2
+  plan:
+  - *toggle_cancel_task
+  - put: cancel-us-west-2-resource
+    params:
+      file: output/state
+
+- name: cancel-eu-central-1
+  plan:
+  - *toggle_cancel_task
+  - put: cancel-eu-central-1-resource
+    params:
+      file: output/state
+
+- name: cancel-eu-west-1
+  plan:
+  - *toggle_cancel_task
+  - put: cancel-eu-west-1-resource
+    params:
+      file: output/state
+
+- name: cancel-ap-southeast-1
+  plan:
+  - *toggle_cancel_task
+  - put: cancel-ap-southeast-1-resource
+    params:
+      file: output/state
+
+- name: cancel-ap-southeast-2
+  plan:
+  - *toggle_cancel_task
+  - put: cancel-ap-southeast-2-resource
+    params:
+      file: output/state
+
+- name: cancel-ap-northeast-1
+  plan:
+  - *toggle_cancel_task
+  - put: cancel-ap-northeast-1-resource
+    params:
+      file: output/state
+
+- name: cancel-ap-northeast-2
+  plan:
+  - *toggle_cancel_task
+  - put: cancel-ap-northeast-2-resource
+    params:
+      file: output/state
+
+- name: cancel-sa-east-1
+  plan:
+  - *toggle_cancel_task
+  - put: cancel-sa-east-1-resource
+    params:
+      file: output/state
 
 - name: us-east-1
   serial_groups: [integration]
   plan:
-  - get: really_often
-    trigger: true
-    passed: [manual-trigger]
+  - *job_trigger
   - get: quickstart-repo
   - get: quickstart-latest-release-candidate
   - get: cloud-formation-outer-template-rc
   - get: aws-pcf-concourse-state
   - get: om-release
+  - get: cancel-us-east-1-resource
   - task: integration-test
     config:
       platform: linux
@@ -171,11 +415,13 @@ jobs:
       inputs:
       - name: quickstart-repo
       - name: cloud-formation-outer-template-rc
+      - name: cancel-us-east-1-resource
+        path: cancel-check
       outputs:
       - name: output
       params:
         <<: *some_values
-        AWS_INTEGRATION_REGION: "us-east-1"
+        AWS_INTEGRATION_REGION: us-east-1
       run: *run
   - put: aws-pcf-concourse-state
     params:
@@ -183,16 +429,15 @@ jobs:
   - *check_task
   - *delete_task
 
-- name: us-east-2
+- name: us-west-1
   serial_groups: [integration]
   plan:
-  - get: really_often
-    trigger: true
-    passed: [manual-trigger]
+  - *job_trigger
   - get: quickstart-repo
   - get: quickstart-latest-release-candidate
   - get: cloud-formation-outer-template-rc
   - get: om-release
+  - get: cancel-us-west-1-resource
   - task: integration-test
     config:
       platform: linux
@@ -200,11 +445,13 @@ jobs:
       inputs:
       - name: quickstart-repo
       - name: cloud-formation-outer-template-rc
+      - name: cancel-us-west-1-resource
+        path: cancel-check
       outputs:
       - name: output
       params:
         <<: *some_values
-        AWS_INTEGRATION_REGION: "us-east-2"
+        AWS_INTEGRATION_REGION: us-west-1
       run: *run
   - put: aws-pcf-concourse-state
     params:
@@ -215,13 +462,12 @@ jobs:
 - name: us-west-2
   serial_groups: [integration]
   plan:
-  - get: really_often
-    trigger: true
-    passed: [manual-trigger]
+  - *job_trigger
   - get: quickstart-repo
   - get: quickstart-latest-release-candidate
   - get: cloud-formation-outer-template-rc
   - get: om-release
+  - get: cancel-us-west-2-resource
   - task: integration-test
     config:
       platform: linux
@@ -229,40 +475,13 @@ jobs:
       inputs:
       - name: quickstart-repo
       - name: cloud-formation-outer-template-rc
+      - name: cancel-us-west-2-resource
+        path: cancel-check
       outputs:
       - name: output
       params:
         <<: *some_values
-        AWS_INTEGRATION_REGION: "us-west-2"
-      run: *run
-  - put: aws-pcf-concourse-state
-    params:
-      file: output/stackid
-  - *check_task
-  - *delete_task
-
-- name: ca-central-1
-  serial_groups: [integration]
-  plan:
-  - get: really_often
-    trigger: true
-    passed: [manual-trigger]
-  - get: quickstart-repo
-  - get: quickstart-latest-release-candidate
-  - get: cloud-formation-outer-template-rc
-  - get: om-release
-  - task: integration-test
-    config:
-      platform: linux
-      <<: *image_resource
-      inputs:
-      - name: quickstart-repo
-      - name: cloud-formation-outer-template-rc
-      outputs:
-      - name: output
-      params:
-        <<: *some_values
-        AWS_INTEGRATION_REGION: "ca-central-1"
+        AWS_INTEGRATION_REGION: us-west-2
       run: *run
   - put: aws-pcf-concourse-state
     params:
@@ -273,13 +492,12 @@ jobs:
 - name: eu-central-1
   serial_groups: [integration]
   plan:
-  - get: really_often
-    trigger: true
-    passed: [manual-trigger]
+  - *job_trigger
   - get: quickstart-repo
   - get: quickstart-latest-release-candidate
   - get: cloud-formation-outer-template-rc
   - get: om-release
+  - get: cancel-eu-central-1-resource
   - task: integration-test
     config:
       platform: linux
@@ -287,11 +505,13 @@ jobs:
       inputs:
       - name: quickstart-repo
       - name: cloud-formation-outer-template-rc
+      - name: cancel-eu-central-1-resource
+        path: cancel-check
       outputs:
       - name: output
       params:
         <<: *some_values
-        AWS_INTEGRATION_REGION: "eu-central-1"
+        AWS_INTEGRATION_REGION: eu-central-1
       run: *run
   - put: aws-pcf-concourse-state
     params:
@@ -302,13 +522,12 @@ jobs:
 - name: eu-west-1
   serial_groups: [integration]
   plan:
-  - get: really_often
-    trigger: true
-    passed: [manual-trigger]
+  - *job_trigger
   - get: quickstart-repo
   - get: quickstart-latest-release-candidate
   - get: cloud-formation-outer-template-rc
   - get: om-release
+  - get: cancel-eu-west-1-resource
   - task: integration-test
     config:
       platform: linux
@@ -316,40 +535,13 @@ jobs:
       inputs:
       - name: quickstart-repo
       - name: cloud-formation-outer-template-rc
+      - name: cancel-eu-west-1-resource
+        path: cancel-check
       outputs:
       - name: output
       params:
         <<: *some_values
-        AWS_INTEGRATION_REGION: "eu-west-1"
-      run: *run
-  - put: aws-pcf-concourse-state
-    params:
-      file: output/stackid
-  - *check_task
-  - *delete_task
-
-- name: eu-west-2
-  serial_groups: [integration]
-  plan:
-  - get: really_often
-    trigger: true
-    passed: [manual-trigger]
-  - get: quickstart-repo
-  - get: quickstart-latest-release-candidate
-  - get: cloud-formation-outer-template-rc
-  - get: om-release
-  - task: integration-test
-    config:
-      platform: linux
-      <<: *image_resource
-      inputs:
-      - name: quickstart-repo
-      - name: cloud-formation-outer-template-rc
-      outputs:
-      - name: output
-      params:
-        <<: *some_values
-        AWS_INTEGRATION_REGION: "eu-west-2"
+        AWS_INTEGRATION_REGION: eu-west-1
       run: *run
   - put: aws-pcf-concourse-state
     params:
@@ -360,13 +552,12 @@ jobs:
 - name: ap-southeast-1
   serial_groups: [integration]
   plan:
-  - get: really_often
-    trigger: true
-    passed: [manual-trigger]
+  - *job_trigger
   - get: quickstart-repo
   - get: quickstart-latest-release-candidate
   - get: cloud-formation-outer-template-rc
   - get: om-release
+  - get: cancel-ap-southeast-1-resource
   - task: integration-test
     config:
       platform: linux
@@ -374,11 +565,13 @@ jobs:
       inputs:
       - name: quickstart-repo
       - name: cloud-formation-outer-template-rc
+      - name: cancel-ap-southeast-1-resource
+        path: cancel-check
       outputs:
       - name: output
       params:
         <<: *some_values
-        AWS_INTEGRATION_REGION: "ap-southeast-1"
+        AWS_INTEGRATION_REGION: ap-southeast-1
       run: *run
   - put: aws-pcf-concourse-state
     params:
@@ -389,13 +582,12 @@ jobs:
 - name: ap-southeast-2
   serial_groups: [integration]
   plan:
-  - get: really_often
-    trigger: true
-    passed: [manual-trigger]
+  - *job_trigger
   - get: quickstart-repo
   - get: quickstart-latest-release-candidate
   - get: cloud-formation-outer-template-rc
   - get: om-release
+  - get: cancel-ap-southeast-2-resource
   - task: integration-test
     config:
       platform: linux
@@ -403,11 +595,13 @@ jobs:
       inputs:
       - name: quickstart-repo
       - name: cloud-formation-outer-template-rc
+      - name: cancel-ap-southeast-2-resource
+        path: cancel-check
       outputs:
       - name: output
       params:
         <<: *some_values
-        AWS_INTEGRATION_REGION: "ap-southeast-2"
+        AWS_INTEGRATION_REGION: ap-southeast-2
       run: *run
   - put: aws-pcf-concourse-state
     params:
@@ -418,13 +612,12 @@ jobs:
 - name: ap-northeast-1
   serial_groups: [integration]
   plan:
-  - get: really_often
-    trigger: true
-    passed: [manual-trigger]
+  - *job_trigger
   - get: quickstart-repo
   - get: quickstart-latest-release-candidate
   - get: cloud-formation-outer-template-rc
   - get: om-release
+  - get: cancel-ap-northeast-1-resource
   - task: integration-test
     config:
       platform: linux
@@ -432,11 +625,13 @@ jobs:
       inputs:
       - name: quickstart-repo
       - name: cloud-formation-outer-template-rc
+      - name: cancel-ap-northeast-1-resource
+        path: cancel-check
       outputs:
       - name: output
       params:
         <<: *some_values
-        AWS_INTEGRATION_REGION: "ap-northeast-1"
+        AWS_INTEGRATION_REGION: ap-northeast-1
       run: *run
   - put: aws-pcf-concourse-state
     params:
@@ -447,13 +642,12 @@ jobs:
 - name: ap-northeast-2
   serial_groups: [integration]
   plan:
-  - get: really_often
-    trigger: true
-    passed: [manual-trigger]
+  - *job_trigger
   - get: quickstart-repo
   - get: quickstart-latest-release-candidate
   - get: cloud-formation-outer-template-rc
   - get: om-release
+  - get: cancel-ap-northeast-2-resource
   - task: integration-test
     config:
       platform: linux
@@ -461,11 +655,13 @@ jobs:
       inputs:
       - name: quickstart-repo
       - name: cloud-formation-outer-template-rc
+      - name: cancel-ap-northeast-2-resource
+        path: cancel-check
       outputs:
       - name: output
       params:
         <<: *some_values
-        AWS_INTEGRATION_REGION: "ap-northeast-2"
+        AWS_INTEGRATION_REGION: ap-northeast-2
       run: *run
   - put: aws-pcf-concourse-state
     params:
@@ -473,16 +669,15 @@ jobs:
   - *check_task
   - *delete_task
 
-- name: ap-south-1
+- name: sa-east-1
   serial_groups: [integration]
   plan:
-  - get: really_often
-    trigger: true
-    passed: [manual-trigger]
+  - *job_trigger
   - get: quickstart-repo
   - get: quickstart-latest-release-candidate
   - get: cloud-formation-outer-template-rc
   - get: om-release
+  - get: cancel-sa-east-1-resource
   - task: integration-test
     config:
       platform: linux
@@ -490,16 +685,17 @@ jobs:
       inputs:
       - name: quickstart-repo
       - name: cloud-formation-outer-template-rc
+      - name: cancel-sa-east-1-resource
+        path: cancel-check
       outputs:
       - name: output
       params:
         <<: *some_values
-        AWS_INTEGRATION_REGION: "ap-south-1"
+        AWS_INTEGRATION_REGION: sa-east-1
       run: *run
   - put: aws-pcf-concourse-state
     params:
       file: output/stackid
   - *check_task
   - *delete_task
-
 
