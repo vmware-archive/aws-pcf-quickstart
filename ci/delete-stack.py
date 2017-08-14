@@ -15,11 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import boto3
+import json
 import os
+import sys
+import time
+
+import boto3
 import botocore
 import botocore.exceptions
-import json
 
 aws_access_key_id = os.environ['AWS_ACCESS_KEY_ID']
 aws_secret_access_key = os.environ['AWS_SECRET_ACCESS_KEY']
@@ -73,6 +76,13 @@ def delete_bucket(bucket_name: str):
             raise e
 
 
+def describe_stack_status(cloudformation_client, stack_id):
+    describe_response = cloudformation_client.describe_stacks(StackName=stack_id)
+    stack = describe_response.get("Stacks")[0]
+
+    return stack.get('StackStatus')
+
+
 with open('../aws-pcf-concourse-state/stackid', 'r') as file:
     stack_metadata = json.loads(file.read())
     stack_id = stack_metadata['stack_id']
@@ -95,3 +105,16 @@ for bucket in buckets:
 
 print("Deleting stack {}".format(stack_id))
 cf_client.delete_stack(StackName=stack_id)
+
+stack_status = describe_stack_status(cf_client, stack_id)
+while stack_status == 'DELETE_IN_PROGRESS':
+    time.sleep(60)
+    stack_status = describe_stack_status(cf_client, stack_id)
+    print("Checking status got {}".format(stack_status))
+
+print("Final status {}".format(stack_status))
+if stack_status != 'DELETE_COMPLETE':
+    print("Stack deletion did not complete, exiting...")
+    sys.exit(1)
+else:
+    sys.exit(0)
