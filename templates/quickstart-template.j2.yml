@@ -31,6 +31,7 @@ Metadata:
         - PivnetToken
         - AdminEmail
         - OpsManagerAdminPassword
+        - CompanyName
       - Label:
           default: RDS
         Parameters:
@@ -87,6 +88,8 @@ Metadata:
         default: Quick Start S3 Bucket Prefix
       AcceptEULA:
         default: Accept EULA
+      CompanyName:
+        default: Custom Branding Company Name
 
 Parameters:
   NATInstanceType:
@@ -199,6 +202,11 @@ Parameters:
     AllowedValues:
     - 'No'
     - 'Yes'
+  CompanyName:
+    Description: Custom Branding Company Name for Apps Manager
+    Type: String
+    Default: 'PCF Quickstart'
+
 
 Rules:
   KeyPairsNotEmpty:
@@ -404,7 +412,8 @@ Resources:
         "PcfElbSshDnsName": "${PCFBase.Outputs.PcfElbSshDnsName}",
         "PcfElasticRuntimeS3BuildpacksBucket": "${PCFBase.Outputs.PcfElasticRuntimeS3BuildpacksBucket}",
         "PcfOpsManagerSecurityGroupId": "${PCFBase.Outputs.PcfOpsManagerSecurityGroupId}",
-        "PcfRdsUsername": "${PCFBase.Outputs.PcfRdsUsername}"
+        "PcfRdsUsername": "${PCFBase.Outputs.PcfRdsUsername}",
+        "PcfCompanyName": "${CompanyName}"
         }
   ## This is the End of our Secured Parameters
   ## This is the EC2 Ops Manager

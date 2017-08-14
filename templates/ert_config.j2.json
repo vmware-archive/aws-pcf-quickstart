@@ -191,7 +191,7 @@
     }
   },
   ".push-apps-manager.company_name": {
-    "value": "PCF Quickstart"
+    "value": "{{pcf_companyname}}"
   },
   ".uaa.service_provider_key_credentials": {
     "value": {

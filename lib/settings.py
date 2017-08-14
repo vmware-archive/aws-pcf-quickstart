@@ -131,6 +131,10 @@ class Settings:
         return self.parameters["PcfCustomResourceSQSQueueUrl"]
 
     @property
+    def pcf_pcfcompanyname(self):
+        return self.parameters["PcfCompanyName"]
+
+    @property
     def pcf_pcfwaithandle(self):
         return self.parameters["PcfWaitHandle"]
 

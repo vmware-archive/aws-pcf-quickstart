@@ -106,6 +106,7 @@ def configure_ert_config(my_settings: Settings):
         "pcf_elastic_runtime_s3_resources_bucket": my_settings.pcf_elasticruntimes3resourcesbucket,
         "pcf_iam_access_key_id": my_settings.pcf_iamuseraccesskey,
         "pcf_iam_secret_access_key": my_settings.pcf_iamusersecretaccesskey,
+        "pcf_companyname": my_settings.pcf_pcfcompanyname,
         "s3_endpoint": my_settings.get_s3_endpoint(),
         "s3_region": my_settings.region,
         "cert": cert.replace("\n", "\\n"),
