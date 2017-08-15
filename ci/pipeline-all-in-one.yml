@@ -31,7 +31,7 @@ resources:
     username: {{github_user_name}}
     password: {{github_access_token}}
 
-- name: cloud-formation-rc
+- name: cloud-formation-template-alpha
   type: s3
   source:
     bucket: aws-pcf-quickstart-templates
@@ -40,7 +40,7 @@ resources:
     access_key_id: {{s3_access_key_id}}
     secret_access_key: {{s3_secret_access_key}}
 
-- name: ops-manager-release-candiate
+- name: ops-manager-template-alpha
   type: s3
   source:
     bucket: aws-pcf-quickstart-templates
@@ -49,7 +49,7 @@ resources:
     access_key_id: {{s3_access_key_id}}
     secret_access_key: {{s3_secret_access_key}}
 
-- name: cloud-formation-outer-template-rc
+- name: pivotal-cloudfoundry-template-alpha
   type: s3
   source:
     bucket: aws-pcf-quickstart-templates
@@ -58,7 +58,7 @@ resources:
     access_key_id: {{s3_access_key_id}}
     secret_access_key: {{s3_secret_access_key}}
 
-- name: quickstart-latest-release-candidate
+- name: quickstart-scripts-alpha
   type: s3
   source:
     bucket: aws-pcf-quickstart-templates
@@ -165,15 +165,6 @@ resources:
     username: {{github_user_name}}
     password: {{github_access_token}}
 
-- name: quickstart-versioned-release
-  type: s3
-  source:
-    bucket: aws-pcf-quickstart-releases
-    region_name: us-west-2
-    regexp: quickstart-(.*).tgz
-    access_key_id: {{s3_access_key_id}}
-    secret_access_key: {{s3_secret_access_key}}
-
 jobs:
 - name: unit-test
   plan:
@@ -239,17 +230,17 @@ jobs:
     params:
       file: output/packer-result-*.json
 
-- name: upload-inner-template-rcs
+- name: upload-inner-template-alpha
   plan:
   - get: quickstart-repo
     trigger: true
     passed:
       - unit-test
-  - put: cloud-formation-rc
+  - put: cloud-formation-template-alpha
     params:
       file: quickstart-repo/cloudformation/cloud-formation.json
       acl: public-read
-  - put: ops-manager-release-candiate
+  - put: ops-manager-template-alpha
     params:
       file: quickstart-repo/cloudformation/ops-manager.json
       acl: public-read
@@ -295,7 +286,7 @@ jobs:
     params:
       file: output/ami-mapping-*.json
 
-- name: instantiate-outer-template-rc
+- name: instantiate-outer-template-alpha
   plan:
   - get: quickstart-repo
     trigger: true
@@ -333,10 +324,10 @@ jobs:
           pip install jinja2 PyYAML
           python3 ci/instantiate-quickstart-template.py
           popd
-          cp quickstart-repo/cloudformation/quickstart-template-rc.yml output
-  - put: cloud-formation-outer-template-rc
+          cp quickstart-repo/cloudformation/pivotal-cloudfoundry.template output
+  - put: pivotal-cloudfoundry-template-alpha
     params:
-      file: output/quickstart-template-rc.yml
+      file: output/pivotal-cloudfoundry.template
       acl: public-read
 
 - name: github-release
@@ -410,7 +401,7 @@ jobs:
       globs:
       - output/quickstart-*.tgz
 
-- name: build-quickstart-rc
+- name: build-quickstart-alpha
   plan:
   - get: version
     passed:
@@ -419,11 +410,7 @@ jobs:
     trigger: true
     passed:
       - github-release
-  - put: quickstart-versioned-release
-    params:
-      acl: public-read
-      file: quickstart-github-release/quickstart-*.tgz
-  - put: quickstart-latest-release-candidate
+  - put: quickstart-scripts-alpha
     params:
       acl: public-read
       file: quickstart-github-release/quickstart-*.tgz
@@ -434,15 +421,15 @@ jobs:
     trigger: false
     passed:
       - github-release
-      - upload-inner-template-rcs
-  - get: quickstart-latest-release-candidate
+      - upload-inner-template-alpha
+  - get: quickstart-scripts-alpha
     trigger: false
     passed:
-    - build-quickstart-rc
-  - get: cloud-formation-outer-template-rc
+    - build-quickstart-alpha
+  - get: pivotal-cloudfoundry-template-alpha
     trigger: false
     passed:
-    - instantiate-outer-template-rc
+    - instantiate-outer-template-alpha
   - task: integration-test
     config:
       platform: linux
@@ -453,7 +440,7 @@ jobs:
           tag: "3"
       inputs:
       - name: quickstart-repo
-      - name: cloud-formation-outer-template-rc
+      - name: pivotal-cloudfoundry-template-alpha
       outputs:
       - name: output
       params:
@@ -486,7 +473,7 @@ jobs:
           # run create stack from the template before
           pushd quickstart-repo
           pip install -r requirements.txt
-          python ./ci/create-stack.py '../cloud-formation-outer-template-rc/pivotal-cloudfoundry.template'
+          python ./ci/create-stack.py '../pivotal-cloudfoundry-template-alpha/pivotal-cloudfoundry.template'
           popd
           cp quickstart-repo/stackid output/stackid
   - put: aws-pcf-concourse-state
@@ -567,17 +554,17 @@ jobs:
     passed:
     - integration-test
   - get: aws-quickstart-repo
-  - get: quickstart-latest-release-candidate #python code
+  - get: quickstart-scripts-alpha #python code
     trigger: true
     passed:
       - integration-test
-  - get: cloud-formation-rc
+  - get: cloud-formation-template-alpha
     passed:
-    - upload-inner-template-rcs
-  - get: ops-manager-release-candiate
+    - upload-inner-template-alpha
+  - get: ops-manager-template-alpha
     passed:
-    - upload-inner-template-rcs
-  - get: cloud-formation-outer-template-rc
+    - upload-inner-template-alpha
+  - get: pivotal-cloudfoundry-template-alpha
     trigger: true
     passed:
     - integration-test
@@ -591,10 +578,10 @@ jobs:
       inputs:
       - name: quickstart-repo
       - name: aws-quickstart-repo
-      - name: quickstart-latest-release-candidate
-      - name: cloud-formation-rc
-      - name: ops-manager-release-candiate
-      - name: cloud-formation-outer-template-rc
+      - name: quickstart-scripts-alpha
+      - name: cloud-formation-template-alpha
+      - name: ops-manager-template-alpha
+      - name: pivotal-cloudfoundry-template-alpha
       outputs:
       - name: aws-quickstart-repo-updated
       params: {}
@@ -610,10 +597,10 @@ jobs:
           cp -r aws-quickstart-repo/. aws-quickstart-repo-updated
 
           #todo: are these paths actually right? What about full path in s3
-          cp quickstart-latest-release-candidate/quickstart.tgz aws-quickstart-repo-updated/scripts/quickstart.tgz
-          cp cloud-formation-rc/cloud-formation.template aws-quickstart-repo-updated/templates/cloud-formation.template
-          cp ops-manager-release-candiate/ops-manager.template aws-quickstart-repo-updated/templates/ops-manager.template
-          cp cloud-formation-outer-template-rc/pivotal-cloudfoundry.template aws-quickstart-repo-updated/templates/pivotal-cloudfoundry.template
+          cp quickstart-scripts-alpha/quickstart.tgz aws-quickstart-repo-updated/scripts/quickstart.tgz
+          cp cloud-formation-template-alpha/cloud-formation.template aws-quickstart-repo-updated/templates/cloud-formation.template
+          cp ops-manager-template-alpha/ops-manager.template aws-quickstart-repo-updated/templates/ops-manager.template
+          cp pivotal-cloudfoundry-template-alpha/pivotal-cloudfoundry.template aws-quickstart-repo-updated/templates/pivotal-cloudfoundry.template
 
           pushd aws-quickstart-repo-updated
 

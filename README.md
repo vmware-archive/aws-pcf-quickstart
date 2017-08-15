@@ -5,10 +5,20 @@ Launch PCF on AWS with a single click.
 See the docs (link todo) for account and launch pre-reqs.
 
 # Running
+To run it without any template or code changes:
 
-1. Get the template `pivotal-cloudfoundry.template` from https://github.com/cf-platform-eng/quickstart-pivotal-cloudfoundry/blob/develop/templates/
-1. Create a new stack: https://console.aws.amazon.com/cloudformation by uploading the template above
-1. View the logs https://console.aws.amazon.com/cloudwatch/ (assuming `ForwardLogOutput` is set to `true`)
+1. Create an s3 bucket. This would be set as `Quick Start S3 Bucket Name`
+1. Get the templates from  https://github.com/cf-platform-eng/quickstart-pivotal-cloudfoundry/blob/develop/templates/ and copy to 
+    * `s3://pivotal/cloudfoundry/latest/templates/cloud-formation.template`
+    * `s3://pivotal/cloudfoundry/latest/templates/ops-manager.template`
+    * Make templates public
+1. Get the `quickstart.tgz` from https://github.com/cf-platform-eng/quickstart-pivotal-cloudfoundry/blob/develop/scripts/ and copy to   
+    * `s3://pivotal/cloudfoundry/latest/scripts/quickstart.tgz`
+    * Make `quickstart.tgz` public
+1. Locally download the template `pivotal-cloudfoundry.template` from https://github.com/cf-platform-eng/quickstart-pivotal-cloudfoundry/blob/develop/templates/
+1. Create a new stack: https://console.aws.amazon.com/cloudformation by uploading the template above.
+1. Be sure to toggle `ForwardLogOutput` to `true` in development, to get feedback on changes in the event of failure
+    * View the logs https://console.aws.amazon.com/cloudwatch/ (assuming `ForwardLogOutput` is set to `true`)
 1. The full run takes ~2.5 hours. Once the `MyCustomBOSH` resource is completed, you can view installation progress from `https://opsman.[template domain]`
 
 # Dev
@@ -24,9 +34,19 @@ Run the unit tests with
 python -m unittest discover -v -s ./lib -p '*_test.py'
 ```
 
-## Running
+### Running with Custom Code
 
-To launch the quickstart locally with different source code, do the following:
+1. Download the linux release of `om` from https://github.com/pivotal-cf/om/releases, move it to `./bin/om`, and `chmod +x ./bin/om`
+1. Download the linux release of `pivnet` from https://github.com/pivotal-cf/pivnet-cli/releases, move it to `./bin/pivnet`, and `chmod +x ./bin/pivnet`
+1. vendor the dependencies
+    * `pip download --no-binary :all: --dest vendor -r requirements.txt`
+1. tar up the repo with
+    * `tar -czvf aws-quickstart.tgz aws-quickstart`
+1. Follow the running instructions, using your customized `quickstart.tgz`
+
+### Running with Custom Templates
+
+To launch the locally with different templates
 * Get the instantiated out `pivotal-cloudfoundry.template` from
     * https://github.com/cf-platform-eng/quickstart-pivotal-cloudfoundry/blob/develop/templates/
 * To make changes to the OpsManagerTemplate or CloudFoundryTemplate (`ops-manager.template` & `cloud-formation.template`)
@@ -35,14 +55,6 @@ To launch the quickstart locally with different source code, do the following:
     1. Make them public
     1. When filling out the CloudFormation params, set OpsManagerTemplate / CloudFoundryTemplate locations to these new s3 urls 
 * To use different quickstart code
-    1. Download the linux release of `om` from https://github.com/pivotal-cf/om/releases, move it to `./bin/om`, and `chmod +x ./bin/om`
-    1. Download the linux release of `pivnet` from https://github.com/pivotal-cf/pivnet-cli/releases, move it to `./bin/pivnet`, and `chmod +x ./bin/pivnet`
-    1. vendor the dependencies
-        * `pip download --no-binary :all: --dest vendor -r requirements.txt`
-    1. tar up the repo with
-        * `tar -czvf aws-quickstart.tgz aws-quickstart`
-    1. upload `aws-quickstart.tgz` to s3, make it public, and set `PCFAutomationRelease` to the new s3 url
-* Be sure to toggle `ForwardLogOutput` to `true`, to get feedback on changes in the event of failure
 
 ## Pull requests
 ### Template

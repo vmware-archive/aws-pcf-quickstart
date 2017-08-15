@@ -67,5 +67,5 @@ context = {
     "supported_regions": supported_regions_yaml
 }
 
-with open("cloudformation/quickstart-template-rc.yml", 'w') as template_file:
+with open("cloudformation/pivotal-cloudfoundry.template", 'w') as template_file:
     template_file.write(quickstart_template.render(context))
