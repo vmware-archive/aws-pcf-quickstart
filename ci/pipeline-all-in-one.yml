@@ -301,7 +301,7 @@ jobs:
     params:
       globs:
         - '*.yml'
-  - task: build-release
+  - task: instantiate-outer-template
     config:
       platform: linux
       image_resource:
@@ -330,7 +330,7 @@ jobs:
       file: output/pivotal-cloudfoundry.template
       acl: public-read
 
-- name: github-release
+- name: build-quickstart-alpha
   plan:
   - get: pivnet-release
   - get: om-release
@@ -342,9 +342,6 @@ jobs:
         - ci/*.yml
     passed:
       - unit-test
-  - get: version
-    params:
-      bump: patch
   - get: ert-tile
     trigger: true
     params:
@@ -361,7 +358,6 @@ jobs:
       - name: pivnet-release
       - name: om-release
       - name: quickstart-repo
-      - name: version
       - name: ert-tile
       outputs:
       - name: output
@@ -390,40 +386,19 @@ jobs:
           popd
 
           mkdir -p output
-          tar -czvf output/quickstart-`cat version/version`.tgz quickstart
-  - put: version
-    params:
-      file: version/version
-  - put: quickstart-github-release
-    params:
-      name: version/version
-      tag: version/version
-      globs:
-      - output/quickstart-*.tgz
-
-- name: build-quickstart-alpha
-  plan:
-  - get: version
-    passed:
-      - github-release
-  - get: quickstart-github-release
-    trigger: true
-    passed:
-      - github-release
+          tar -czvf output/quickstart.tgz quickstart
   - put: quickstart-scripts-alpha
     params:
       acl: public-read
-      file: quickstart-github-release/quickstart-*.tgz
+      file: output/quickstart.tgz
 
 - name: integration-test
   plan:
   - get: quickstart-repo
     trigger: false
     passed:
-      - github-release
       - upload-inner-template-alpha
   - get: quickstart-scripts-alpha
-    trigger: false
     passed:
     - build-quickstart-alpha
   - get: pivotal-cloudfoundry-template-alpha
@@ -547,6 +522,52 @@ jobs:
           python ./ci/delete-stack.py
           popd
 
+
+- name: github-release
+  plan:
+  - get: quickstart-repo
+    trigger: true
+    passed:
+    - integration-test
+  - get: pivotal-cloudfoundry-template-alpha
+    trigger: true
+    passed:
+    - integration-test
+  - get: quickstart-scripts-alpha
+    passed:
+    - integration-test
+  - get: version
+    params:
+      bump: patch
+  - task: add-version-to-filename
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: cfplatformeng/quickstart-ci
+      inputs:
+      - name: quickstart-scripts-alpha
+      - name: version
+      outputs:
+      - name: output
+      params:
+      run:
+        path: bash
+        args:
+        - -exc
+        - |
+          cp quickstart-scripts-alpha/quickstart.tgz output/quickstart-`cat version/version`.tgz
+  - put: version
+    params:
+      file: version/version
+  - put: quickstart-github-release
+    params:
+      name: version/version
+      tag: version/version
+      globs:
+      - output/quickstart-*.tgz
+
 - name: commit-and-pr-aws-quickstart-repo
   plan:
   - get: quickstart-repo
@@ -554,8 +575,7 @@ jobs:
     passed:
     - integration-test
   - get: aws-quickstart-repo
-  - get: quickstart-scripts-alpha #python code
-    trigger: true
+  - get: quickstart-scripts-alpha
     passed:
       - integration-test
   - get: cloud-formation-template-alpha
