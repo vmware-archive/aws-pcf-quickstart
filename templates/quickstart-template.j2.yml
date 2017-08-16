@@ -446,7 +446,11 @@ Resources:
     CreationPolicy:
       ResourceSignal:
         Timeout: PT30M
-    DependsOn: OpsManagerInstance
+    DependsOn:
+    - OpsManagerInstance
+    - PCFEmitLogsPolicy
+    - PCFParameterStorePolicy
+    - PCFDescribeStackPolicy
     Properties:
       ImageId: !FindInMap [AMIMapping, !Ref "AWS::Region", "bootstrap"]
       InstanceType: t2.micro

@@ -12,6 +12,13 @@ resource_types:
     repository: cholick/concourse-webpage-resource
     tag: latest
 
+- name: slack-notification
+  type: docker-image
+  source:
+    repository: cfcommunity/slack-notification-resource
+    tag: latest
+
+
 resources:
 - name: quickstart-repo
   type: git
@@ -164,6 +171,12 @@ resources:
     file: quickstart_release_version
     username: {{github_user_name}}
     password: {{github_access_token}}
+
+- name: slack-alert
+  type: slack-notification
+  source:
+    url: {{slack_hook}}
+
 
 jobs:
 - name: unit-test
@@ -451,6 +464,36 @@ jobs:
           python ./ci/create-stack.py '../pivotal-cloudfoundry-template-alpha/pivotal-cloudfoundry.template'
           popd
           cp quickstart-repo/stackid output/stackid
+    on_failure:
+      aggregate:
+        - put: slack-alert
+          params:
+            icon_emoji: ":sad_panda:"
+            username: Concourse CI
+            channel: "#amazon"
+            text: "Integration test failed"
+        - task: delete-buckets
+          config:
+            inputs:
+            - name: quickstart-repo
+            platform: linux
+            image_resource:
+              type: docker-image
+              source:
+                repository: python
+                tag: "3"
+            params:
+              AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
+              AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}
+            run:
+              path: bash
+              args:
+              - -exc
+              - |
+                pushd quickstart-repo
+                pip install boto3
+                python ./ci/delete-buckets.py
+                popd
   - put: aws-pcf-concourse-state
     params:
       file: output/stackid
@@ -521,7 +564,30 @@ jobs:
           pip install -r requirements.txt
           python ./ci/delete-stack.py
           popd
-
+    ensure:
+      aggregate:
+        - task: delete-buckets
+          config:
+            inputs:
+            - name: quickstart-repo
+            platform: linux
+            image_resource:
+              type: docker-image
+              source:
+                repository: python
+                tag: "3"
+            params:
+              AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
+              AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}
+            run:
+              path: bash
+              args:
+              - -exc
+              - |
+                pushd quickstart-repo
+                pip install boto3
+                python ./ci/delete-buckets.py
+                popd
 
 - name: github-release
   plan:
