@@ -36,7 +36,7 @@ def test_exit_code_success(exit_code):
     return exit_code == 0
 
 
-def check_return_code(out, err, return_code, step_name):
+def check_cr_return_code(out, err, return_code, step_name):
     print("Ran: {}; exit code: {}".format(step_name, exit_code))
     if return_code != 0:
         util.exponential_backoff(
@@ -45,33 +45,41 @@ def check_return_code(out, err, return_code, step_name):
         )
         sys.exit(1)
 
+def check_waitcondition_return_code(out, err, return_code, step_name):
+    print("Ran: {}; exit code: {}".format(step_name, exit_code))
+    if return_code != 0:
+        util.exponential_backoff(
+            functools.partial(wait_condition.report_failure, my_settings, out),
+            test_exit_code_success
+        )
+        sys.exit(1)
 
 out, err, exit_code = accept_eula.accept_eulas(my_settings)
-check_return_code(out, err, exit_code, 'accept_eula')
+check_cr_return_code(out, err, exit_code, 'accept_eula')
 
 exit_code = wait_for_dns.wait_for_dns(my_settings)
-check_return_code("", "", exit_code, 'wait_for_dns')
+check_cr_return_code("", "", exit_code, 'wait_for_dns')
 
 out, err, exit_code = om_manager.config_opsman_auth(my_settings)
-check_return_code(out, err, exit_code, 'config_opsman_auth')
+check_cr_return_code(out, err, exit_code, 'config_opsman_auth')
 
 out, err, exit_code = configure_opsman_director.configure_opsman_director(my_settings)
-check_return_code(out, err, exit_code, 'configure_opsman_director')
+check_cr_return_code(out, err, exit_code, 'configure_opsman_director')
 out, err, exit_code = om_manager.apply_changes(my_settings)
-check_return_code(out, err, exit_code, 'apply_changes')
+check_cr_return_code(out, err, exit_code, 'apply_changes')
 
 sqs.report_cr_creation_success(my_settings, 'MyCustomBOSH')
 
 out, err, exit_code = download_and_import.download_assets(my_settings, asset_path)
-check_return_code(out, err, exit_code, 'download_assets')
+check_waitcondition_return_code(out, err, exit_code, 'download_assets')
 out, err, exit_code = download_and_import.upload_assets(my_settings, asset_path)
-check_return_code(out, err, exit_code, 'upload_assets')
+check_waitcondition_return_code(out, err, exit_code, 'upload_assets')
 out, err, exit_code = download_and_import.upload_stemcell(my_settings, asset_path)
-check_return_code(out, err, exit_code, 'upload_stemcell')
+check_waitcondition_return_code(out, err, exit_code, 'upload_stemcell')
 
 out, err, exit_code = configure_ert.configure_ert(my_settings)
-check_return_code(out, err, exit_code, 'configure_ert')
+check_waitcondition_return_code(out, err, exit_code, 'configure_ert')
 out, err, exit_code = om_manager.apply_changes(my_settings)
-check_return_code(out, err, exit_code, 'apply_changes')
+check_waitcondition_return_code(out, err, exit_code, 'apply_changes')
 
 wait_condition.report_success(my_settings, "Successfully deployed Elastic Runtime")

@@ -37,12 +37,12 @@ def check_status(password, opsman, identifier):
         print("curling opsman status failed")
         sys.exit(p.returncode)
 
-    settings = json.loads(out)
+    installations = json.loads(out)
 
-    for setting in settings['installations']:
-        status = [a for a in setting['additions'] if a['identifier'] == identifier]
+    for installation in installations['installations']:
+        status = [a for a in installation['additions'] if a['identifier'] == identifier]
         if len(status) > 0:
-            return setting['status']
+            return installation['status']
 
     return None
 
