@@ -1590,12 +1590,6 @@
     "PcfIamUserName": {
       "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfIamUserName" ]}
     },
-    "PcfIamUserAccessKey": {
-      "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfIamUserAccessKey" ]}
-    },
-    "PcfIamUserSecretAccessKey": {
-      "Value": { "Fn::GetAtt": [ "OpsManStack", "Outputs.PcfIamUserSecretAccessKey" ]}
-    },
     "PcfOpsManagerS3Bucket": {
       "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfOpsManagerS3Bucket" ]}
     },

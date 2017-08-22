@@ -472,13 +472,6 @@
         "Policies": []
       }
     },
-    "PcfIamUserAccessKey": {
-      "Type": "AWS::IAM::AccessKey",
-      "DependsOn": "PcfIamUser",
-      "Properties": {
-        "UserName": {"Ref": "PcfIamUser"}
-      }
-    },
     "PcfOpsManagerSecurityGroup": {
       "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
@@ -746,12 +739,6 @@
     "PcfIamUserName": {
       "Value": {"Ref": "PcfIamUser"}
     },
-    "PcfIamUserAccessKey": {
-      "Value": {"Ref": "PcfIamUserAccessKey"}
-    },
-    "PcfIamUserSecretAccessKey": {
-      "Value": { "Fn::GetAtt": [ "PcfIamUserAccessKey", "SecretAccessKey"]}
-    },
     "PcfIamInstanceProfile": {
       "Value": {"Ref": "PcfIamInstanceProfile"}
     },
@@ -802,10 +789,6 @@
     "PcfRdsUsername": {
       "Condition": "CreateRDS",
       "Value": {"Ref": "05RdsUsername"}
-    },
-    "PcfRdsPassword": {
-      "Condition": "CreateRDS",
-      "Value": {"Ref": "06RdsPassword"}
     },
     "PcfRdsDBName": {
       "Condition": "CreateRDS",
