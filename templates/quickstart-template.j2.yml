@@ -313,7 +313,7 @@ Resources:
   PcfIamUserAccessKey:
     Type: AWS::IAM::AccessKey
     Properties:
-      UserName: !Ref PCFBase.Outputs.PcfIamUserName
+      UserName: !GetAtt PCFBase.Outputs.PcfIamUserName
 
   ## This Policy is for Allowing the OpsManager EC2 Instance access to the Describe stack and
   ## Stored Parameters.
