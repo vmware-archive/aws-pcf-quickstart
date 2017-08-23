@@ -1,4 +1,11 @@
 ---
+resource_types:
+
+- name: slack-notification
+  type: docker-image
+  source:
+    repository: cfcommunity/slack-notification-resource
+    tag: latest
 
 resources:
 - name: quickstart-repo
@@ -28,21 +35,21 @@ resources:
     access_key_id: {{aws_admin_key_id}}
     secret_access_key: {{aws_admin_secret_access_key}}
 
-- name: quickstart-latest-release-candidate
-  type: s3
-  source:
-    bucket: aws-pcf-quickstart-releases
-    region_name: us-west-2
-    versioned_file: quickstart-rc.tgz
-    access_key_id: {{s3_access_key_id}}
-    secret_access_key: {{s3_secret_access_key}}
-
-- name: cloud-formation-outer-template-rc
+- name: quickstart-scripts-alpha
   type: s3
   source:
     bucket: aws-pcf-quickstart-templates
     region_name: us-west-2
-    versioned_file: quickstart-template-rc.yml
+    versioned_file: pivotal/cloudfoundry/latest/scripts/quickstart.tgz
+    access_key_id: {{s3_access_key_id}}
+    secret_access_key: {{s3_secret_access_key}}
+
+- name: pivotal-cloudfoundry-template-alpha
+  type: s3
+  source:
+    bucket: aws-pcf-quickstart-templates
+    region_name: us-west-2
+    versioned_file: pivotal/cloudfoundry/latest/templates/pivotal-cloudfoundry.template
     access_key_id: {{s3_access_key_id}}
     secret_access_key: {{s3_secret_access_key}}
 
@@ -145,6 +152,12 @@ resources:
     access_key_id: {{aws_admin_key_id}}
     secret_access_key: {{aws_admin_secret_access_key}}
 
+- name: slack-alert
+  type: slack-notification
+  source:
+    url: {{slack_hook}}
+
+
 templates:
 params: &some_values
   AWS_CF_PASSWORD: {{aws_cf_password}}
@@ -179,9 +192,40 @@ run: &run
 
     pushd quickstart-repo
     pip install -r requirements.txt
-    python ./ci/create-stack.py '../cloud-formation-outer-template-rc/quickstart-template-rc.yml' ${AWS_INTEGRATION_REGION}
+    python ./ci/create-stack.py '../pivotal-cloudfoundry-template-alpha/pivotal-cloudfoundry.template' ${AWS_INTEGRATION_REGION}
     popd
     cp quickstart-repo/stackid output/stackid
+
+on_failure: &on_failure
+  aggregate:
+    - put: slack-alert
+      params:
+        icon_emoji: ":sad_panda:"
+        username: Concourse CI
+        channel: "@jshah"
+        text: "Region Integration test failed"
+    - task: delete-buckets
+      config:
+        inputs:
+        - name: quickstart-repo
+        platform: linux
+        image_resource:
+          type: docker-image
+          source:
+            repository: python
+            tag: "3"
+        params:
+          AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
+          AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}
+        run:
+          path: bash
+          args:
+          - -exc
+          - |
+            pushd quickstart-repo
+            pip install boto3
+            python ./ci/delete-buckets.py
+            popd
 
 image_resource: &image_resource
   image_resource:
@@ -242,6 +286,30 @@ delete_task: &delete_task
         pip install -r requirements.txt
         python ./ci/delete-stack.py
         popd
+  ensure:
+    aggregate:
+      - task: delete-buckets
+        config:
+          inputs:
+          - name: quickstart-repo
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: python
+              tag: "3"
+          params:
+            AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
+            AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}
+          run:
+            path: bash
+            args:
+            - -exc
+            - |
+              pushd quickstart-repo
+              pip install boto3
+              python ./ci/delete-buckets.py
+              popd
 
 toggle_cancel_task: &toggle_cancel_task
   task: toggle_cancel_task
@@ -403,8 +471,8 @@ jobs:
   plan:
   - *job_trigger
   - get: quickstart-repo
-  - get: quickstart-latest-release-candidate
-  - get: cloud-formation-outer-template-rc
+  - get: quickstart-scripts-alpha
+  - get: pivotal-cloudfoundry-template-alpha
   - get: aws-pcf-concourse-state
   - get: om-release
   - get: cancel-us-east-1-resource
@@ -414,7 +482,7 @@ jobs:
       <<: *image_resource
       inputs:
       - name: quickstart-repo
-      - name: cloud-formation-outer-template-rc
+      - name: pivotal-cloudfoundry-template-alpha
       - name: cancel-us-east-1-resource
         path: cancel-check
       outputs:
@@ -423,6 +491,7 @@ jobs:
         <<: *some_values
         AWS_INTEGRATION_REGION: us-east-1
       run: *run
+    on_failure: *on_failure
   - put: aws-pcf-concourse-state
     params:
       file: output/stackid
@@ -434,8 +503,8 @@ jobs:
   plan:
   - *job_trigger
   - get: quickstart-repo
-  - get: quickstart-latest-release-candidate
-  - get: cloud-formation-outer-template-rc
+  - get: quickstart-scripts-alpha
+  - get: pivotal-cloudfoundry-template-alpha
   - get: om-release
   - get: cancel-us-west-1-resource
   - task: integration-test
@@ -444,7 +513,7 @@ jobs:
       <<: *image_resource
       inputs:
       - name: quickstart-repo
-      - name: cloud-formation-outer-template-rc
+      - name: pivotal-cloudfoundry-template-alpha
       - name: cancel-us-west-1-resource
         path: cancel-check
       outputs:
@@ -453,6 +522,7 @@ jobs:
         <<: *some_values
         AWS_INTEGRATION_REGION: us-west-1
       run: *run
+    on_failure: *on_failure
   - put: aws-pcf-concourse-state
     params:
       file: output/stackid
@@ -464,8 +534,8 @@ jobs:
   plan:
   - *job_trigger
   - get: quickstart-repo
-  - get: quickstart-latest-release-candidate
-  - get: cloud-formation-outer-template-rc
+  - get: quickstart-scripts-alpha
+  - get: pivotal-cloudfoundry-template-alpha
   - get: om-release
   - get: cancel-us-west-2-resource
   - task: integration-test
@@ -474,7 +544,7 @@ jobs:
       <<: *image_resource
       inputs:
       - name: quickstart-repo
-      - name: cloud-formation-outer-template-rc
+      - name: pivotal-cloudfoundry-template-alpha
       - name: cancel-us-west-2-resource
         path: cancel-check
       outputs:
@@ -483,6 +553,7 @@ jobs:
         <<: *some_values
         AWS_INTEGRATION_REGION: us-west-2
       run: *run
+    on_failure: *on_failure
   - put: aws-pcf-concourse-state
     params:
       file: output/stackid
@@ -494,8 +565,8 @@ jobs:
   plan:
   - *job_trigger
   - get: quickstart-repo
-  - get: quickstart-latest-release-candidate
-  - get: cloud-formation-outer-template-rc
+  - get: quickstart-scripts-alpha
+  - get: pivotal-cloudfoundry-template-alpha
   - get: om-release
   - get: cancel-eu-central-1-resource
   - task: integration-test
@@ -504,7 +575,7 @@ jobs:
       <<: *image_resource
       inputs:
       - name: quickstart-repo
-      - name: cloud-formation-outer-template-rc
+      - name: pivotal-cloudfoundry-template-alpha
       - name: cancel-eu-central-1-resource
         path: cancel-check
       outputs:
@@ -513,6 +584,7 @@ jobs:
         <<: *some_values
         AWS_INTEGRATION_REGION: eu-central-1
       run: *run
+    on_failure: *on_failure
   - put: aws-pcf-concourse-state
     params:
       file: output/stackid
@@ -524,8 +596,8 @@ jobs:
   plan:
   - *job_trigger
   - get: quickstart-repo
-  - get: quickstart-latest-release-candidate
-  - get: cloud-formation-outer-template-rc
+  - get: quickstart-scripts-alpha
+  - get: pivotal-cloudfoundry-template-alpha
   - get: om-release
   - get: cancel-eu-west-1-resource
   - task: integration-test
@@ -534,7 +606,7 @@ jobs:
       <<: *image_resource
       inputs:
       - name: quickstart-repo
-      - name: cloud-formation-outer-template-rc
+      - name: pivotal-cloudfoundry-template-alpha
       - name: cancel-eu-west-1-resource
         path: cancel-check
       outputs:
@@ -543,6 +615,7 @@ jobs:
         <<: *some_values
         AWS_INTEGRATION_REGION: eu-west-1
       run: *run
+    on_failure: *on_failure
   - put: aws-pcf-concourse-state
     params:
       file: output/stackid
@@ -554,8 +627,8 @@ jobs:
   plan:
   - *job_trigger
   - get: quickstart-repo
-  - get: quickstart-latest-release-candidate
-  - get: cloud-formation-outer-template-rc
+  - get: quickstart-scripts-alpha
+  - get: pivotal-cloudfoundry-template-alpha
   - get: om-release
   - get: cancel-ap-southeast-1-resource
   - task: integration-test
@@ -564,7 +637,7 @@ jobs:
       <<: *image_resource
       inputs:
       - name: quickstart-repo
-      - name: cloud-formation-outer-template-rc
+      - name: pivotal-cloudfoundry-template-alpha
       - name: cancel-ap-southeast-1-resource
         path: cancel-check
       outputs:
@@ -573,6 +646,7 @@ jobs:
         <<: *some_values
         AWS_INTEGRATION_REGION: ap-southeast-1
       run: *run
+    on_failure: *on_failure
   - put: aws-pcf-concourse-state
     params:
       file: output/stackid
@@ -584,8 +658,8 @@ jobs:
   plan:
   - *job_trigger
   - get: quickstart-repo
-  - get: quickstart-latest-release-candidate
-  - get: cloud-formation-outer-template-rc
+  - get: quickstart-scripts-alpha
+  - get: pivotal-cloudfoundry-template-alpha
   - get: om-release
   - get: cancel-ap-southeast-2-resource
   - task: integration-test
@@ -594,7 +668,7 @@ jobs:
       <<: *image_resource
       inputs:
       - name: quickstart-repo
-      - name: cloud-formation-outer-template-rc
+      - name: pivotal-cloudfoundry-template-alpha
       - name: cancel-ap-southeast-2-resource
         path: cancel-check
       outputs:
@@ -603,6 +677,7 @@ jobs:
         <<: *some_values
         AWS_INTEGRATION_REGION: ap-southeast-2
       run: *run
+    on_failure: *on_failure
   - put: aws-pcf-concourse-state
     params:
       file: output/stackid
@@ -614,8 +689,8 @@ jobs:
   plan:
   - *job_trigger
   - get: quickstart-repo
-  - get: quickstart-latest-release-candidate
-  - get: cloud-formation-outer-template-rc
+  - get: quickstart-scripts-alpha
+  - get: pivotal-cloudfoundry-template-alpha
   - get: om-release
   - get: cancel-ap-northeast-1-resource
   - task: integration-test
@@ -624,7 +699,7 @@ jobs:
       <<: *image_resource
       inputs:
       - name: quickstart-repo
-      - name: cloud-formation-outer-template-rc
+      - name: pivotal-cloudfoundry-template-alpha
       - name: cancel-ap-northeast-1-resource
         path: cancel-check
       outputs:
@@ -633,6 +708,7 @@ jobs:
         <<: *some_values
         AWS_INTEGRATION_REGION: ap-northeast-1
       run: *run
+    on_failure: *on_failure
   - put: aws-pcf-concourse-state
     params:
       file: output/stackid
@@ -644,8 +720,8 @@ jobs:
   plan:
   - *job_trigger
   - get: quickstart-repo
-  - get: quickstart-latest-release-candidate
-  - get: cloud-formation-outer-template-rc
+  - get: quickstart-scripts-alpha
+  - get: pivotal-cloudfoundry-template-alpha
   - get: om-release
   - get: cancel-ap-northeast-2-resource
   - task: integration-test
@@ -654,7 +730,7 @@ jobs:
       <<: *image_resource
       inputs:
       - name: quickstart-repo
-      - name: cloud-formation-outer-template-rc
+      - name: pivotal-cloudfoundry-template-alpha
       - name: cancel-ap-northeast-2-resource
         path: cancel-check
       outputs:
@@ -663,6 +739,7 @@ jobs:
         <<: *some_values
         AWS_INTEGRATION_REGION: ap-northeast-2
       run: *run
+    on_failure: *on_failure
   - put: aws-pcf-concourse-state
     params:
       file: output/stackid
@@ -674,8 +751,8 @@ jobs:
   plan:
   - *job_trigger
   - get: quickstart-repo
-  - get: quickstart-latest-release-candidate
-  - get: cloud-formation-outer-template-rc
+  - get: quickstart-scripts-alpha
+  - get: pivotal-cloudfoundry-template-alpha
   - get: om-release
   - get: cancel-sa-east-1-resource
   - task: integration-test
@@ -684,7 +761,7 @@ jobs:
       <<: *image_resource
       inputs:
       - name: quickstart-repo
-      - name: cloud-formation-outer-template-rc
+      - name: pivotal-cloudfoundry-template-alpha
       - name: cancel-sa-east-1-resource
         path: cancel-check
       outputs:
@@ -693,6 +770,7 @@ jobs:
         <<: *some_values
         AWS_INTEGRATION_REGION: sa-east-1
       run: *run
+    on_failure: *on_failure
   - put: aws-pcf-concourse-state
     params:
       file: output/stackid

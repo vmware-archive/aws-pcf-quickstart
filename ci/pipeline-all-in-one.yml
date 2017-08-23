@@ -412,6 +412,7 @@ jobs:
     passed:
       - upload-inner-template-alpha
   - get: quickstart-scripts-alpha
+    trigger: false
     passed:
     - build-quickstart-alpha
   - get: pivotal-cloudfoundry-template-alpha
@@ -504,7 +505,10 @@ jobs:
   - get: quickstart-repo
     passed:
     - integration-test
+  - get: aws-pcf-concourse-state
     trigger: true
+    passed:
+    - integration-test
   - task: check-cf-status
     attempts: 10
     config:
@@ -539,6 +543,7 @@ jobs:
     passed:
     - check-cf-status
   - get: aws-pcf-concourse-state
+    trigger: false
     passed:
     - integration-test
   - task: delete-cf
@@ -591,15 +596,11 @@ jobs:
 
 - name: github-release
   plan:
-  - get: quickstart-repo
-    trigger: true
-    passed:
-    - integration-test
-  - get: pivotal-cloudfoundry-template-alpha
-    trigger: true
-    passed:
-    - integration-test
   - get: quickstart-scripts-alpha
+    passed:
+    - integration-test
+  - get: aws-pcf-concourse-state
+    trigger: true
     passed:
     - integration-test
   - get: version
@@ -637,7 +638,6 @@ jobs:
 - name: commit-and-pr-aws-quickstart-repo
   plan:
   - get: quickstart-repo
-    trigger: true
     passed:
     - integration-test
   - get: aws-quickstart-repo
@@ -651,6 +651,9 @@ jobs:
     passed:
     - upload-inner-template-alpha
   - get: pivotal-cloudfoundry-template-alpha
+    passed:
+    - integration-test
+  - get: aws-pcf-concourse-state
     trigger: true
     passed:
     - integration-test
