@@ -1644,9 +1644,6 @@
     "PcfRdsUsername": {
       "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfRdsUsername" ]}
     },
-    "PcfRdsPassword": {
-      "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfRdsPassword" ]}
-    },
     "PcfRdsDBName": {
       "Value": {"Fn::GetAtt": [ "OpsManStack", "Outputs.PcfRdsDBName" ]}
     }
