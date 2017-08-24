@@ -1,5 +1,4 @@
 {
-  "test": "foo",
   "AWSTemplateFormatVersion": "2010-09-09",
   "Description": "Cloudformation template for configuring Pivotal Cloud Foundry on AWS",
   "Parameters": {

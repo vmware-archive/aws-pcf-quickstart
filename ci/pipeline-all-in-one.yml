@@ -179,6 +179,41 @@ resources:
 
 
 jobs:
+- name: diff-templates
+  plan:
+  - get: quickstart-repo
+  - get: ert-tile
+    trigger: true
+    params:
+      globs:
+      - cf-cloudformation.json
+  - task: diff-templates
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: cfplatformeng/quickstart-ci
+      inputs:
+      - name: ert-tile
+      - name: quickstart-repo
+      run:
+        path: bash
+        args:
+        - -exc
+        - |
+          set +e
+          diff quickstart-repo/cloudformation/cf-cloudformation-base.json ert-tile/cf-cloudformation.json
+          if [ $? -eq 0 ]; then
+            echo "No diff"
+            exit 0
+          else
+            curl -X POST -H 'Content-type: application/json' \
+              --data '{"channel": "#amazon", "username": "Concourse CI", "icon_emoji": ":sad_panda:", "text":"Cloud Formation base template changed <@prasad>. Action required."}' \
+              {{slack_hook}}
+            exit 1
+          fi
+
 - name: unit-test
   plan:
   - get: quickstart-repo
