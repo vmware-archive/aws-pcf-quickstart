@@ -279,6 +279,7 @@ jobs:
       - name: ami-version
       - name: awslogs-agent-setup
       - name: aws-cfn-bootstrap
+      - name: ubuntu-ami
       outputs:
       - name: output
       params:

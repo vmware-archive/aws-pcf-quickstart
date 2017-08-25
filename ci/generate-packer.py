@@ -37,7 +37,7 @@ def main(argv):
         ami_version = version_file.read()
 
     with open('./ubuntu-ami/id', 'r') as id_file:
-        base_ami = id_file.read()
+        base_ami = id_file.read().strip()
 
     with open('./quickstart-repo/ci/packer.j2.json', 'r') as template_file:
         template = jinja2.Template(template_file.read())
