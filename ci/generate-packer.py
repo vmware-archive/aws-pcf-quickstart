@@ -36,12 +36,16 @@ def main(argv):
     with open('./ami-version/version', 'r') as version_file:
         ami_version = version_file.read()
 
+    with open('./ubuntu-ami/id', 'r') as id_file:
+        base_ami = id_file.read()
+
     with open('./quickstart-repo/ci/packer.j2.json', 'r') as template_file:
         template = jinja2.Template(template_file.read())
 
         ctx = {
             "aws_access_key_id": os.environ['AWS_ACCESS_KEY_ID'],
             "aws_secret_access_key": os.environ['AWS_SECRET_ACCESS_KEY'],
+            "base_ami": base_ami,
             "ami_version": ami_version
         }
 

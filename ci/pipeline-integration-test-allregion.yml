@@ -169,6 +169,7 @@ params: &some_values
   AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}
   US_EAST_1_SSLCERTIFICATEARN: {{us_east_1_sslcertificatearn}}
   US_EAST_2_SSLCERTIFICATEARN: {{us_east_2_sslcertificatearn}}
+  US_WEST_1_SSLCERTIFICATEARN: {{us_west_1_sslcertificatearn}}
   US_WEST_2_SSLCERTIFICATEARN: {{us_west_2_sslcertificatearn}}
   CA_CENTRAL_1_SSLCERTIFICATEARN: {{ca_central_1_sslcertificatearn}}
   EU_CENTRAL_1_SSLCERTIFICATEARN: {{eu_central_1_sslcertificatearn}}

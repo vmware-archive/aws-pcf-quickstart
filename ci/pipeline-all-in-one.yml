@@ -1,5 +1,10 @@
 ---
 resource_types:
+- name: ami
+  type: docker-image
+  source:
+    repository: jdub/ami-resource
+
 - name: pivnet
   type: docker-image
   source:
@@ -20,6 +25,20 @@ resource_types:
 
 
 resources:
+- name: ubuntu-ami
+  type: ami
+  check_every: 1h
+  source:
+    aws_access_key_id: {{aws_admin_key_id}}
+    aws_secret_access_key: {{aws_admin_secret_access_key}}
+    region: us-west-1
+    filters:
+      owner-id: "099720109477"
+      is-public: true
+      state: available
+      name: ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*
+      root-device-type: ebs
+
 - name: quickstart-repo
   type: git
   source:
@@ -242,6 +261,8 @@ jobs:
   - get: quickstart-repo
   - get: awslogs-agent-setup
   - get: aws-cfn-bootstrap
+  - get: ubuntu-ami
+    trigger: true
   - get: ami-version
     params:
       bump: patch
@@ -478,6 +499,7 @@ jobs:
         AWS_INTEGRATION_REGION: {{aws_integration_region}}
         US_EAST_1_SSLCERTIFICATEARN: {{us_east_1_sslcertificatearn}}
         US_EAST_2_SSLCERTIFICATEARN: {{us_east_2_sslcertificatearn}}
+        US_WEST_1_SSLCERTIFICATEARN: {{us_west_1_sslcertificatearn}}
         US_WEST_2_SSLCERTIFICATEARN: {{us_west_2_sslcertificatearn}}
         CA_CENTRAL_1_SSLCERTIFICATEARN: {{ca_central_1_sslcertificatearn}}
         EU_WEST_1_SSLCERTIFICATEARN: {{eu_west_1_sslcertificatearn}}

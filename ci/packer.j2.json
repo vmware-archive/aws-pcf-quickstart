@@ -5,7 +5,7 @@
       "access_key": "{{aws_access_key_id}}",
       "secret_key": "{{aws_secret_access_key}}",
       "region": "us-west-1",
-      "source_ami": "ami-73f7da13",
+      "source_ami": "{{base_ami}}",
       "instance_type": "t2.micro",
       "ssh_username": "ubuntu",
       "ami_name": "pcf bootstrap {{ami_version}}",
