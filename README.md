@@ -9,7 +9,7 @@ To run without any template or code changes:
 
 1. Download the template `pivotal-cloudfoundry.template` from https://github.com/cf-platform-eng/quickstart-pivotal-cloudfoundry/blob/develop/templates/
 1. Create a new stack at https://console.aws.amazon.com/cloudformation by uploading `pivotal-cloudfoundry.template`
-    * Set `Quick Start S3 Bucket Name` to `aws-pcf-quickstart-rc`
+    * Set `Quick Start S3 Bucket Name` to `aws-pcf-quickstart-templates`
     * To toggle `Forward Log Output` to `true` to get feedback on changes in the event of failure
     * Customize other parameters as needed per docs     
 1. The full run takes ~2.5 hours. Once the `MyCustomBOSH` resource is completed, you can view installation progress from `https://opsman.[domain paramater value]`
