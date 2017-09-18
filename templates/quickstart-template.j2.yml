@@ -1,52 +1,50 @@
 ---
-AWSTemplateFormatVersion: "2010-09-09"
-
-Description: >
-  This template will automatically deploy a reference architecture for the Pivotal Cloud Foundry stack.
-  For a detailed guide on how to deploy this template, please read the instructions QS(qs-1ngltrcpf)
-
+AWSTemplateFormatVersion: '2010-09-09'
+Description: This template will automatically deploy a reference architecture for
+  the Pivotal Cloud Foundry stack. For a detailed guide on how to deploy this template,
+  please read the instructions (qs-1ngltrcpf)
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
-      - Label:
-          default: Amazon EC2 Configuration
-        Parameters:
-        - PCFKeyPair
-        - NATInstanceType
-        - SSLCertificateARN
-        - ElbPrefix
-        - AllowHttpOnElb
-        - ForwardLogOutput
-      - Label:
-          default: Network and DNS Configuration
-        Parameters:
-        - OpsManagerIngress
-        - HostedZoneId
-        - Domain
-      - Label:
-          default: Pivotal Cloud Foundry Configuration
-        Parameters:
-        - NumberOfAZs
-        - SkipSSLValidation
-        - PivnetToken
-        - AdminEmail
-        - OpsManagerAdminPassword
-        - CompanyName
-      - Label:
-          default: RDS
-        Parameters:
-        - RdsDBName
-        - RdsUsername
-        - RdsPassword
-      - Label:
-          default: AWS Quick Start Configuration
-        Parameters:
-        - QSS3BucketName
-        - QSS3KeyPrefix
-      - Label:
-          default: End User License Agreement
-        Parameters:
-        - AcceptEULA
+    - Label:
+        default: Amazon EC2 Configuration
+      Parameters:
+      - PCFKeyPair
+      - NATInstanceType
+      - SSLCertificateARN
+      - ElbPrefix
+      - AllowHttpOnElb
+      - ForwardLogOutput
+    - Label:
+        default: Network and DNS Configuration
+      Parameters:
+      - OpsManagerIngress
+      - HostedZoneId
+      - Domain
+    - Label:
+        default: Pivotal Cloud Foundry Configuration
+      Parameters:
+      - NumberOfAZs
+      - SkipSSLValidation
+      - PivnetToken
+      - AdminEmail
+      - OpsManagerAdminPassword
+      - CompanyName
+    - Label:
+        default: RDS
+      Parameters:
+      - RdsDBName
+      - RdsUsername
+      - RdsPassword
+    - Label:
+        default: AWS Quick Start Configuration
+      Parameters:
+      - QSS3BucketName
+      - QSS3KeyPrefix
+    - Label:
+        default: End User License Agreement
+      Parameters:
+      - AcceptEULA
     ParameterLabels:
       RdsDBName:
         default: RDS DB Name
@@ -90,7 +88,6 @@ Metadata:
         default: Accept EULA
       CompanyName:
         default: Custom Branding Company Name
-
 Parameters:
   NATInstanceType:
     Type: String
@@ -110,7 +107,8 @@ Parameters:
     Description: Select the Instance Type to use for the NAT vm
   OpsManagerIngress:
     Type: String
-    Description: CIDR range allowed to connect to Pivotal Ops Manager and Bootstrap instances
+    Description: CIDR range allowed to connect to Pivotal Ops Manager and Bootstrap
+      instances
   RdsDBName:
     Type: String
     MinLength: '4'
@@ -123,7 +121,7 @@ Parameters:
     Type: String
     NoEcho: 'true'
     MinLength: '8'
-    AllowedPattern: "[\\w-_]*"
+    AllowedPattern: '[\w-_]*'
     Description: Database password
   SSLCertificateARN:
     Type: String
@@ -142,8 +140,8 @@ Parameters:
     Description: Allow HTTP traffic on PCF-ELB port 80.
   PivnetToken:
     Type: String
-    Description: Pivotal Network token to accept EULA (requires registration). To generate a token, see
-      https://network.pivotal.io/docs/api#how-to-authenticate
+    Description: Pivotal Network token to accept EULA (requires registration). To
+      generate a token, see https://network.pivotal.io/docs/api#how-to-authenticate
   AdminEmail:
     Type: String
     Description: Admin email used by mysql monitor, for example
@@ -152,49 +150,61 @@ Parameters:
     Description: Existing hosted zone in which to create DNS records
   Domain:
     Type: String
-    Description: Root or subdomain for all Pivotal Cloud Foundry DNS entries (e.g. - example.com or pcf.example.com). Must match hosted zone.
+    Description: Root or subdomain for all Pivotal Cloud Foundry DNS entries (e.g.
+      example.com or pcf.example.com). Must match hosted zone.
   OpsManagerAdminPassword:
     Type: String
     NoEcho: 'true'
     MinLength: '14'
-    AllowedPattern: "[\\w-_]*"
-    Description: Admin password for Pivotal Ops Manager. At least 14 characters from the set of alphanumeric, dashes, and underscores.
+    AllowedPattern: '[\w-_]*'
+    Description: Admin password for Pivotal Ops Manager. At least 14 characters from
+      the set of alphanumeric, dashes, and underscores.
   PCFKeyPair:
     Type: AWS::EC2::KeyPair::KeyName
     Description: Select the SSH keypair to use for Pivotal Ops Manager and NAT instance
   NumberOfAZs:
     Type: Number
-    AllowedValues: [1,2]
+    AllowedValues:
+    - 1
+    - 2
     Default: 1
-    Description: Select number of Availability Zones. This changes the deployment size. 2 is a HA deployment, with nearly double the number of VMs
+    Description: Select number of Availability Zones. This changes the deployment
+      size. 2 is a HA deployment, with nearly double the number of VMs
   ForwardLogOutput:
-    Description: |
-      When true, installation logs are sent to 'CloudWatch Logs'. Critical for solving failures, but
-      potentially exposes secrets used during the bootstrap process.
+    Description: When true, installation logs are sent to 'CloudWatch Logs'. Critical
+      for solving failures, but potentially exposes secrets used during the bootstrap
+      process.
     Type: String
     Default: 'true'
     AllowedValues:
     - 'true'
     - 'false'
   SkipSSLValidation:
-    Description: |
-      When true, SSL certificates are not validated. *Not recommended for a production environment*
+    Description: When true, SSL certificates are not validated. *Not recommended for
+      a production environment*
     Type: String
     AllowedValues:
     - 'true'
     - 'false'
   QSS3BucketName:
-      AllowedPattern: "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$"
-      ConstraintDescription: Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).
-      Default: quickstart-reference
-      Description: S3 bucket name for the Quick Start assets. This string can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).
-      Type: String
+    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
+    ConstraintDescription: Quick Start bucket name can include numbers, lowercase
+      letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
+      (-).
+    Default: quickstart-reference
+    Description: S3 bucket name for the Quick Start assets. This string can include
+      numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
+      or end with a hyphen (-).
+    Type: String
   QSS3KeyPrefix:
-      AllowedPattern: "^[0-9a-zA-Z-/]*$"
-      ConstraintDescription: Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).
-      Default: pivotal/cloudfoundry/latest/
-      Description: S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).
-      Type: String
+    AllowedPattern: ^[0-9a-zA-Z-/]*$
+    ConstraintDescription: Quick Start key prefix can include numbers, lowercase letters,
+      uppercase letters, hyphens (-), and forward slash (/).
+    Default: pivotal/cloudfoundry/latest/
+    Description: S3 key prefix for the Quick Start assets. Quick Start key prefix
+      can include numbers, lowercase letters, uppercase letters, hyphens (-), and
+      forward slash (/).
+    Type: String
   AcceptEULA:
     Description: Accept Pivotal EULA
     Type: String
@@ -205,9 +215,7 @@ Parameters:
   CompanyName:
     Description: Custom Branding Company Name for Apps Manager
     Type: String
-    Default: 'PCF Quickstart'
-
-
+    Default: PCF Quickstart
 Rules:
   KeyPairsNotEmpty:
     Assertions:
@@ -215,7 +223,7 @@ Rules:
         Fn::Not:
         - Fn::EachMemberEquals:
           - Fn::RefAll: AWS::EC2::KeyPair::KeyName
-          - ""
+          - ''
       AssertDescription: All key pair parameters must not be empty
   SupportedRegionRule:
       Assertions:
@@ -229,13 +237,12 @@ Rules:
     - Assert:
         Fn::Equals:
         - !Ref AcceptEULA
-        - "Yes"
+        - 'Yes'
       AssertDescription: Must accept the End User License Agreement for Pivotal Products
 Mappings:
   AMIMapping:
     {{ami_mapping | indent}}
 Resources:
-  ## cloud-formation.json
   PCFBase:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -247,41 +254,40 @@ Resources:
         05RdsUsername: !Ref RdsUsername
         06RdsPassword: !Ref RdsPassword
         07SSLCertificateARN: !Ref SSLCertificateARN
-        08OpsManagerTemplate: !Sub "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/ops-manager.template"
+        08OpsManagerTemplate: !Sub https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/ops-manager.template
         09ElbPrefix: !Ref ElbPrefix
         10AllowHttpOnElb: !Ref AllowHttpOnElb
         11PivnetToken: !Ref PivnetToken
         12AdminEmail: !Ref AdminEmail
-      TemplateURL: !Sub "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/cloud-formation.template"
-  ## Custom resource stuff
+      TemplateURL: !Sub https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/cloud-formation.template
   CustomResourceSQSQueue:
-    Type: "AWS::SQS::Queue"
+    Type: AWS::SQS::Queue
     Properties:
       QueueName: CustomResourceSQSQueue
       VisibilityTimeout: 1
   CustomResourceSNSTopic:
-    Type: "AWS::SNS::Topic"
+    Type: AWS::SNS::Topic
     Properties:
       DisplayName: custom-resource-topic
       Subscription:
-        - Endpoint: !GetAtt CustomResourceSQSQueue.Arn
-          Protocol: sqs
+      - Endpoint: !GetAtt CustomResourceSQSQueue.Arn
+        Protocol: sqs
   CustomResourceSQSQueuePolicy:
-    Type: "AWS::SQS::QueuePolicy"
+    Type: AWS::SQS::QueuePolicy
     Properties:
       PolicyDocument:
-        Version: "2012-10-17"
+        Version: '2012-10-17'
         Statement:
-          - Effect: "Allow"
-            Principal:
-              AWS: "*"
-            Action: "sqs:SendMessage"
-            Resource: !GetAtt CustomResourceSQSQueue.Arn
-            Condition:
-              ArnEquals:
-                aws:SourceArn: !Ref CustomResourceSNSTopic
+        - Effect: Allow
+          Principal:
+            AWS: '*'
+          Action: sqs:SendMessage
+          Resource: !GetAtt CustomResourceSQSQueue.Arn
+          Condition:
+            ArnEquals:
+              aws:SourceArn: !Ref CustomResourceSNSTopic
       Queues:
-        - !Ref CustomResourceSQSQueue
+      - !Ref CustomResourceSQSQueue
   MyCustomBOSH:
     Type: Custom::BOSH
     Version: 1.0
@@ -302,85 +308,78 @@ Resources:
     - PCFEmitLogsPolicy
     - SSMParameterJSON
   WaitHandle:
-    Type: "AWS::CloudFormation::WaitConditionHandle"
+    Type: AWS::CloudFormation::WaitConditionHandle
   WaitCondition:
     Type: "AWS::CloudFormation::WaitCondition"
     Properties:
       Handle:
-        Ref: "WaitHandle"
-      Timeout: "14400"
+        Ref: WaitHandle
+      Timeout: '14400'
       Count: 1
   PcfIamUserAccessKey:
     Type: AWS::IAM::AccessKey
     Properties:
       UserName: !GetAtt PCFBase.Outputs.PcfIamUserName
-
-  ## This Policy is for Allowing the OpsManager EC2 Instance access to the Describe stack and
-  ## Stored Parameters.
   PCFDescribeStackPolicy:
-    Type: "AWS::IAM::Policy"
+    Type: AWS::IAM::Policy
     Properties:
       PolicyDocument:
-        Version: "2012-10-17"
+        Version: '2012-10-17'
         Statement:
-          -
-            Effect: "Allow"
-            Action:
-              - "cloudformation:DescribeStacks"
-            Resource: !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${AWS::StackName}/*"
+        - Effect: Allow
+          Action:
+          - cloudformation:DescribeStacks
+          Resource: !Sub arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${AWS::StackName}/*
       PolicyName: !Sub ${AWS::StackName}-describe-stack
       Roles:
-        - !GetAtt PCFBase.Outputs.PcfIamRole
+      - !GetAtt PCFBase.Outputs.PcfIamRole
   PCFParameterStorePolicy:
-    Type: "AWS::IAM::Policy"
+    Type: AWS::IAM::Policy
     Properties:
       PolicyDocument:
-        Version: "2012-10-17"
+        Version: '2012-10-17'
         Statement:
-          -
-            Effect: "Allow"
-            Action:
-              - "ssm:DescribeParameters"
-              - "ssm:GetParameters"
-              - "ssm:GetParameter"
-            Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}.*"
+        - Effect: Allow
+          Action:
+          - ssm:DescribeParameters
+          - ssm:GetParameters
+          - ssm:GetParameter
+          Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}.*
       PolicyName: !Sub ${AWS::StackName}-parameter-store
       Roles:
-        - !GetAtt PCFBase.Outputs.PcfIamRole
+      - !GetAtt PCFBase.Outputs.PcfIamRole
   PCFCustomResourcePolicy:
-    Type: "AWS::IAM::Policy"
+    Type: AWS::IAM::Policy
     Properties:
       PolicyDocument:
-        Version: "2012-10-17"
+        Version: '2012-10-17'
         Statement:
-          -
-            Effect: "Allow"
-            Action: "sqs:*"
-            Resource: !GetAtt CustomResourceSQSQueue.Arn
+        - Effect: Allow
+          Action: sqs:*
+          Resource: !GetAtt CustomResourceSQSQueue.Arn
       PolicyName: !Sub ${AWS::StackName}-custom-resource
       Roles:
-        - !GetAtt PCFBase.Outputs.PcfIamRole
+      - !GetAtt PCFBase.Outputs.PcfIamRole
   PCFEmitLogsPolicy:
-    Type: "AWS::IAM::Policy"
+    Type: AWS::IAM::Policy
     Properties:
       PolicyDocument:
-        Version: "2012-10-17"
+        Version: '2012-10-17'
         Statement:
-          - Effect: "Allow"
-            Action:
-              - logs:CreateLogGroup
-              - logs:CreateLogStream
-              - logs:PutLogEvents
-              - logs:DescribeLogStreams
-            Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:pcf-bootstrap-${AWS::StackName}:*"
+        - Effect: Allow
+          Action:
+          - logs:CreateLogGroup
+          - logs:CreateLogStream
+          - logs:PutLogEvents
+          - logs:DescribeLogStreams
+          Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:pcf-bootstrap-${AWS::StackName}:*
       PolicyName: !Sub ${AWS::StackName}-emit-logs-policy
       Roles:
-        - !GetAtt PCFBase.Outputs.PcfIamRole
-  ## This is the Start of our Secured Parameters
+      - !GetAtt PCFBase.Outputs.PcfIamRole
   SSMParameterJSON:
-    Type: "AWS::SSM::Parameter"
+    Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "${AWS::StackName}.SSMParameterJSON"
+      Name: !Sub ${AWS::StackName}.SSMParameterJSON
       Description: JSON Array of All SSM Passed Parameters
       Type: String
       Value: !Sub |
@@ -420,32 +419,34 @@ Resources:
         "PcfRdsUsername": "${PCFBase.Outputs.PcfRdsUsername}",
         "PcfCompanyName": "${CompanyName}"
         }
-  ## This is the End of our Secured Parameters
-  ## This is the EC2 Ops Manager
   OpsManagerInstance:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: !FindInMap [AMIMapping, !Ref "AWS::Region", "opsman"]
+      ImageId:
+        !FindInMap
+        - AMIMapping
+        - !Ref AWS::Region
+        - opsman
       InstanceType: m4.large
       IamInstanceProfile: !GetAtt PCFBase.Outputs.PcfIamInstanceProfile
       KeyName: !Ref PCFKeyPair
       Monitoring: true
       BlockDeviceMappings:
-        - DeviceName: "/dev/xvda"
-          Ebs:
-            DeleteOnTermination: true
-            VolumeSize: 100
-            VolumeType: gp2
+      - DeviceName: /dev/xvda
+        Ebs:
+          DeleteOnTermination: true
+          VolumeSize: 100
+          VolumeType: gp2
       NetworkInterfaces:
-        - AssociatePublicIpAddress: "true"
-          DeviceIndex: "0"
-          GroupSet:
-            - !GetAtt PCFBase.Outputs.PcfOpsManagerSecurityGroupId
-          SubnetId: !GetAtt PCFBase.Outputs.PcfPublicSubnetId
+      - AssociatePublicIpAddress: 'true'
+        DeviceIndex: '0'
+        GroupSet:
+        - !GetAtt PCFBase.Outputs.PcfOpsManagerSecurityGroupId
+        SubnetId: !GetAtt PCFBase.Outputs.PcfPublicSubnetId
       SourceDestCheck: true
       Tags:
-        - Key: Name
-          Value: "PCF Ops Manager"
+      - Key: Name
+        Value: PCF Ops Manager
   BootstrapInstance:
     Type: AWS::EC2::Instance
     CreationPolicy:
@@ -457,40 +458,45 @@ Resources:
     - PCFParameterStorePolicy
     - PCFDescribeStackPolicy
     Properties:
-      ImageId: !FindInMap [AMIMapping, !Ref "AWS::Region", "bootstrap"]
+      ImageId:
+        !FindInMap
+        - AMIMapping
+        - !Ref AWS::Region
+        - bootstrap
       InstanceType: t2.micro
       IamInstanceProfile: !GetAtt PCFBase.Outputs.PcfIamInstanceProfile
       KeyName: !Ref PCFKeyPair
       Monitoring: true
       BlockDeviceMappings:
-        - DeviceName: "/dev/sda1"
-          Ebs:
-            DeleteOnTermination: true
-            VolumeSize: 50
-            VolumeType: gp2
+      - DeviceName: /dev/sda1
+        Ebs:
+          DeleteOnTermination: true
+          VolumeSize: 50
+          VolumeType: gp2
       NetworkInterfaces:
-        - AssociatePublicIpAddress: "true"
-          DeviceIndex: "0"
-          GroupSet:
-            - !GetAtt PCFBase.Outputs.PcfOpsManagerSecurityGroupId
-          SubnetId: !GetAtt PCFBase.Outputs.PcfPublicSubnetId
+      - AssociatePublicIpAddress: 'true'
+        DeviceIndex: '0'
+        GroupSet:
+        - !GetAtt PCFBase.Outputs.PcfOpsManagerSecurityGroupId
+        SubnetId: !GetAtt PCFBase.Outputs.PcfPublicSubnetId
       SourceDestCheck: true
       Tags:
-        - Key: Name
-          Value: "PCF Bootstrap"
-      UserData: !Base64
-        "Fn::Sub": |
-          #!/bin/bash
+      - Key: Name
+        Value: PCF Bootstrap
+      UserData:
+        !Base64
+          Fn::Sub: |
+            #!/bin/bash
 
-          cfn-init -v --stack ${AWS::StackName} --resource BootstrapInstance --region ${AWS::Region}
-          cfn-signal -e $? --stack ${AWS::StackName} --resource BootstrapInstance --region ${AWS::Region}
+            cfn-init -v --stack ${AWS::StackName} --resource BootstrapInstance --region ${AWS::Region}
+            cfn-signal -e $? --stack ${AWS::StackName} --resource BootstrapInstance --region ${AWS::Region}
 
-          su ubuntu -c /home/ubuntu/quickstart/bootstrap.sh
+            su ubuntu -c /home/ubuntu/quickstart/bootstrap.sh
     Metadata:
       AWS::CloudFormation::Init:
         config:
           sources:
-            '/home/ubuntu': !Sub "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/quickstart.tgz"
+            /home/ubuntu: !Sub https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/quickstart.tgz
           files:
             /home/ubuntu/scripts/awslogs.config:
               owner: ubuntu
@@ -543,22 +549,18 @@ Resources:
                   echo "Skipping CloudWatch Logs, ForwardLogOutput was false"
                 fi
             b_chmod_stuff:
-              command: |
-                chown -R ubuntu:ubuntu /home/ubuntu/quickstart
+              command: chown -R ubuntu:ubuntu /home/ubuntu/quickstart
             c_copy_version_confifg_to_known_location:
-              command: |
-                cp /home/ubuntu/quickstart/version_config.json /var/local/version_config.json
+              command: cp /home/ubuntu/quickstart/version_config.json /var/local/version_config.json
             d_install_delete_daemon:
-              command: |
-                /home/ubuntu/quickstart/daemon/install.sh
-
+              command: /home/ubuntu/quickstart/daemon/install.sh
   DNSOpsMan:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneId: !Ref HostedZoneId
       Name: !Sub opsman.${Domain}
       ResourceRecords:
-        - !Sub "${OpsManagerInstance.PublicIp}"
+      - !Sub ${OpsManagerInstance.PublicIp}
       TTL: 60
       Type: A
   DNS:
@@ -567,16 +569,17 @@ Resources:
       HostedZoneId: !Ref HostedZoneId
       Name: !Sub bootstrap.${Domain}
       ResourceRecords:
-        - !Sub "${BootstrapInstance.PublicIp}"
+      - !Sub ${BootstrapInstance.PublicIp}
       TTL: 60
       Type: A
   DNSStar:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneId: !Ref HostedZoneId
-      Name: !Sub "*.${Domain}"
+      Name:
+        Fn::Sub: '*.${Domain}'
       ResourceRecords:
-        - !GetAtt PCFBase.Outputs.PcfElbDnsName
+      - !GetAtt PCFBase.Outputs.PcfElbDnsName
       TTL: 60
       Type: CNAME
   DNSSsh:
@@ -585,28 +588,30 @@ Resources:
       HostedZoneId: !Ref HostedZoneId
       Name: !Sub ssh.sys.${Domain}
       ResourceRecords:
-        - !GetAtt PCFBase.Outputs.PcfElbSshDnsName
+      - !GetAtt PCFBase.Outputs.PcfElbSshDnsName
       TTL: 60
       Type: CNAME
   DNSSys:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneId: !Ref HostedZoneId
-      Name: !Sub "*.sys.${Domain}"
+      Name:
+        Fn::Sub: '*.sys.${Domain}'
       ResourceRecords:
-        - !GetAtt PCFBase.Outputs.PcfElbDnsName
+      - !GetAtt PCFBase.Outputs.PcfElbDnsName
       TTL: 60
       Type: CNAME
   DNSApps:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneId: !Ref HostedZoneId
-      Name: !Sub "*.apps.${Domain}"
+      Name:
+        Fn::Sub: '*.apps.${Domain}'
       ResourceRecords:
-        - !GetAtt PCFBase.Outputs.PcfElbDnsName
+      - !GetAtt PCFBase.Outputs.PcfElbDnsName
       TTL: 60
       Type: CNAME
 Outputs:
   OpsManager:
     Description: Url For Logging into OpsManager
-    Value: !Sub "https://opsman.${Domain}"
+    Value: !Sub https://opsman.${Domain}
