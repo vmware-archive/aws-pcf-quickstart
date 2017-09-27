@@ -206,7 +206,7 @@ Parameters:
       forward slash (/).
     Type: String
   AcceptEULA:
-    Description: Accept Pivotal EULA
+    Description: https://pivotal.io/evaluation-agreement
     Type: String
     Default: 'No'
     AllowedValues:
