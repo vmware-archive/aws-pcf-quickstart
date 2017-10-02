@@ -125,7 +125,8 @@ Parameters:
     Description: Database password
   SSLCertificateARN:
     Type: String
-    Description: ARN for pre-uploaded SSL certificate
+    Description: ARN for pre-uploaded SSL certificate.
+      The certificate should cover *.pcf_domain, *.sys.pcf_domain, *.apps.pcf_domain, *.login.pcf_domain, and *.uaa.pcf_domain
   ElbPrefix:
     Type: String
     Description: Prefix for the name of the ELBs provisioned. (Required)
