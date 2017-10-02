@@ -15,7 +15,7 @@
     "value": "enable"
   },
   ".ha_proxy.skip_cert_verify": {
-    "value": true
+    "value": {{pcf_skipsslvalidation}}
   },
   ".properties.route_services.enable.ignore_ssl_cert_verification": {
     "value": true

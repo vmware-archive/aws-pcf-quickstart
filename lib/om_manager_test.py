@@ -32,7 +32,6 @@ class TestOmManager(unittest.TestCase):
         self.settings.opsman_url = 'https://cf.example.com'
         self.settings.opsman_user = 'admin'
         self.settings.pcf_opsmanageradminpassword = 'monkey-123'
-        self.settings.pcf_input_skipsslvalidation = "true"
 
     def to_bytes(self, str: str):
         return bytearray(str, "utf-8")
@@ -49,19 +48,6 @@ class TestOmManager(unittest.TestCase):
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
         )
 
-    @patch('subprocess.Popen')
-    def test_configure_auth_no_skip_ssl(self, mock_popen):
-        self.settings.pcf_input_skipsslvalidation = "false"
-        p = Mock(Popen)
-        mock_popen.return_value = p
-        p.returncode = 0
-        p.communicate.return_value = self.to_bytes("out: foo"), self.to_bytes("error: bar")
-        om_manager.config_opsman_auth(self.settings)
-        mock_popen.assert_called_with(
-            "om  --target https://cf.example.com configure-authentication --username 'admin' --password 'monkey-123' --decryption-passphrase 'monkey-123'",
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
-        )
-
     @patch('om_manager.get_om_with_auth')
     @patch('util.run_command')
     def test_curl_get(self, mock_run_command, mock_get_om_with_auth):
@@ -73,12 +59,12 @@ class TestOmManager(unittest.TestCase):
     @patch('om_manager.get_om_with_auth')
     @patch('util.run_command')
     def test_curl_payload(self, mock_run_command, mock_get_om_with_auth):
-        mock_get_om_with_auth.return_value = "om plus some auth"
+        mock_get_om_with_auth.return_value = "om -k plus some auth"
 
         om_manager.curl_payload(self.settings, "/api/foo", '{"foo": "bar"}', "PUT")
 
         mock_run_command.assert_called_with(
-            "om plus some auth curl --path /api/foo --request PUT --data '{\"foo\": \"bar\"}'"
+            "om -k plus some auth curl --path /api/foo --request PUT --data '{\"foo\": \"bar\"}'"
         )
 
     @patch('util.run_command')
@@ -138,12 +124,6 @@ class TestOmManager(unittest.TestCase):
 
     def test_get_om_with_auth(self):
         expected_om_command = "om -k --target https://cf.example.com --username 'admin' --password 'monkey-123'"
-        om_command = om_manager.get_om_with_auth(self.settings)
-        self.assertEqual(om_command, expected_om_command)
-
-    def test_get_om_with_auth_with_ssl(self):
-        self.settings.pcf_input_skipsslvalidation = "false"
-        expected_om_command = "om  --target https://cf.example.com --username 'admin' --password 'monkey-123'"
         om_command = om_manager.get_om_with_auth(self.settings)
         self.assertEqual(om_command, expected_om_command)
 

@@ -109,6 +109,7 @@ def configure_ert_config(my_settings: Settings):
         "pcf_companyname": my_settings.pcf_pcfcompanyname,
         "s3_endpoint": my_settings.get_s3_endpoint(),
         "s3_region": my_settings.region,
+        "pcf_skipsslvalidation": my_settings.pcf_input_skipsslvalidation,
         "cert": cert.replace("\n", "\\n"),
         "key": key.replace("\n", "\\n")
     }

@@ -31,8 +31,7 @@ def format_om_json_str(om_json: str):
 
 
 def config_opsman_auth(my_settings: settings.Settings):
-    cmd = "om {sslflag} --target {url} configure-authentication --username '{user}' --password '{password}' --decryption-passphrase '{password}'".format(
-        sslflag=sslvalidation_flag(my_settings),
+    cmd = "om -k --target {url} configure-authentication --username '{user}' --password '{password}' --decryption-passphrase '{password}'".format(
         url=my_settings.opsman_url,
         user=my_settings.opsman_user,
         password=my_settings.pcf_opsmanageradminpassword
@@ -94,16 +93,8 @@ def stage_product(product_name: str, my_settings: settings.Settings):
 
 
 def get_om_with_auth(my_settings: settings.Settings):
-    return "om {sslflag} --target {url} --username '{username}' --password '{password}'".format(
-        sslflag=sslvalidation_flag(my_settings),
+    return "om -k --target {url} --username '{username}' --password '{password}'".format(
         url=my_settings.opsman_url,
         username=my_settings.opsman_user,
         password=my_settings.pcf_opsmanageradminpassword
     )
-
-
-def sslvalidation_flag(settings: settings.Settings):
-    if settings.pcf_input_skipsslvalidation == "true":
-        return "-k"
-    else:
-        return ""
