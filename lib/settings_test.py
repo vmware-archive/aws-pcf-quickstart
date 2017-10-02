@@ -49,6 +49,10 @@ input_params = {
                 {
                     'ParameterValue': 'pcf.example.com',
                     'ParameterKey': 'Domain'
+                },
+                {
+                    'ParameterValue': 'true',
+                    'ParameterKey': 'SkipSSLValidation'
                 }
             ]
         }
@@ -62,7 +66,8 @@ param_json_doc = """
   "PcfPrivateSubnetAvailabilityZone": "canada-1a",
   "PcfPrivateSubnet2AvailabilityZone": "canada-1b",
   "PcfOpsManagerAdminPassword": "monkey123",
-  "PcfNumberOfAZs": "1"
+  "PcfNumberOfAZs": "1",
+  "SkipSSLValidation": "true"
 }
 """
 
@@ -165,6 +170,11 @@ class TestSettings(unittest.TestCase):
 
     def test_get_s3_endpoint(self):
         self.assertEqual(self.settings.get_s3_endpoint(), "s3-canada-west-1.amazonaws.com")
+
+    def test_setters(self):
+        self.assertEqual(self.settings.pcf_input_skipsslvalidation, "true")
+        self.settings.pcf_input_skipsslvalidation = "false"
+        self.assertEqual(self.settings.pcf_input_skipsslvalidation, "false")
 
     def test_get_s3_endpoint_east1(self):
         self.settings.region = "us-east-1"

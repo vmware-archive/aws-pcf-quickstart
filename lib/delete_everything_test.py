@@ -28,6 +28,7 @@ class TestDeleteEverything(unittest.TestCase):
         self.settings = Mock(Settings)
         self.settings.region = 'canada-1a'
         self.settings.pcf_elasticruntimes3buildpacksbucket = 'bucket-bp'
+        self.settings.pcf_input_skipsslvalidation = 'false'
         self.settings.pcf_elasticruntimes3dropletsbucket = 'bucket-dp'
         self.settings.pcf_elasticruntimes3packagesbucket = 'bucket-pkg'
         self.settings.pcf_elasticruntimes3resourcesbucket = 'bucket-rsc'
@@ -47,6 +48,7 @@ class TestDeleteEverything(unittest.TestCase):
         delete_everything.delete_everything(self.settings)
 
         mock_backoff.assert_called_with("om-with-auth-for-realz delete-installation")
+        self.assertEqual(self.settings.pcf_input_skipsslvalidation, 'true')
 
     @patch('om_manager.is_opsman_configured')
     @patch('delete_everything.expire_bucket')
