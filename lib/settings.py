@@ -170,10 +170,6 @@ class Settings:
     def pcf_input_skipsslvalidation(self):
         return self.input_parameters["SkipSSLValidation"]
 
-    @pcf_input_skipsslvalidation.setter
-    def pcf_input_skipsslvalidation(self, value):
-        self.input_parameters["SkipSSLValidation"] = value
-
     @property
     def opsman_url(self):
         return "https://opsman.{}".format(self.pcf_input_domain)
