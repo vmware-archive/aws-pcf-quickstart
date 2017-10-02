@@ -171,11 +171,11 @@ Parameters:
     Description: Select number of Availability Zones. This changes the deployment
       size. 2 is a HA deployment, with nearly double the number of VMs
   ForwardLogOutput:
-    Description: When true, installation logs are sent to 'CloudWatch Logs'. Critical
+    Description: When true, installation logs are sent to 'CloudWatch Logs'. Very useful
       for solving failures, but potentially exposes secrets used during the bootstrap
       process.
     Type: String
-    Default: 'true'
+    Default: 'false'
     AllowedValues:
     - 'true'
     - 'false'
