@@ -555,13 +555,23 @@ Resources:
               command: cp /home/ubuntu/quickstart/version_config.json /var/local/version_config.json
             d_install_delete_daemon:
               command: /home/ubuntu/quickstart/daemon/install.sh
+  OpsManagerEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId: !Ref OpsManagerInstance
+      Domain: vpc
+  BootstrapEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId: !Ref BootstrapInstance
+      Domain: vpc
   DNSOpsMan:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneId: !Ref HostedZoneId
       Name: !Sub opsman.${Domain}
       ResourceRecords:
-      - !Sub ${OpsManagerInstance.PublicIp}
+      - !Ref OpsManagerEIP
       TTL: 60
       Type: A
   DNS:
@@ -570,7 +580,7 @@ Resources:
       HostedZoneId: !Ref HostedZoneId
       Name: !Sub bootstrap.${Domain}
       ResourceRecords:
-      - !Sub ${BootstrapInstance.PublicIp}
+      - !Ref BootstrapEIP
       TTL: 60
       Type: A
   DNSStar:
