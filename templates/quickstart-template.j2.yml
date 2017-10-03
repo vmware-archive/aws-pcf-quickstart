@@ -42,7 +42,7 @@ Metadata:
       - QSS3BucketName
       - QSS3KeyPrefix
     - Label:
-        default: End User License Agreement
+        default: Pivotal's End User License Agreement
       Parameters:
       - AcceptEULA
     ParameterLabels:
@@ -207,7 +207,7 @@ Parameters:
       forward slash (/).
     Type: String
   AcceptEULA:
-    Description: https://pivotal.io/evaluation-agreement
+    Description: By toggling 'Yes' above, you are affirming that you have reviewed and agree that your use of the software will be governed by the terms available at https://pivotal.io/evaluation-agreement
     Type: String
     Default: 'No'
     AllowedValues:
