@@ -406,7 +406,7 @@ Resources:
         "PcfOpsManagerAdminPassword": "${OpsManagerAdminPassword}",
         "PcfRdsAddress": "${PCFBase.Outputs.PcfRdsAddress}",
         "PcfElbDnsName": "${PCFBase.Outputs.PcfElbDnsName}",
-        "PcfOpsManagerInstanceIP": "${OpsManagerInstance.PublicIp}",
+        "PcfOpsManagerInstanceIP": "${OpsManagerEIP}",
         "PcfPrivateSubnetAvailabilityZone": "${PCFBase.Outputs.PcfPrivateSubnetAvailabilityZone}",
         "PcfCustomResourceSQSQueueUrl": "${CustomResourceSQSQueue}",
         "PcfVpc": "${PCFBase.Outputs.PcfVpc}",
