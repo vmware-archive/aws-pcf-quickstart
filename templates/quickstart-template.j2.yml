@@ -331,7 +331,6 @@ Resources:
           Action:
           - cloudformation:DescribeStacks
           Resource: !Sub arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${AWS::StackName}/*
-      PolicyName: !Sub ${AWS::StackName}-describe-stack
       Roles:
       - !GetAtt PCFBase.Outputs.PcfIamRole
   PCFParameterStorePolicy:
@@ -346,7 +345,6 @@ Resources:
           - ssm:GetParameters
           - ssm:GetParameter
           Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}.*
-      PolicyName: !Sub ${AWS::StackName}-parameter-store
       Roles:
       - !GetAtt PCFBase.Outputs.PcfIamRole
   PCFCustomResourcePolicy:
@@ -358,7 +356,6 @@ Resources:
         - Effect: Allow
           Action: sqs:*
           Resource: !GetAtt CustomResourceSQSQueue.Arn
-      PolicyName: !Sub ${AWS::StackName}-custom-resource
       Roles:
       - !GetAtt PCFBase.Outputs.PcfIamRole
   PCFEmitLogsPolicy:
@@ -374,7 +371,6 @@ Resources:
           - logs:PutLogEvents
           - logs:DescribeLogStreams
           Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:pcf-bootstrap-${AWS::StackName}:*
-      PolicyName: !Sub ${AWS::StackName}-emit-logs-policy
       Roles:
       - !GetAtt PCFBase.Outputs.PcfIamRole
   SSMParameterJSON:
