@@ -184,6 +184,7 @@ Parameters:
     Description: When true, SSL certificates are not validated. *Not recommended for
       a production environment*
     Type: String
+    Default: 'false'
     AllowedValues:
     - 'true'
     - 'false'
