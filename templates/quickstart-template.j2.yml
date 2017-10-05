@@ -264,7 +264,6 @@ Resources:
   CustomResourceSQSQueue:
     Type: AWS::SQS::Queue
     Properties:
-      QueueName: CustomResourceSQSQueue
       VisibilityTimeout: 1
   CustomResourceSNSTopic:
     Type: AWS::SNS::Topic
