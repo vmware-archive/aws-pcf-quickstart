@@ -15,14 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import functools
 import os
 import sys
-import functools
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, os.path.join(PATH, 'lib'))
 
-from lib import settings, om_manager, configure_opsman_director, configure_ert, sqs, wait_condition, wait_for_dns
+from lib import settings, om_manager, configure_opsman_director, configure_ert, sqs, wait_condition
 from lib import util, accept_eula, download_and_import
 
 my_settings = settings.Settings()
@@ -56,9 +56,6 @@ def check_waitcondition_return_code(out, err, return_code, step_name):
 
 out, err, exit_code = accept_eula.accept_eulas(my_settings)
 check_cr_return_code(out, err, exit_code, 'accept_eula')
-
-exit_code = wait_for_dns.wait_for_dns(my_settings)
-check_cr_return_code("", "", exit_code, 'wait_for_dns')
 
 out, err, exit_code = om_manager.config_opsman_auth(my_settings)
 check_cr_return_code(out, err, exit_code, 'config_opsman_auth')
