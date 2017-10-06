@@ -551,8 +551,7 @@ Resources:
                 fi
             b_etc_hosts_override:
               command: !Sub
-                - echo "${PrivateIpAddress} opsman.${Domain}" >> /etc/hosts
-                - { PrivateIpAddress: !GetAtt OpsManagerInstance.PrivateIpAddress }
+                echo "${OpsManagerInstance.PrivateIp} opsman.${Domain}" >> /etc/hosts
             c_chmod_stuff:
               command: chown -R ubuntu:ubuntu /home/ubuntu/quickstart
             d_copy_version_confifg_to_known_location:
