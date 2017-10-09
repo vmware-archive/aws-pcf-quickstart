@@ -506,6 +506,12 @@
           },
           {
             "IpProtocol": "tcp",
+            "FromPort": "443",
+            "ToPort": "443",
+            "CidrIp": "10.0.0.0/16"
+          },
+          {
+            "IpProtocol": "tcp",
             "FromPort": "25555",
             "ToPort": "25555",
             "CidrIp": "10.0.0.0/16"
