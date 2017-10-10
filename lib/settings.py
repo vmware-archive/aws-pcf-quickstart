@@ -229,6 +229,9 @@ class Settings:
         self.stemcell_release_version = stemcell.get('version')
         self.stemcell_release_sha256 = stemcell.get('sha256')
 
+    def get_pcf_keypair_name(self):
+        return "{}-pcf-keypair".format(self.stack_name)
+
 
 def read_version_config():
     with open(version_config_file_path) as version_config_file:

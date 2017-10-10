@@ -92,7 +92,7 @@ def configure_opsman_director(my_settings: Settings):
 def generate_ssh_keypair(my_settings: Settings):
     client = boto3.client(service_name='ec2', region_name=my_settings.region)
 
-    keyname = "{}-pcf-keypair".format(my_settings.stack_name)
+    keyname = my_settings.get_pcf_keypair_name()
     response = client.create_key_pair(
         DryRun=False,
         KeyName=keyname

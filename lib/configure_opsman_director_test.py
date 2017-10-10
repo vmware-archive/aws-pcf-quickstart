@@ -75,6 +75,7 @@ class TestConfigureOpsManDirector(unittest.TestCase):
     @patch('os.chmod')
     @patch('boto3.client')
     def test_generate_ssh_keypair(self, mock_client_constructor, mock_chmod):
+        self.settings.get_pcf_keypair_name.return_value = 'my-pcf-stack-pcf-keypair'
         mock_client = Mock()
         mock_client.create_key_pair.return_value = {
             'KeyMaterial': "------blah----"
@@ -96,6 +97,5 @@ class TestConfigureOpsManDirector(unittest.TestCase):
         home = expanduser("~/.ssh")
         expected_keypath = "{}/my-pcf-stack-pcf-keypair.pem".format(home)
 
-        self.assertEqual(keyname, expected_key_name)
         self.assertEqual(keybytes, "------blah----")
         mock_chmod.assert_called_with(expected_keypath, 0o400)

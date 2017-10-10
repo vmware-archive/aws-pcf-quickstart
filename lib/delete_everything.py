@@ -34,6 +34,8 @@ def delete_everything(my_settings: Settings):
             print("OM cmd failed to delete installation {}".format(return_code))
             return out, err, return_code
 
+    delete_keypair(my_settings)
+
     buckets = [
         my_settings.pcf_opsmanagers3bucket,
         my_settings.pcf_elasticruntimes3buildpacksbucket,
@@ -41,15 +43,19 @@ def delete_everything(my_settings: Settings):
         my_settings.pcf_elasticruntimes3packagesbucket,
         my_settings.pcf_elasticruntimes3resourcesbucket
     ]
-
-    # todo: should we delete the keypair...?
-
     for bucket_name in buckets:
         try:
             expire_bucket(my_settings, bucket_name)
         except Exception as e:
             print(e)
     return "", "", 0
+
+
+def delete_keypair(my_settings: Settings):
+    ec2_client = boto3.client(service_name='ec2', region_name=my_settings.region)
+    ec2_client.delete_key_pair(
+        KeyName=my_settings.get_pcf_keypair_name(), DryRun=False
+    )
 
 
 def expire_bucket(my_settings: Settings, bucket_name: str):

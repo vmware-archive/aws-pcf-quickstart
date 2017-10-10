@@ -35,11 +35,14 @@ class TestDeleteEverything(unittest.TestCase):
         self.settings.pcf_iam_secret_access_key = 'key-secret'
         self.settings.resources_created = True
 
+    @patch('delete_everything.delete_keypair')
     @patch('om_manager.is_opsman_configured')
     @patch('delete_everything.expire_bucket')
     @patch('util.exponential_backoff_cmd')
     @patch('om_manager.get_om_with_auth')
-    def test_om_delete_installation(self, mock_auth, mock_backoff, mock_expire_bucket, mock_is_opsman_configured):
+    def test_om_delete_installation(
+            self, mock_auth, mock_backoff, mock_expire_bucket, mock_is_opsman_configured, mock_delete_keypair
+    ):
         mock_backoff.return_value = "", "", 0
         mock_is_opsman_configured.return_value = True
 
@@ -48,23 +51,29 @@ class TestDeleteEverything(unittest.TestCase):
         delete_everything.delete_everything(self.settings)
 
         mock_backoff.assert_called_with("om-with-auth-for-realz delete-installation")
+        mock_delete_keypair.assert_called()
 
+    @patch('delete_everything.delete_keypair')
     @patch('delete_everything.expire_bucket')
     @patch('util.exponential_backoff_cmd')
     @patch('om_manager.get_om_with_auth')
-    def test_delete_installation_no_om_when_no_resources(self, mock_auth, mock_backoff, mock_expire_bucket):
+    def test_delete_installation_no_om_when_no_resources(
+            self, mock_auth, mock_backoff, mock_expire_bucket, mock_delete_keypair
+    ):
         self.settings.resources_created = False
 
         delete_everything.delete_everything(self.settings)
 
         mock_backoff.assert_not_called()
 
-
+    @patch('delete_everything.delete_keypair')
     @patch('om_manager.is_opsman_configured')
     @patch('delete_everything.expire_bucket')
     @patch('util.exponential_backoff_cmd')
     @patch('om_manager.get_om_with_auth')
-    def test_om_delete_installation_fails(self, mock_auth, mock_backoff, mock_expire_bucket, mock_is_opsman_configured):
+    def test_om_delete_installation_fails(
+            self, mock_auth, mock_backoff, mock_expire_bucket, mock_is_opsman_configured, mock_delete_keypair
+    ):
         mock_backoff.return_value = "Fail", "", 1
         mock_is_opsman_configured.return_value = True
 
@@ -73,11 +82,14 @@ class TestDeleteEverything(unittest.TestCase):
         self.assertEqual(result[0], "Fail")
         self.assertEqual(result[2], 1)
 
+    @patch('delete_everything.delete_keypair')
     @patch('om_manager.is_opsman_configured')
     @patch('delete_everything.expire_bucket')
     @patch('util.exponential_backoff_cmd')
     @patch('om_manager.get_om_with_auth')
-    def test_expire_buckets(self, mock_auth, mock_backoff, mock_expire_bucket, mock_is_opsman_configured):
+    def test_expire_buckets(
+            self, mock_auth, mock_backoff, mock_expire_bucket, mock_is_opsman_configured, mock_delete_keypair
+    ):
         mock_backoff.return_value = "", "", 0
         mock_is_opsman_configured.return_value = True
 
@@ -89,10 +101,11 @@ class TestDeleteEverything(unittest.TestCase):
             self.settings, "bucket-rsc"
         )
 
+    @patch('delete_everything.delete_keypair')
     @patch('boto3.client')
     @patch('util.exponential_backoff_cmd')
     @patch('om_manager.get_om_with_auth')
-    def test_expire_bucket(self, mock_auth, mock_backoff, mock_client_constructor):
+    def test_expire_bucket(self, mock_auth, mock_backoff, mock_client_constructor, mock_delete_keypair):
         mock_client = Mock()
         mock_client_constructor.return_value = mock_client
 
@@ -100,11 +113,12 @@ class TestDeleteEverything(unittest.TestCase):
 
         self.assertEqual(mock_client.put_bucket_lifecycle_configuration.call_count, 1)
 
+    @patch('delete_everything.delete_keypair')
     @patch('om_manager.is_opsman_configured')
     @patch('util.exponential_backoff_cmd')
     @patch('om_manager.get_om_with_auth')
     def test_skips_delete_installation_when_opsman_not_configured(
-            self, mock_auth, mock_exponential_backoff, mock_is_opsman_configured
+            self, mock_auth, mock_exponential_backoff, mock_is_opsman_configured, mock_delete_keypair
     ):
         mock_is_opsman_configured.return_value = False
 
