@@ -33,6 +33,7 @@ class TestDeleteEverything(unittest.TestCase):
         self.settings.pcf_elasticruntimes3resourcesbucket = 'bucket-rsc'
         self.settings.pcf_iam_access_key_id = 'key-vale'
         self.settings.pcf_iam_secret_access_key = 'key-secret'
+        self.settings.resources_created = True
 
     @patch('om_manager.is_opsman_configured')
     @patch('delete_everything.expire_bucket')
@@ -47,6 +48,17 @@ class TestDeleteEverything(unittest.TestCase):
         delete_everything.delete_everything(self.settings)
 
         mock_backoff.assert_called_with("om-with-auth-for-realz delete-installation")
+
+    @patch('delete_everything.expire_bucket')
+    @patch('util.exponential_backoff_cmd')
+    @patch('om_manager.get_om_with_auth')
+    def test_delete_installation_no_om_when_no_resources(self, mock_auth, mock_backoff, mock_expire_bucket):
+        self.settings.resources_created = False
+
+        delete_everything.delete_everything(self.settings)
+
+        mock_backoff.assert_not_called()
+
 
     @patch('om_manager.is_opsman_configured')
     @patch('delete_everything.expire_bucket')

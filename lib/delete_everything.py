@@ -16,7 +16,6 @@
 # limitations under the License.
 
 import boto3
-import botocore.exceptions
 
 import om_manager
 import util
@@ -24,7 +23,7 @@ from settings import Settings
 
 
 def delete_everything(my_settings: Settings):
-    if om_manager.is_opsman_configured(my_settings):
+    if my_settings.resources_created and om_manager.is_opsman_configured(my_settings):
         cmd = "{om_with_auth} delete-installation".format(
             om_with_auth=om_manager.get_om_with_auth(my_settings)
         )

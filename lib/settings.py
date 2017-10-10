@@ -16,11 +16,13 @@
 # limitations under the License.
 
 import json
+import os
 
 import boto3
 
 metadata_file = "/var/local/cloudformation/stack-meta.json"
 version_config_file_path = "/var/local/version_config.json"
+resource_created_file = "/home/ubuntu/quickstart/state/resource_created"
 
 
 class Settings:
@@ -173,6 +175,14 @@ class Settings:
     @property
     def opsman_url(self):
         return "https://opsman.{}".format(self.pcf_input_domain)
+
+    @property
+    def resources_created(self):
+        return os.path.isfile(resource_created_file)
+
+    def toggle_resources_created(self):
+        with open(resource_created_file, 'w') as f:
+            f.write('')
 
     def get_s3_endpoint(self):
         stack_region = self.region

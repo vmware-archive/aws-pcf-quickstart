@@ -17,7 +17,7 @@
 
 import unittest
 
-from mock import patch, Mock
+from mock import patch, Mock,  mock_open
 
 import json
 import settings
@@ -183,3 +183,17 @@ class TestSettings(unittest.TestCase):
             self.settings.stemcell_release_sha256,
             "ece6b9aaa4af20c180c446582bfa8e7d29681e2aac06c5d3d978a92c84432237"
         )
+
+    @patch('os.path.isfile')
+    def test_resources_created(self, isfile_mock):
+        isfile_mock.return_value = False
+        self.assertFalse(self.settings.resources_created)
+
+        isfile_mock.return_value = True
+        self.assertTrue(self.settings.resources_created)
+
+    def test_toggle_resources_created(self):
+        my_mock_open = mock_open()
+        with patch('settings.open', my_mock_open):
+            self.settings.toggle_resources_created()
+        my_mock_open.assert_called()
