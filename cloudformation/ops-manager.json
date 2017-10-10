@@ -428,6 +428,7 @@
                 "ec2:RebootInstances",
                 "ec2:TerminateInstances",
                 "ec2:CreateKeyPair",
+                "ec2:DeleteKeyPair",
                 "ec2:DescribeKeyPairs",
                 "ec2:DescribeRegions",
                 "ec2:DescribeSnapshots",
