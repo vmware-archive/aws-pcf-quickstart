@@ -377,6 +377,20 @@ Resources:
       PolicyName: !Sub ${AWS::StackName}-emit-logs-policy
       Roles:
       - !GetAtt PCFBase.Outputs.PcfIamRole
+  PCFKeyPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - ec2:CreateKeyPair
+          - ec2:DeleteKeyPair
+          Resource: !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:key-pair/${AWS::StackName}-pcf-keypair
+      PolicyName: !Sub ${AWS::StackName}-key-policy
+      Roles:
+      - !GetAtt PCFBase.Outputs.PcfIamRole
   SSMParameterJSON:
     Type: AWS::SSM::Parameter
     Properties:
@@ -458,6 +472,7 @@ Resources:
     - PCFEmitLogsPolicy
     - PCFParameterStorePolicy
     - PCFDescribeStackPolicy
+    - PCFKeyPolicy
     Properties:
       ImageId:
         !FindInMap
