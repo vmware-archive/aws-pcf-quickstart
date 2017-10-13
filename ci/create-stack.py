@@ -72,7 +72,7 @@ def create_stack(template_path: str, aws_region: str):
         {"ParameterKey": "SkipSSLValidation", "ParameterValue": "true"},
         {"ParameterKey": "AcceptEULA", "ParameterValue": "Yes"},
         {"ParameterKey": "ForwardLogOutput", "ParameterValue": "true"},
-        {"ParameterKey": "QSS3BucketName", "ParameterValue": "aws-pcf-quickstart-templates"}
+        {"ParameterKey": "QSS3BucketName", "ParameterValue": "aws-pcf-quickstart-templates-1-12"}
     ]
 
     client = boto3.client(
