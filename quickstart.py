@@ -75,6 +75,11 @@ check_waitcondition_return_code(out, err, exit_code, 'upload_assets')
 out, err, exit_code = download_and_import.upload_stemcell(my_settings, asset_path)
 check_waitcondition_return_code(out, err, exit_code, 'upload_stemcell')
 
+# todo: start temp!!!
+wait_condition.report_success(my_settings, "Successfully deployed Elastic Runtime")
+sys.exit(0)
+# todo: end temp!!!
+
 out, err, exit_code = configure_ert.configure_ert(my_settings)
 check_waitcondition_return_code(out, err, exit_code, 'configure_ert')
 out, err, exit_code = om_manager.apply_changes(my_settings)
