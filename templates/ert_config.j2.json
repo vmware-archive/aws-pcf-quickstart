@@ -14,21 +14,6 @@
   ".properties.route_services": {
     "value": "enable"
   },
-  ".properties.gorouter_ssl_ciphers": {
-    "value": "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384"
-  },
-  ".properties.haproxy_ssl_ciphers": {
-    "value": "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384"
-  },
-  ".properties.haproxy_forward_tls": {
-    "value": "disable"
-  },
-  ".properties.networking_poe_ssl_cert": {
-    "value": {
-      "cert_pem": "{{cert}}",
-      "private_key_pem": "{{key}}"
-    }
-  },
   ".ha_proxy.skip_cert_verify": {
     "value": {{pcf_skipsslvalidation}}
   },
