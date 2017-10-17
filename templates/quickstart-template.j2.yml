@@ -363,38 +363,42 @@ Resources:
       Value: !Sub |
         {
         "PcfRdsPassword": "${RdsPassword}",
-        "PcfPublicSubnetId2": "${PCFBase.Outputs.PcfPublicSubnetId2}",
-        "PcfElasticRuntimeS3PackagesBucket": "${PCFBase.Outputs.PcfElasticRuntimeS3PackagesBucket}",
-        "PcfNumberOfAZs": "${NumberOfAZs}",
-        "PcfPublicSubnetAvailabilityZone": "${PCFBase.Outputs.PcfPublicSubnetAvailabilityZone}",
-        "PcfIamRole": "${PCFBase.Outputs.PcfIamRole}",
-        "PcfElasticRuntimeS3ResourcesBucket": "${PCFBase.Outputs.PcfElasticRuntimeS3ResourcesBucket}",
         "PcfRdsPort": "${PCFBase.Outputs.PcfRdsPort}",
-        "PcfOpsManagerS3Bucket": "${PCFBase.Outputs.PcfOpsManagerS3Bucket}",
-        "PcfIamUserName": "${PCFBase.Outputs.PcfIamUserName}",
-        "PcfPublicSubnetAvailabilityZone2": "${PCFBase.Outputs.PcfPublicSubnetAvailabilityZone2}",
-        "PcfPrivateSubnetId": "${PCFBase.Outputs.PcfPrivateSubnetId}",
-        "PcfPublicSubnetId": "${PCFBase.Outputs.PcfPublicSubnetId}",
         "PcfRdsDBName": "${PCFBase.Outputs.PcfRdsDBName}",
-        "PcfVmsSecurityGroupId": "${PCFBase.Outputs.PcfVmsSecurityGroupId}",
-        "PcfElbTcpDnsName": "${PCFBase.Outputs.PcfElbTcpDnsName}",
-        "PcfPrivateSubnet2AvailabilityZone": "${PCFBase.Outputs.PcfPrivateSubnet2AvailabilityZone}",
-        "PcfWaitHandle": "${WaitHandle}",
-        "PcfOpsManagerAdminPassword": "${OpsManagerAdminPassword}",
         "PcfRdsAddress": "${PCFBase.Outputs.PcfRdsAddress}",
-        "PcfElbDnsName": "${PCFBase.Outputs.PcfElbDnsName}",
-        "PcfOpsManagerInstanceIP": "${PCFBase.Outputs.PcfOpsManIPAddress}",
-        "PcfPrivateSubnetAvailabilityZone": "${PCFBase.Outputs.PcfPrivateSubnetAvailabilityZone}",
-        "PcfCustomResourceSQSQueueUrl": "${CustomResourceSQSQueue}",
+        "PcfRdsUsername": "${PCFBase.Outputs.PcfRdsUsername}",
+        "PcfNumberOfAZs": "${NumberOfAZs}",
         "PcfVpc": "${PCFBase.Outputs.PcfVpc}",
+        "PcfAvailabilityZone1": "PCFBase.Outputs.PcfManagementSubnetAZ1AvailabilityZone",
+        "PcfAvailabilityZone2": "PCFBase.Outputs.PcfManagementSubnetAZ2AvailabilityZone",
+        "PcfAvailabilityZone3": "PCFBase.Outputs.PcfManagementSubnetAZ3AvailabilityZone",
+        "PcfManagementSubnetAZ1": "PCFBase.Outputs.PcfManagementSubnetAZ1",
+        "PcfManagementSubnetAZ2": "PCFBase.Outputs.PcfManagementSubnetAZ2",
+        "PcfManagementSubnetAZ3": "PCFBase.Outputs.PcfManagementSubnetAZ3",
+        "PcfERTSubnetAZ1": "PCFBase.Outputs.PcfERTSubnetAZ1",
+        "PcfERTSubnetAZ2": "PCFBase.Outputs.PcfERTSubnetAZ2",
+        "PcfERTSubnetAZ3": "PCFBase.Outputs.PcfERTSubnetAZ3",
+        "PcfServicesSubnetAZ1": "PCFBase.Outputs.PcfServicesSubnetAZ1",
+        "PcfServicesSubnetAZ2": "PCFBase.Outputs.PcfServicesSubnetAZ2",
+        "PcfServicesSubnetAZ3": "PCFBase.Outputs.PcfServicesSubnetAZ3",
+        "PcfOpsManagerS3Bucket": "${PCFBase.Outputs.PcfOpsManagerS3Bucket}",
+        "PcfElasticRuntimeS3BuildpacksBucket": "${PCFBase.Outputs.PcfElasticRuntimeS3BuildpacksBucket}",
         "PcfElasticRuntimeS3DropletsBucket": "${PCFBase.Outputs.PcfElasticRuntimeS3DropletsBucket}",
-        "PcfPrivateSubnet2Id": "${PCFBase.Outputs.PcfPrivateSubnet2Id}",
+        "PcfElasticRuntimeS3PackagesBucket": "${PCFBase.Outputs.PcfElasticRuntimeS3PackagesBucket}",
+        "PcfElasticRuntimeS3ResourcesBucket": "${PCFBase.Outputs.PcfElasticRuntimeS3ResourcesBucket}",
+        "PcfIamRole": "${PCFBase.Outputs.PcfIamRole}",
+        "PcfIamUserName": "${PCFBase.Outputs.PcfIamUserName}",
         "PcfIamUserAccessKey": "${PcfIamUserAccessKey}",
         "PcfIamUserSecretAccessKey": "${PcfIamUserAccessKey.SecretAccessKey}",
+        "PcfVmsSecurityGroupId": "${PCFBase.Outputs.PcfVmsSecurityGroup}",
+        "PcfOpsManagerSecurityGroupId": "${PCFBase.Outputs.PcfOpsManSecurityGroup}",
+        "PcfElbTcpDnsName": "${PCFBase.Outputs.PcfElbTcpDnsName}",
         "PcfElbSshDnsName": "${PCFBase.Outputs.PcfElbSshDnsName}",
-        "PcfElasticRuntimeS3BuildpacksBucket": "${PCFBase.Outputs.PcfElasticRuntimeS3BuildpacksBucket}",
-        "PcfOpsManagerSecurityGroupId": "${PCFBase.Outputs.PcfOpsManagerSecurityGroupId}",
-        "PcfRdsUsername": "${PCFBase.Outputs.PcfRdsUsername}",
+        "PcfElbWebDnsName": "${PCFBase.Outputs.PcfElbWebDnsName}",
+        "PcfWaitHandle": "${WaitHandle}",
+        "PcfCustomResourceSQSQueueUrl": "${CustomResourceSQSQueue}",
+        "PcfOpsManagerAdminPassword": "${OpsManagerAdminPassword}",
+        "PcfOpsManagerInstanceIP": "${PCFBase.Outputs.PcfOpsManIPAddress}",
         "PcfCompanyName": "${CompanyName}"
         }
   BootstrapInstance:
@@ -427,7 +431,7 @@ Resources:
         DeviceIndex: '0'
         GroupSet:
         - !GetAtt PCFBase.Outputs.PcfOpsManagerSecurityGroupId
-        SubnetId: !GetAtt PCFBase.Outputs.PcfPublicSubnetId
+        SubnetId: !GetAtt PCFBase.Outputs.PcfManagementSubnetAZ1
       SourceDestCheck: true
       Tags:
       - Key: Name
