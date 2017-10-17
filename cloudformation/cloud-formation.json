@@ -2464,10 +2464,6 @@
       "Condition": "CreateRDS",
       "Value": {"Ref": "RDSUsername"}
     },
-    "PcfRdsPassword": {
-      "Condition": "CreateRDS",
-      "Value": {"Ref": "RDSPassword"}
-    },
     "PcfRdsDBName": {
       "Condition": "CreateRDS",
       "Value": {"Ref": "RDSDBName"}
@@ -2501,6 +2497,9 @@
     },
     "PcfIamRole": {
       "Value": {"Ref": "PcfIamRole"}
+    },
+    "PcfOpsManSecurityGroup": {
+      "Value": { "Ref" : "PcfOpsManSecurityGroup" }
     }
   }
 }
