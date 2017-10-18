@@ -545,7 +545,7 @@ Resources:
       Name:
         Fn::Sub: '*.${Domain}'
       ResourceRecords:
-      - !GetAtt PCFBase.Outputs.PcfElbDnsName
+      - !GetAtt PCFBase.Outputs.PcfElbWebDnsName
       TTL: 60
       Type: CNAME
   DNSSsh:
@@ -564,7 +564,7 @@ Resources:
       Name:
         Fn::Sub: '*.sys.${Domain}'
       ResourceRecords:
-      - !GetAtt PCFBase.Outputs.PcfElbDnsName
+      - !GetAtt PCFBase.Outputs.PcfElbWebDnsName
       TTL: 60
       Type: CNAME
   DNSApps:
@@ -574,7 +574,7 @@ Resources:
       Name:
         Fn::Sub: '*.apps.${Domain}'
       ResourceRecords:
-      - !GetAtt PCFBase.Outputs.PcfElbDnsName
+      - !GetAtt PCFBase.Outputs.PcfElbWebDnsName
       TTL: 60
       Type: CNAME
 Outputs:
