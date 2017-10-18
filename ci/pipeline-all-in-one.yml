@@ -45,15 +45,6 @@ resources:
     access_key_id: {{s3_access_key_id}}
     secret_access_key: {{s3_secret_access_key}}
 
-- name: ops-manager-template-alpha
-  type: s3
-  source:
-    bucket: aws-pcf-quickstart-templates-1-12
-    region_name: us-west-2
-    versioned_file: pivotal/cloudfoundry/latest/templates/ops-manager.template
-    access_key_id: {{s3_access_key_id}}
-    secret_access_key: {{s3_secret_access_key}}
-
 - name: pivotal-cloudfoundry-template-alpha
   type: s3
   source:
@@ -162,10 +153,6 @@ jobs:
   - put: cloud-formation-template-alpha
     params:
       file: quickstart-repo/cloudformation/cloud-formation.json
-      acl: public-read
-  - put: ops-manager-template-alpha
-    params:
-      file: quickstart-repo/cloudformation/ops-manager.json
       acl: public-read
 
 - name: instantiate-outer-template-alpha
@@ -338,7 +325,7 @@ jobs:
           params:
             icon_emoji: ":sad_panda:"
             username: Concourse CI
-            channel: "@jshah"
+            channel: "@cholick"
             text: "Integration test failed"
         - task: delete-buckets
           config:
