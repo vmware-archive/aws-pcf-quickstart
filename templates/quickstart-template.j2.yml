@@ -433,7 +433,7 @@ Resources:
       - AssociatePublicIpAddress: 'true'
         DeviceIndex: '0'
         GroupSet:
-        - !GetAtt PCFBase.Outputs.PcfOpsManagerSecurityGroupId
+        - !GetAtt PCFBase.Outputs.PcfOpsManSecurityGroup
         SubnetId: !GetAtt PCFBase.Outputs.PcfManagementSubnetAZ1
       SourceDestCheck: true
       Tags:
@@ -526,7 +526,7 @@ Resources:
       HostedZoneId: !Ref HostedZoneId
       Name: !Sub opsman.${Domain}
       ResourceRecords:
-      - !GetAtt PCFBase.Outputs.PcfIamRole
+      - !GetAtt PCFBase.Outputs.PcfOpsManIPAddress
       TTL: 60
       Type: A
   DNS:

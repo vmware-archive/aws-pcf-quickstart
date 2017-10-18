@@ -9,7 +9,7 @@
       ]
     }
   },
-  "Description": "CloudFormation template for configuring Pivotal Cloud Foundry on AWS",
+  "Description": "CloudFormation template for configuring Pivotal Cloud Foundry on AWS QS(qs-1ngltrcp5)",
   "Mappings": {
     "NATRegionToAmiMap" : {
       "us-east-1" : {
@@ -1271,6 +1271,7 @@
     },
     "PcfBuildpacksBucket": {
       "Type": "AWS::S3::Bucket",
+      "DeletionPolicy": "Retain",
       "Properties": {
         "AccessControl": "Private",
         "VersioningConfiguration": {
@@ -1286,6 +1287,7 @@
     },
     "PcfDropletsBucket": {
       "Type": "AWS::S3::Bucket",
+      "DeletionPolicy": "Retain",
       "Properties": {
         "AccessControl": "Private",
         "VersioningConfiguration": {
@@ -1301,6 +1303,7 @@
     },
     "PcfOpsManBucket": {
       "Type": "AWS::S3::Bucket",
+      "DeletionPolicy": "Retain",
       "Properties": {
         "AccessControl": "Private",
         "VersioningConfiguration": {
@@ -1316,6 +1319,7 @@
     },
     "PcfPackagesBucket": {
       "Type": "AWS::S3::Bucket",
+      "DeletionPolicy": "Retain",
       "Properties": {
         "AccessControl": "Private",
         "VersioningConfiguration": {
@@ -1331,6 +1335,7 @@
     },
     "PcfResourcesBucket": {
       "Type": "AWS::S3::Bucket",
+      "DeletionPolicy": "Retain",
       "Properties": {
         "AccessControl": "Private",
         "VersioningConfiguration": {
