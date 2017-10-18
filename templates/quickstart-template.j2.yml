@@ -220,15 +220,18 @@ Resources:
     Properties:
       Parameters:
         EnvironmentID: !Ref EnvironmentID
-        AvailabilityZone1: Fn::Select:
-        - 0
-        - Fn::GetAZs: !Ref AWS::Region
-        AvailabilityZone2: Fn::Select:
-        - 1
-        - Fn::GetAZs: !Ref AWS::Region
-        AvailabilityZone3: Fn::Select:
-        - 2
-        - Fn::GetAZs: !Ref AWS::Region
+        AvailabilityZone1:
+          Fn::Select:
+          - 0
+          - Fn::GetAZs: !Ref AWS::Region
+        AvailabilityZone2:
+          Fn::Select:
+          - 1
+          - Fn::GetAZs: !Ref AWS::Region
+        AvailabilityZone3:
+          Fn::Select:
+          - 2
+          - Fn::GetAZs: !Ref AWS::Region
         OpsManAMI: !FindInMap
         - AMIMapping
         - !Ref AWS::Region
