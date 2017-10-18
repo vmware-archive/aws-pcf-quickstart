@@ -526,7 +526,7 @@ Resources:
       HostedZoneId: !Ref HostedZoneId
       Name: !Sub opsman.${Domain}
       ResourceRecords:
-      - !Ref PCFBase.Outputs.PcfOpsManIPAddress
+      - !GetAtt PCFBase.Outputs.PcfIamRole
       TTL: 60
       Type: A
   DNS:
