@@ -367,7 +367,6 @@ Resources:
         {
         "PcfRdsPassword": "${RdsPassword}",
         "PcfRdsPort": "${PCFBase.Outputs.PcfRdsPort}",
-        "PcfRdsDBName": "${PCFBase.Outputs.PcfRdsDBName}",
         "PcfRdsAddress": "${PCFBase.Outputs.PcfRdsAddress}",
         "PcfRdsUsername": "${PCFBase.Outputs.PcfRdsUsername}",
         "PcfNumberOfAZs": "${NumberOfAZs}",
@@ -389,19 +388,15 @@ Resources:
         "PcfElasticRuntimeS3DropletsBucket": "${PCFBase.Outputs.PcfElasticRuntimeS3DropletsBucket}",
         "PcfElasticRuntimeS3PackagesBucket": "${PCFBase.Outputs.PcfElasticRuntimeS3PackagesBucket}",
         "PcfElasticRuntimeS3ResourcesBucket": "${PCFBase.Outputs.PcfElasticRuntimeS3ResourcesBucket}",
-        "PcfIamRole": "${PCFBase.Outputs.PcfIamRole}",
-        "PcfIamUserName": "${PCFBase.Outputs.PcfIamUserName}",
         "PcfIamUserAccessKey": "${PcfIamUserAccessKey}",
         "PcfIamUserSecretAccessKey": "${PcfIamUserAccessKey.SecretAccessKey}",
         "PcfVmsSecurityGroupId": "${PCFBase.Outputs.PcfVmsSecurityGroup}",
-        "PcfOpsManagerSecurityGroupId": "${PCFBase.Outputs.PcfOpsManSecurityGroup}",
         "PcfElbTcpDnsName": "${PCFBase.Outputs.PcfElbTcpDnsName}",
         "PcfElbSshDnsName": "${PCFBase.Outputs.PcfElbSshDnsName}",
         "PcfElbWebDnsName": "${PCFBase.Outputs.PcfElbWebDnsName}",
         "PcfWaitHandle": "${WaitHandle}",
         "PcfCustomResourceSQSQueueUrl": "${CustomResourceSQSQueue}",
         "PcfOpsManagerAdminPassword": "${OpsManagerAdminPassword}",
-        "PcfOpsManagerInstanceIP": "${PCFBase.Outputs.PcfOpsManIPAddress}",
         "PcfCompanyName": "${CompanyName}"
         }
   BootstrapInstance:

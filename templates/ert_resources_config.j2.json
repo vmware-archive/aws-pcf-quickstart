@@ -1,5 +1,5 @@
 {
-  "router": {"elb_names": ["{{router_lb_name}}-pcf-elb"]},
-  "diego_brain": {"elb_names": ["{{router_lb_name}}-pcf-ssh-elb"]},
-  "tcp_router": {"elb_names": ["{{router_lb_name}}-pcf-tcp-elb"]}
+  "router": {"elb_names": ["{{pcf_elb_web_dns_name}}"]},
+  "diego_brain": {"elb_names": ["{{pcf_elb_ssh_dns_name}}"]},
+  "tcp_router": {"elb_names": ["{{pcf_elb_tcp_dns_name}}"]}
 }

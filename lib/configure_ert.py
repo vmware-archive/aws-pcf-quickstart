@@ -64,7 +64,9 @@ def configure_ert_resources(my_settings: Settings):
     if my_settings.pcf_input_elbprefix != "":
         prefix = my_settings.pcf_input_elbprefix
     ert_resource_ctx = {
-        "router_lb_name": "{prefix}".format(prefix=prefix)
+        "pcf_elb_tcp_dns_name": my_settings.pcf_pcfelbtcpdnsname,
+        "pcf_elb_ssh_dns_name": my_settings.pcf_pcfelbsshdnsname,
+        "pcf_elb_web_dns_name": my_settings.pcf_pcfelbwebdnsname,
     }
     with open("templates/ert_resources_config.j2.json", 'r') as f:
         ert_resource_template = Template(f.read())
