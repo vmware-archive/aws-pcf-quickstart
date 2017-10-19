@@ -31,7 +31,7 @@ asset_path = '/home/ubuntu/tiles'
 max_retries = 5
 
 
-def test_exit_code_success(exit_code):
+def check_exit_code_success(exit_code):
     print("exit_code {}".format(exit_code))
     return exit_code == 0
 
@@ -41,7 +41,7 @@ def check_cr_return_code(out, err, return_code, step_name):
     if return_code != 0:
         util.exponential_backoff(
             functools.partial(sqs.report_cr_creation_failure, my_settings, out),
-            test_exit_code_success
+            check_exit_code_success
         )
         sys.exit(1)
 
@@ -50,7 +50,7 @@ def check_waitcondition_return_code(out, err, return_code, step_name):
     if return_code != 0:
         util.exponential_backoff(
             functools.partial(wait_condition.report_failure, my_settings, out),
-            test_exit_code_success
+            check_exit_code_success
         )
         sys.exit(1)
 

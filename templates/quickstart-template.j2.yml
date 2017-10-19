@@ -140,7 +140,7 @@ Parameters:
     - 2
     Default: 1
     Description: Select number of Availability Zones. This changes the deployment
-      size. 2 is a HA deployment, with nearly double the number of VMs
+      size. 2 is a semi-HA deployment and 3 is a fully HA deployment.
   ForwardLogOutput:
     Description: When true, installation logs are sent to 'CloudWatch Logs'. Very useful
       for solving failures, but potentially exposes secrets used during the bootstrap
@@ -371,18 +371,18 @@ Resources:
         "PcfRdsUsername": "${PCFBase.Outputs.PcfRdsUsername}",
         "PcfNumberOfAZs": "${NumberOfAZs}",
         "PcfVpc": "${PCFBase.Outputs.PcfVpc}",
-        "PcfAvailabilityZone1": "PCFBase.Outputs.PcfManagementSubnetAZ1AvailabilityZone",
-        "PcfAvailabilityZone2": "PCFBase.Outputs.PcfManagementSubnetAZ2AvailabilityZone",
-        "PcfAvailabilityZone3": "PCFBase.Outputs.PcfManagementSubnetAZ3AvailabilityZone",
-        "PcfManagementSubnetAZ1": "PCFBase.Outputs.PcfManagementSubnetAZ1",
-        "PcfManagementSubnetAZ2": "PCFBase.Outputs.PcfManagementSubnetAZ2",
-        "PcfManagementSubnetAZ3": "PCFBase.Outputs.PcfManagementSubnetAZ3",
-        "PcfERTSubnetAZ1": "PCFBase.Outputs.PcfERTSubnetAZ1",
-        "PcfERTSubnetAZ2": "PCFBase.Outputs.PcfERTSubnetAZ2",
-        "PcfERTSubnetAZ3": "PCFBase.Outputs.PcfERTSubnetAZ3",
-        "PcfServicesSubnetAZ1": "PCFBase.Outputs.PcfServicesSubnetAZ1",
-        "PcfServicesSubnetAZ2": "PCFBase.Outputs.PcfServicesSubnetAZ2",
-        "PcfServicesSubnetAZ3": "PCFBase.Outputs.PcfServicesSubnetAZ3",
+        "PcfAvailabilityZone1": "${PCFBase.Outputs.PcfManagementSubnetAZ1AvailabilityZone}",
+        "PcfAvailabilityZone2": "${PCFBase.Outputs.PcfManagementSubnetAZ2AvailabilityZone}",
+        "PcfAvailabilityZone3": "${PCFBase.Outputs.PcfManagementSubnetAZ3AvailabilityZone}",
+        "PcfManagementSubnetAZ1": "${PCFBase.Outputs.PcfManagementSubnetAZ1}",
+        "PcfManagementSubnetAZ2": "${PCFBase.Outputs.PcfManagementSubnetAZ2}",
+        "PcfManagementSubnetAZ3": "${PCFBase.Outputs.PcfManagementSubnetAZ3}",
+        "PcfERTSubnetAZ1": "${PCFBase.Outputs.PcfERTSubnetAZ1}",
+        "PcfERTSubnetAZ2": "${PCFBase.Outputs.PcfERTSubnetAZ2}",
+        "PcfERTSubnetAZ3": "${PCFBase.Outputs.PcfERTSubnetAZ3}",
+        "PcfServicesSubnetAZ1": "${PCFBase.Outputs.PcfServicesSubnetAZ1}",
+        "PcfServicesSubnetAZ2": "${PCFBase.Outputs.PcfServicesSubnetAZ2}",
+        "PcfServicesSubnetAZ3": "${PCFBase.Outputs.PcfServicesSubnetAZ3}",
         "PcfOpsManagerS3Bucket": "${PCFBase.Outputs.PcfOpsManagerS3Bucket}",
         "PcfElasticRuntimeS3BuildpacksBucket": "${PCFBase.Outputs.PcfElasticRuntimeS3BuildpacksBucket}",
         "PcfElasticRuntimeS3DropletsBucket": "${PCFBase.Outputs.PcfElasticRuntimeS3DropletsBucket}",

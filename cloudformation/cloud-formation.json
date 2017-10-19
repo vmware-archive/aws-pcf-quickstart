@@ -1950,6 +1950,34 @@
         }
       }
     },
+    "PcfIngressRuleOpsMan4": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "PcfOpsManSecurityGroup"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "SourceSecurityGroupId": {
+          "Ref": "PcfOpsManSecurityGroup"
+        }
+      }
+    },
+    "PcfIngressRuleOpsMan5": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "PcfOpsManSecurityGroup"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "SourceSecurityGroupId": {
+          "Ref": "PcfOpsManSecurityGroup"
+        }
+      }
+    },
     "PcfIngressRuleElb1": {
       "Type": "AWS::EC2::SecurityGroupIngress",
       "Properties": {
@@ -2334,6 +2362,8 @@
                 "ec2:RebootInstances",
                 "ec2:TerminateInstances",
                 "ec2:DescribeKeypairs",
+                "ec2:CreateKeyPair",
+                "ec2:DeleteKeyPair",
                 "ec2:DescribeRegions",
                 "ec2:DescribeSnapshots",
                 "ec2:CreateSnapshot",
