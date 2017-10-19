@@ -1,0 +1,7 @@
+{
+  "ha_proxy": {"instances": 0},
+
+  "mysql": {"instances": 0},
+  "mysql_proxy": {"instances": 0},
+  "mysql_monitor": {"instances": 0}
+}
