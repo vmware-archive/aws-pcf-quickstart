@@ -85,8 +85,11 @@ Metadata:
 Parameters:
   EnvironmentID:
     Type: String
+    MinLength: '1'
+    AllowedPattern: '[\w-_]*'
     Default: pcf
-    Description: Prefix for various AWS resources created
+    Description: Prefix for various AWS resources created. At least 1 characters from
+      the set of alphanumeric, dashes, and underscores.
   OpsManagerIngress:
     Type: String
     Description: CIDR range allowed to connect to Pivotal Ops Manager and Bootstrap
@@ -138,6 +141,7 @@ Parameters:
     AllowedValues:
     - 1
     - 2
+    - 3
     Default: 1
     Description: Select number of Availability Zones. This changes the deployment
       size. 2 is a semi-HA deployment and 3 is a fully HA deployment.

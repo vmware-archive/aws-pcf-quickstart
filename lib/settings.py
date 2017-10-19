@@ -198,10 +198,6 @@ class Settings:
         return self.input_parameters["AdminEmail"]
 
     @property
-    def pcf_input_elbprefix(self):
-        return self.input_parameters["ElbPrefix"]
-
-    @property
     def pcf_input_hostedzoneid(self):
         return self.input_parameters["HostedZoneId"]
 

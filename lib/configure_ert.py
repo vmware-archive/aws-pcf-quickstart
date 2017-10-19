@@ -60,9 +60,6 @@ def configure_ert(my_settings: Settings):
 
 
 def configure_ert_resources(my_settings: Settings):
-    prefix = my_settings.stack_name
-    if my_settings.pcf_input_elbprefix != "":
-        prefix = my_settings.pcf_input_elbprefix
     ert_resource_ctx = {
         "pcf_elb_tcp_dns_name": my_settings.pcf_pcfelbtcpdnsname,
         "pcf_elb_ssh_dns_name": my_settings.pcf_pcfelbsshdnsname,
