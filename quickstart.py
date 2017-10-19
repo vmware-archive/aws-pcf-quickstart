@@ -45,6 +45,7 @@ def check_cr_return_code(out, err, return_code, step_name):
         )
         sys.exit(1)
 
+
 def check_waitcondition_return_code(out, err, return_code, step_name):
     print("Ran: {}; exit code: {}".format(step_name, exit_code))
     if return_code != 0:
@@ -54,17 +55,18 @@ def check_waitcondition_return_code(out, err, return_code, step_name):
         )
         sys.exit(1)
 
+
 out, err, exit_code = accept_eula.accept_eulas(my_settings)
 check_cr_return_code(out, err, exit_code, 'accept_eula')
 
 out, err, exit_code = om_manager.config_opsman_auth(my_settings)
 check_cr_return_code(out, err, exit_code, 'config_opsman_auth')
 
-#out, err, exit_code = configure_opsman_director.configure_opsman_director(my_settings)
-#check_cr_return_code(out, err, exit_code, 'configure_opsman_director')
-#my_settings.toggle_resources_created()
-#out, err, exit_code = om_manager.apply_changes(my_settings)
-#check_cr_return_code(out, err, exit_code, 'apply_changes')
+out, err, exit_code = configure_opsman_director.configure_opsman_director(my_settings)
+check_cr_return_code(out, err, exit_code, 'configure_opsman_director')
+my_settings.toggle_resources_created()
+out, err, exit_code = om_manager.apply_changes(my_settings)
+check_cr_return_code(out, err, exit_code, 'apply_changes')
 
 sqs.report_cr_creation_success(my_settings, 'MyCustomBOSH')
 
@@ -74,11 +76,6 @@ out, err, exit_code = download_and_import.upload_assets(my_settings, asset_path)
 check_waitcondition_return_code(out, err, exit_code, 'upload_assets')
 out, err, exit_code = download_and_import.upload_stemcell(my_settings, asset_path)
 check_waitcondition_return_code(out, err, exit_code, 'upload_stemcell')
-
-# todo: start temp!!!
-wait_condition.report_success(my_settings, "Successfully deployed Elastic Runtime")
-sys.exit(0)
-# todo: end temp!!!
 
 out, err, exit_code = configure_ert.configure_ert(my_settings)
 check_waitcondition_return_code(out, err, exit_code, 'configure_ert')
