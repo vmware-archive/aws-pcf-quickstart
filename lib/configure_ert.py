@@ -61,9 +61,9 @@ def configure_ert(my_settings: Settings):
 
 def configure_ert_resources(my_settings: Settings):
     ert_resource_ctx = {
-        "pcf_elb_tcp_dns_name": my_settings.pcf_pcfelbtcpdnsname,
-        "pcf_elb_ssh_dns_name": my_settings.pcf_pcfelbsshdnsname,
-        "pcf_elb_web_dns_name": my_settings.pcf_pcfelbwebdnsname,
+        "pcf_elb_tcp_name": my_settings.pcf_pcfelbtcpname,
+        "pcf_elb_ssh_name": my_settings.pcf_pcfelbsshname,
+        "pcf_elb_web_name": my_settings.pcf_pcfelbwebname,
     }
     with open("templates/ert_resources_config.j2.json", 'r') as f:
         ert_resource_template = Template(f.read())
