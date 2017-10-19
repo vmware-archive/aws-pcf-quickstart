@@ -46,10 +46,6 @@ class Settings:
         self.region = meta["Region"]
 
     @property
-    def pcf_elbdnsname(self):
-        return self.parameters["PcfElbDnsName"]
-
-    @property
     def pcf_elasticruntimes3buildpacksbucket(self):
         return self.parameters["PcfElasticRuntimeS3BuildpacksBucket"]
 
@@ -174,16 +170,16 @@ class Settings:
         return self.parameters["PcfWaitHandle"]
 
     @property
-    def pcf_pcfelbtcpdnsname(self):
-        return self.parameters["PcfElbTcpDnsName"]
+    def pcf_pcfelbtcpname(self):
+        return self.parameters["PcfElbTcpName"]
 
     @property
-    def pcf_pcfelbsshdnsname(self):
-        return self.parameters["PcfElbSshDnsName"]
+    def pcf_pcfelbsshname(self):
+        return self.parameters["PcfElbSshName"]
 
     @property
-    def pcf_pcfelbwebdnsname(self):
-        return self.parameters["PcfElbWebDnsName"]
+    def pcf_pcfelbwebname(self):
+        return self.parameters["PcfElbWebName"]
 
     @property
     def pcf_input_pivnettoken(self):
