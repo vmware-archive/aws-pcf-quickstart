@@ -76,11 +76,8 @@ def configure_ert_resources(my_settings: Settings):
 
 
 def configure_ert_multiaz_resources(my_settings: Settings):
-    if my_settings.pcf_pcfnumberofazs > 2:
+    if my_settings.pcf_pcfnumberofazs > 1:
         with open("templates/ert_3_az_resources_config.j2.json", 'r') as f:
-            template = f.read()
-    elif my_settings.pcf_pcfnumberofazs == 2:
-        with open("templates/ert_2_az_resources_config.j2.json", 'r') as f:
             template = f.read()
     else:
         with open("templates/ert_1_az_resources_config.j2.json", 'r') as f:

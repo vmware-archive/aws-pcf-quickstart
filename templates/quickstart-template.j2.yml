@@ -140,11 +140,10 @@ Parameters:
     Type: Number
     AllowedValues:
     - 1
-    - 2
     - 3
     Default: 1
     Description: Select number of Availability Zones. This changes the deployment
-      size. 2 is a semi-HA deployment and 3 is a fully HA deployment.
+      footprint. 1 is a single AZ with no redundancy; 3 is a fully HA deployment.
   ForwardLogOutput:
     Description: When true, installation logs are sent to 'CloudWatch Logs'. Very useful
       for solving failures, but potentially exposes secrets used during the bootstrap
