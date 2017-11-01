@@ -168,9 +168,8 @@ Parameters:
     AllowedValues:
     - Starter
     - Multi-AZ
-    Default: Starter
     Description: Select the initial deployment size. Starter creates a single instance for most job VMs.
-    Multi-AZ is a HA deployment across 2 availability zones.
+      Multi-AZ is a HA deployment across 2 availability zones.
   ForwardLogOutput:
     Description: When true, installation logs are sent to 'CloudWatch Logs'. Very useful
       for solving failures, but potentially exposes secrets used during the bootstrap
