@@ -24,7 +24,7 @@ Metadata:
     - Label:
         default: Pivotal Cloud Foundry Configuration
       Parameters:
-      - NumberOfAZs
+      - DeploymentSize
       - SkipSSLValidation
       - PivnetToken
       - AdminEmail
@@ -52,8 +52,8 @@ Metadata:
         default: RDS Username
       RdsPassword:
         default: RDS Password
-      NumberOfAZs:
-        default: Number of Availability Zones
+      DeploymentSize:
+        default: Size of the Deployment
       SkipSSLValidation:
         default: Skip SSL Validation
       PivnetToken:
@@ -163,14 +163,14 @@ Parameters:
   PCFKeyPair:
     Type: AWS::EC2::KeyPair::KeyName
     Description: Select the SSH keypair to use for Pivotal Ops Manager and NAT instance
-  NumberOfAZs:
-    Type: Number
+  DeploymentSize:
+    Type: String
     AllowedValues:
-    - 1
-    - 2
-    Default: 1
-    Description: Select number of Availability Zones. This changes the deployment
-      size. 2 is a HA deployment, with nearly double the number of VMs
+    - Starter
+    - Multi-AZ
+    Default: Starter
+    Description: Select the initial deployment size. Starter creates a single instance for most job VMs.
+    Multi-AZ is a HA deployment across 2 availability zones.
   ForwardLogOutput:
     Description: When true, installation logs are sent to 'CloudWatch Logs'. Very useful
       for solving failures, but potentially exposes secrets used during the bootstrap
@@ -388,7 +388,7 @@ Resources:
         "PcfRdsPassword": "${RdsPassword}",
         "PcfPublicSubnetId2": "${PCFBase.Outputs.PcfPublicSubnetId2}",
         "PcfElasticRuntimeS3PackagesBucket": "${PCFBase.Outputs.PcfElasticRuntimeS3PackagesBucket}",
-        "PcfNumberOfAZs": "${NumberOfAZs}",
+        "PcfDeploymentSize": "${DeploymentSize}",
         "PcfPublicSubnetAvailabilityZone": "${PCFBase.Outputs.PcfPublicSubnetAvailabilityZone}",
         "PcfIamRole": "${PCFBase.Outputs.PcfIamRole}",
         "PcfElasticRuntimeS3ResourcesBucket": "${PCFBase.Outputs.PcfElasticRuntimeS3ResourcesBucket}",

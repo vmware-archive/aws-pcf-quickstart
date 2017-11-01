@@ -62,7 +62,7 @@ param_json_doc = """
   "PcfPrivateSubnetAvailabilityZone": "canada-1a",
   "PcfPrivateSubnet2AvailabilityZone": "canada-1b",
   "PcfOpsManagerAdminPassword": "monkey123",
-  "PcfNumberOfAZs": "1"
+  "PcfDeploymentSize": "Starter"
 }
 """
 
@@ -158,7 +158,7 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(self.settings.pcf_rdspassword, "monkey123")
         self.assertEqual(self.settings.pcf_privatesubnetavailabilityzone, "canada-1a")
         self.assertEqual(self.settings.pcf_privatesubnet2availabilityzone, "canada-1b")
-        self.assertEqual(self.settings.pcf_pcfnumberofazs, 1)
+        self.assertEqual(self.settings.pcf_pcfdeploymentsize, "Starter")
 
     def test_default_values(self):
         self.assertEqual(self.settings.opsman_user, 'admin')

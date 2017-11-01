@@ -125,8 +125,8 @@ class Settings:
         return self.parameters["PcfElasticRuntimeS3ResourcesBucket"]
 
     @property
-    def pcf_pcfnumberofazs(self):
-        return int(self.parameters["PcfNumberOfAZs"])
+    def pcf_pcfdeploymentsize(self):
+        return self.parameters["PcfDeploymentSize"]
 
     @property
     def pcf_pcfcustomresourcesqsqueueurl(self):

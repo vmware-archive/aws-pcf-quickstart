@@ -67,6 +67,7 @@ def create_stack(template_path: str, aws_region: str):
         {"ParameterKey": "ElbPrefix", "ParameterValue": "my-pcf-elb"},
         {"ParameterKey": "PCFKeyPair", "ParameterValue": pcfkeypair},
         {"ParameterKey": "RdsUsername", "ParameterValue": "admin"},
+        {"ParameterKey": "DeploymentSize", "ParameterValue": "Starter"},
         {"ParameterKey": "AdminEmail", "ParameterValue": "noreply@pivotal.io"},
         {"ParameterKey": "PivnetToken", "ParameterValue": pivnettoken},
         {"ParameterKey": "SkipSSLValidation", "ParameterValue": "true"},

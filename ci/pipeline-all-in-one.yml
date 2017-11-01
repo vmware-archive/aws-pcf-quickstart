@@ -748,6 +748,7 @@ jobs:
           cp cloud-formation-template-alpha/cloud-formation.template aws-quickstart-repo-updated/templates/cloud-formation.template
           cp ops-manager-template-alpha/ops-manager.template aws-quickstart-repo-updated/templates/ops-manager.template
           cp pivotal-cloudfoundry-template-alpha/pivotal-cloudfoundry.template aws-quickstart-repo-updated/templates/pivotal-cloudfoundry.template
+          cp quickstart-repo/scripts/gen_ssl_certs.sh aws-quickstart-repo-updated/scripts/gen_ssl_certs.sh
 
           pushd aws-quickstart-repo-updated
 
