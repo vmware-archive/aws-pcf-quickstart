@@ -31,7 +31,7 @@ Metadata:
       - OpsManagerAdminPassword
       - CompanyName
     - Label:
-        default: RDS
+        default: Amazon RDS
       Parameters:
       - RdsDBName
       - RdsUsername
