@@ -62,7 +62,7 @@ resources:
   source:
     bucket: aws-pcf-quickstart-templates
     region_name: us-west-2
-    versioned_file: pivotal/cloudfoundry/latest/templates/cloud-formation.template
+    versioned_file: quickstart-pivotal-cloudfoundry/templates/cloud-formation.template
     access_key_id: {{s3_access_key_id}}
     secret_access_key: {{s3_secret_access_key}}
 
@@ -71,7 +71,7 @@ resources:
   source:
     bucket: aws-pcf-quickstart-templates
     region_name: us-west-2
-    versioned_file: pivotal/cloudfoundry/latest/templates/ops-manager.template
+    versioned_file: quickstart-pivotal-cloudfoundry/templates/ops-manager.template
     access_key_id: {{s3_access_key_id}}
     secret_access_key: {{s3_secret_access_key}}
 
@@ -80,7 +80,7 @@ resources:
   source:
     bucket: aws-pcf-quickstart-templates
     region_name: us-west-2
-    versioned_file: pivotal/cloudfoundry/latest/templates/pivotal-cloudfoundry.template
+    versioned_file: quickstart-pivotal-cloudfoundry/templates/pivotal-cloudfoundry.template
     access_key_id: {{s3_access_key_id}}
     secret_access_key: {{s3_secret_access_key}}
 
@@ -89,7 +89,7 @@ resources:
   source:
     bucket: aws-pcf-quickstart-templates
     region_name: us-west-2
-    versioned_file: pivotal/cloudfoundry/latest/scripts/quickstart.tgz
+    versioned_file: quickstart-pivotal-cloudfoundry/scripts/quickstart.tgz
     access_key_id: {{s3_access_key_id}}
     secret_access_key: {{s3_secret_access_key}}
 

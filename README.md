@@ -42,11 +42,11 @@ python -m unittest discover -v -s ./lib -p '*_test.py'
 #### Create Stack
 1. Create an s3 bucket
 1. Upload templates
-    * `cloudformation/cloudformation.json` to `[s3 bucket]/pivotal/cloudfoundry/latest/templates/cloud-formation.template`
-    * `cloudformation/ops-manager.json` to  `[s3 bucket]/pivotal/cloudfoundry/latest/templates/ops-manager.template`
+    * `cloudformation/cloudformation.json` to `[s3 bucket]/quickstart-pivotal-cloudfoundry/templates/cloud-formation.template`
+    * `cloudformation/ops-manager.json` to  `[s3 bucket]/quickstart-pivotal-cloudfoundry/templates/ops-manager.template`
     * Make both templates public
 1. Copy your custom `quickstart.tgz`
-    * `[s3 bucket]/pivotal/cloudfoundry/latest/scripts/quickstart.tgz`
+    * `[s3 bucket]/quickstart-pivotal-cloudfoundry/scripts/quickstart.tgz`
     * Make `quickstart.tgz` public
 1. Download the template `pivotal-cloudfoundry.template` from https://github.com/cf-platform-eng/quickstart-pivotal-cloudfoundry/blob/develop/templates/
     * To PR any changes to `pivotal-cloudfoundry.template`, modify `templates/quickstart-template.j2.yml` 
