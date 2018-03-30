@@ -1,6 +1,6 @@
 # AWS Quickstart
 
-Launch PCF on AWS with a single click.
+Install PCF on AWS with a single click.
 
 See the docs (link todo) for account and launch pre-reqs.
 
