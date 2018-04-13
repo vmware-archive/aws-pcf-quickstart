@@ -77,10 +77,10 @@ def configure_ert_resources(my_settings: Settings):
 
 def configure_ert_multiaz_resources(my_settings: Settings):
     if my_settings.pcf_pcfdeploymentsize == "Multi-AZ":
-        with open("templates/ert_3_az_resources_config.j2.json", 'r') as f:
+        with open("templates/ert_multiaz_resources_config.j2.json", 'r') as f:
             template = f.read()
     else:
-        with open("templates/ert_1_az_resources_config.j2.json", 'r') as f:
+        with open("templates/ert_singleaz_resources_config.j2.json", 'r') as f:
             template = f.read()
 
     ert_resource_config = om_manager.format_om_json_str(template)
