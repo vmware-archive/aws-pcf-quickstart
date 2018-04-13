@@ -11,7 +11,10 @@ Metadata:
       Parameters:
       - EnvironmentID
       - PCFKeyPair
+      - NATInstanceType
       - SSLCertificateARN
+      - ElbPrefix
+      - AllowHttpOnElb
       - ForwardLogOutput
     - Label:
         default: Network and DNS Configuration
@@ -22,14 +25,14 @@ Metadata:
     - Label:
         default: Pivotal Cloud Foundry Configuration
       Parameters:
-      - NumberOfAZs
+      - DeploymentSize
       - SkipSSLValidation
       - PivnetToken
       - AdminEmail
       - OpsManagerAdminPassword
       - CompanyName
     - Label:
-        default: RDS
+        default: Amazon RDS
       Parameters:
       - RdsDBName
       - RdsUsername
@@ -52,8 +55,8 @@ Metadata:
         default: RDS Username
       RdsPassword:
         default: RDS Password
-      NumberOfAZs:
-        default: Number of Availability Zones
+      DeploymentSize:
+        default: Size of the Deployment
       SkipSSLValidation:
         default: Skip SSL Validation
       PivnetToken:
@@ -70,8 +73,14 @@ Metadata:
         default: Domain
       PCFKeyPair:
         default: Keypair
+      NATInstanceType:
+        default: NAT Instance Type
       SSLCertificateARN:
         default: SSL Certificate ARN
+      ElbPrefix:
+        default: ELB Prefix
+      AllowHttpOnElb:
+        default: Allow HTTP on ELB
       ForwardLogOutput:
         default: Forward Log Output
       QSS3BucketName:
@@ -136,14 +145,13 @@ Parameters:
   PCFKeyPair:
     Type: AWS::EC2::KeyPair::KeyName
     Description: Select the SSH keypair to use for Pivotal Ops Manager and NAT instance
-  NumberOfAZs:
-    Type: Number
+  DeploymentSize:
+    Type: String
     AllowedValues:
-    - 1
-    - 3
-    Default: 1
-    Description: Select number of Availability Zones. This changes the deployment
-      footprint. 1 is a single AZ with no redundancy; 3 is a fully HA deployment.
+    - Starter
+    - Multi-AZ
+    Description: Select the initial deployment size. Starter creates a single instance for most job VMs.
+      Multi-AZ is a HA deployment across 2 availability zones.
   ForwardLogOutput:
     Description: When true, installation logs are sent to 'CloudWatch Logs'. Very useful
       for solving failures, but potentially exposes secrets used during the bootstrap
@@ -166,7 +174,7 @@ Parameters:
     ConstraintDescription: Quick Start bucket name can include numbers, lowercase
       letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
       (-).
-    Default: quickstart-reference
+    Default: aws-quickstart
     Description: S3 bucket name for the Quick Start assets. This string can include
       numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
       or end with a hyphen (-).
@@ -175,7 +183,7 @@ Parameters:
     AllowedPattern: ^[0-9a-zA-Z-/]*$
     ConstraintDescription: Quick Start key prefix can include numbers, lowercase letters,
       uppercase letters, hyphens (-), and forward slash (/).
-    Default: pivotal/cloudfoundry/latest/
+    Default: quickstart-pivotal-cloudfoundry/
     Description: S3 key prefix for the Quick Start assets. Quick Start key prefix
       can include numbers, lowercase letters, uppercase letters, hyphens (-), and
       forward slash (/).
@@ -372,7 +380,7 @@ Resources:
         "PcfRdsPort": "${PCFBase.Outputs.PcfRdsPort}",
         "PcfRdsAddress": "${PCFBase.Outputs.PcfRdsAddress}",
         "PcfRdsUsername": "${PCFBase.Outputs.PcfRdsUsername}",
-        "PcfNumberOfAZs": "${NumberOfAZs}",
+        "PcfDeploymentSize": "${DeploymentSize}",
         "PcfVpc": "${PCFBase.Outputs.PcfVpc}",
         "PcfAvailabilityZone1": "${PCFBase.Outputs.PcfManagementSubnetAZ1AvailabilityZone}",
         "PcfAvailabilityZone2": "${PCFBase.Outputs.PcfManagementSubnetAZ2AvailabilityZone}",

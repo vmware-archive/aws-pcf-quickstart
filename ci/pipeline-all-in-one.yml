@@ -25,43 +25,83 @@ resource_types:
 
 
 resources:
+- name: ubuntu-ami
+  type: ami
+  check_every: 1h
+  source:
+    aws_access_key_id: {{aws_admin_key_id}}
+    aws_secret_access_key: {{aws_admin_secret_access_key}}
+    region: us-west-1
+    filters:
+      owner-id: "099720109477"
+      is-public: true
+      state: available
+      name: ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*
+      root-device-type: ebs
 
 - name: quickstart-repo
   type: git
   source:
-    branch: '1_12'
+    branch: master
     uri: https://github.com/cf-platform-eng/aws-pcf-quickstart
     username: {{github_user_name}}
     password: {{github_access_token}}
     ignore_paths:
       - ci/*.yml
 
+- name: aws-quickstart-repo
+  type: git
+  source:
+    branch: develop
+    uri: https://github.com/cf-platform-eng/quickstart-pivotal-cloudfoundry
+    username: {{github_user_name}}
+    password: {{github_access_token}}
+
 - name: cloud-formation-template-alpha
   type: s3
   source:
-    bucket: aws-pcf-quickstart-templates-1-12
+    bucket: aws-pcf-quickstart-templates
     region_name: us-west-2
-    versioned_file: pivotal/cloudfoundry/latest/templates/cloud-formation.template
+    versioned_file: quickstart-pivotal-cloudfoundry/templates/cloud-formation.template
+    access_key_id: {{s3_access_key_id}}
+    secret_access_key: {{s3_secret_access_key}}
+
+- name: ops-manager-template-alpha
+  type: s3
+  source:
+    bucket: aws-pcf-quickstart-templates
+    region_name: us-west-2
+    versioned_file: quickstart-pivotal-cloudfoundry/templates/ops-manager.template
     access_key_id: {{s3_access_key_id}}
     secret_access_key: {{s3_secret_access_key}}
 
 - name: pivotal-cloudfoundry-template-alpha
   type: s3
   source:
-    bucket: aws-pcf-quickstart-templates-1-12
+    bucket: aws-pcf-quickstart-templates
     region_name: us-west-2
-    versioned_file: pivotal/cloudfoundry/latest/templates/pivotal-cloudfoundry.template
+    versioned_file: quickstart-pivotal-cloudfoundry/templates/pivotal-cloudfoundry.template
     access_key_id: {{s3_access_key_id}}
     secret_access_key: {{s3_secret_access_key}}
 
 - name: quickstart-scripts-alpha
   type: s3
   source:
-    bucket: aws-pcf-quickstart-templates-1-12
+    bucket: aws-pcf-quickstart-templates
     region_name: us-west-2
-    versioned_file: pivotal/cloudfoundry/latest/scripts/quickstart.tgz
+    versioned_file: quickstart-pivotal-cloudfoundry/scripts/quickstart.tgz
     access_key_id: {{s3_access_key_id}}
     secret_access_key: {{s3_secret_access_key}}
+
+- name: ami-version
+  type: semver
+  source:
+    driver: git
+    uri: https://github.com/cf-platform-eng/aws-pcf-quickstart
+    branch: ami_version
+    file: ami_version
+    username: {{github_user_name}}
+    password: {{github_access_token}}
 
 - name: ert-tile
   type: pivnet
@@ -79,14 +119,35 @@ resources:
     product_slug: ops-manager
     product_version: 1\.12\.*
 
+- name: packer-result
+  type: s3
+  source:
+    bucket: aws-pcf-quickstart-releases
+    region_name: us-west-2
+    regexp: packer-result-(.*).json
+    access_key_id: {{s3_access_key_id}}
+    secret_access_key: {{s3_secret_access_key}}
+
 - name: ami-mapping
   type: s3
   source:
-    bucket: aws-pcf-quickstart-releases-1-12
+    bucket: aws-pcf-quickstart-releases
     region_name: us-west-2
     regexp: ami-mapping-(.*).json
     access_key_id: {{s3_access_key_id}}
     secret_access_key: {{s3_secret_access_key}}
+
+- name: awslogs-agent-setup
+  type: webpage
+  source:
+    filename: awslogs-agent-setup.py
+    url: https://s3.amazonaws.com//aws-cloudwatch/downloads/latest/awslogs-agent-setup.py
+
+- name: aws-cfn-bootstrap
+  type: webpage
+  source:
+    filename: aws-cfn-bootstrap-latest.tar.gz
+    url: https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
 
 - name: aws-pcf-concourse-state
   type: s3
@@ -96,6 +157,13 @@ resources:
     versioned_file: stackid
     access_key_id: {{aws_admin_key_id}}
     secret_access_key: {{aws_admin_secret_access_key}}
+
+- name: quickstart-github-release
+  type: github-release
+  source:
+    owner: cf-platform-eng
+    repository: aws-pcf-quickstart
+    access_token: {{github_access_token}}
 
 - name: pivnet-release
   type: github-release
@@ -113,6 +181,16 @@ resources:
     access_token: {{github_access_token}}
     version: v0.0.24
 
+- name: version
+  type: semver
+  source:
+    driver: git
+    uri: https://github.com/cf-platform-eng/aws-pcf-quickstart
+    branch: quickstart_release_version
+    file: quickstart_release_version
+    username: {{github_user_name}}
+    password: {{github_access_token}}
+
 - name: slack-alert
   type: slack-notification
   source:
@@ -120,6 +198,40 @@ resources:
 
 
 jobs:
+- name: diff-templates
+  plan:
+  - get: quickstart-repo
+  - get: ert-tile
+    trigger: true
+    params:
+      globs:
+      - cf-cloudformation.json
+  - task: diff-templates
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: cfplatformeng/quickstart-ci
+      inputs:
+      - name: ert-tile
+      - name: quickstart-repo
+      run:
+        path: bash
+        args:
+        - -exc
+        - |
+          set +e
+          diff quickstart-repo/cloudformation/cf-cloudformation-base.json ert-tile/cf-cloudformation.json
+          if [ $? -eq 0 ]; then
+            echo "No diff"
+            exit 0
+          else
+            curl -X POST -H 'Content-type: application/json' \
+              --data '{"channel": "#amazon", "username": "Concourse CI", "icon_emoji": ":sad_panda:", "text":"Cloud Formation base template changed <@prasad>. Action required."}' \
+              {{slack_hook}}
+            exit 1
+          fi
 
 - name: unit-test
   plan:
@@ -144,6 +256,50 @@ jobs:
           python -m unittest discover -v -s ./lib -p '*_test.py'
           popd
 
+- name: build-ami
+  plan:
+  - get: quickstart-repo
+  - get: awslogs-agent-setup
+  - get: aws-cfn-bootstrap
+  - get: ubuntu-ami
+    trigger: true
+  - get: ami-version
+    params:
+      bump: patch
+  - task: build-ami
+    attempts: 2
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: cfplatformeng/quickstart-ci
+      inputs:
+      - name: quickstart-repo
+      - name: ami-version
+      - name: awslogs-agent-setup
+      - name: aws-cfn-bootstrap
+      - name: ubuntu-ami
+      outputs:
+      - name: output
+      params:
+        AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
+        AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}
+      run:
+        path: bash
+        args:
+        - -exc
+        - |
+          ./quickstart-repo/ci/generate-packer.py
+          mkdir -p output
+          cp manifest.json output/packer-result-$(cat ./ami-version/version).json
+  - put: ami-version
+    params:
+      file: ami-version/version
+  - put: packer-result
+    params:
+      file: output/packer-result-*.json
+
 - name: upload-inner-template-alpha
   plan:
   - get: quickstart-repo
@@ -154,6 +310,51 @@ jobs:
     params:
       file: quickstart-repo/cloudformation/cloud-formation.json
       acl: public-read
+  - put: ops-manager-template-alpha
+    params:
+      file: quickstart-repo/cloudformation/ops-manager.json
+      acl: public-read
+
+- name: replicate-ami
+  plan:
+  - get: quickstart-repo
+  - get: packer-result
+    trigger: true
+    passed:
+    - build-ami
+  - get: ami-version
+  - get: opsman-tile
+    params:
+      globs:
+        - '*.yml'
+  - task: replicate-ami
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: cfplatformeng/quickstart-ci
+      inputs:
+      - name: quickstart-repo
+      - name: packer-result
+      - name: ami-version
+      - name: opsman-tile
+      outputs:
+      - name: output
+      params:
+        AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
+        AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}
+      run:
+        path: bash
+        args:
+        - -exc
+        - |
+          mkdir -p output
+          pip install PyYAML
+          ./quickstart-repo/ci/copy-image.py
+  - put: ami-mapping
+    params:
+      file: output/ami-mapping-*.json
 
 - name: instantiate-outer-template-alpha
   plan:
@@ -162,6 +363,9 @@ jobs:
     passed:
       - unit-test
   - get: ami-mapping
+    trigger: true
+    passed:
+      - replicate-ami
   - get: opsman-tile
     trigger: true
     params:
@@ -325,7 +529,7 @@ jobs:
           params:
             icon_emoji: ":sad_panda:"
             username: Concourse CI
-            channel: "@cholick"
+            channel: "#amazon"
             text: "Integration test failed"
         - task: delete-buckets
           config:
@@ -447,3 +651,146 @@ jobs:
                 pip install boto3
                 python ./ci/delete-buckets.py
                 popd
+
+- name: github-release
+  plan:
+  - get: quickstart-scripts-alpha
+    passed:
+    - integration-test
+  - get: aws-pcf-concourse-state
+    trigger: true
+    passed:
+    - integration-test
+  - get: version
+    params:
+      bump: patch
+  - task: add-version-to-filename
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: cfplatformeng/quickstart-ci
+      inputs:
+      - name: quickstart-scripts-alpha
+      - name: version
+      outputs:
+      - name: output
+      params:
+      run:
+        path: bash
+        args:
+        - -exc
+        - |
+          cp quickstart-scripts-alpha/quickstart.tgz output/quickstart-`cat version/version`.tgz
+  - put: version
+    params:
+      file: version/version
+  - put: quickstart-github-release
+    params:
+      name: version/version
+      tag: version/version
+      globs:
+      - output/quickstart-*.tgz
+
+- name: commit-and-pr-aws-quickstart-repo
+  plan:
+  - get: quickstart-repo
+    passed:
+    - integration-test
+  - get: aws-quickstart-repo
+  - get: quickstart-scripts-alpha
+    passed:
+      - integration-test
+  - get: cloud-formation-template-alpha
+    passed:
+    - upload-inner-template-alpha
+  - get: ops-manager-template-alpha
+    passed:
+    - upload-inner-template-alpha
+  - get: pivotal-cloudfoundry-template-alpha
+    passed:
+    - integration-test
+  - get: aws-pcf-concourse-state
+    trigger: true
+    passed:
+    - integration-test
+  - task: commit-aws-quickstart-repo
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: cfplatformeng/quickstart-ci
+      inputs:
+      - name: quickstart-repo
+      - name: aws-quickstart-repo
+      - name: quickstart-scripts-alpha
+      - name: cloud-formation-template-alpha
+      - name: ops-manager-template-alpha
+      - name: pivotal-cloudfoundry-template-alpha
+      outputs:
+      - name: aws-quickstart-repo-updated
+      params: {}
+      run:
+        path: bash
+        args:
+        - -exc
+        - |
+          pushd quickstart-repo
+          sha=$(git rev-parse HEAD)
+          popd
+
+          cp -r aws-quickstart-repo/. aws-quickstart-repo-updated
+
+          #todo: are these paths actually right? What about full path in s3
+          cp quickstart-scripts-alpha/quickstart.tgz aws-quickstart-repo-updated/scripts/quickstart.tgz
+          cp cloud-formation-template-alpha/cloud-formation.template aws-quickstart-repo-updated/templates/cloud-formation.template
+          cp ops-manager-template-alpha/ops-manager.template aws-quickstart-repo-updated/templates/ops-manager.template
+          cp pivotal-cloudfoundry-template-alpha/pivotal-cloudfoundry.template aws-quickstart-repo-updated/templates/pivotal-cloudfoundry.template
+          cp quickstart-repo/scripts/gen_ssl_certs.sh aws-quickstart-repo-updated/scripts/gen_ssl_certs.sh
+
+          pushd aws-quickstart-repo-updated
+
+          pushd scripts/quickstart
+          git checkout master && git pull
+          git checkout $sha
+          popd
+
+          git config --global user.name "Pivotal Concourse"
+          git config --global user.email "ci@example.com" #todo: better email....
+
+          git add -A .
+          git commit -m "Commiting release candiate for PR"
+
+          popd
+  - put: aws-quickstart-repo
+    params:
+      repository: aws-quickstart-repo-updated
+
+- name: make_pr_to_aws
+  plan:
+  - get: quickstart-repo
+    passed:
+    - commit-and-pr-aws-quickstart-repo
+  - get: aws-quickstart-repo
+  - get: version
+  - task: make_pr_to_aws
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: cfplatformeng/quickstart-ci
+      inputs:
+      - name: quickstart-repo
+      - name: version
+      params:
+        GITHUB_ACCESS_TOKEN: {{github_access_token}}
+      run:
+        path: bash
+        args:
+        - -exc
+        - |
+          pip install requests
+          python3 quickstart-repo/ci/github-pullrequest.py

@@ -59,7 +59,7 @@ param_json_doc = """
   "PcfAvailabilityZone2": "canada-1b",
   "PcfAvailabilityZone3": "canada-1c",
   "PcfOpsManagerAdminPassword": "monkey123",
-  "PcfNumberOfAZs": "1"
+  "PcfDeploymentSize": "Starter"
 }
 """
 
@@ -155,7 +155,7 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(self.settings.pcf_pcfavailabilityzone1, "canada-1a")
         self.assertEqual(self.settings.pcf_pcfavailabilityzone2, "canada-1b")
         self.assertEqual(self.settings.pcf_pcfavailabilityzone3, "canada-1c")
-        self.assertEqual(self.settings.pcf_pcfnumberofazs, 1)
+        self.assertEqual(self.settings.pcf_pcfdeploymentsize, "Starter")
 
     def test_default_values(self):
         self.assertEqual(self.settings.opsman_user, 'admin')
