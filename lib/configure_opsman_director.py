@@ -39,12 +39,19 @@ def configure_opsman_director(my_settings: Settings):
         "ssh_private_key": keybytes.replace("\n", "\\n"),
         "region": my_settings.region,
         "encrypted": "false",
-        "vpc_private_subnet_id": my_settings.pcf_privatesubnetid,
-        "vpc_private_subnet_az": my_settings.pcf_privatesubnetavailabilityzone,
-        "vpc_private_subnet_id2": my_settings.pcf_privatesubnet2id,
-        "vpc_private_subnet_az2": my_settings.pcf_privatesubnet2availabilityzone,
-        "singleton_availability_zone": my_settings.pcf_privatesubnetavailabilityzone
-
+        "pcf_management_subnet_az1": my_settings.pcf_pcfmanagementsubnetaz1,
+        "pcf_management_subnet_az2": my_settings.pcf_pcfmanagementsubnetaz2,
+        "pcf_management_subnet_az3": my_settings.pcf_pcfmanagementsubnetaz3,
+        "pcf_ert_subnet_az1": my_settings.pcf_pcfertsubnetaz1,
+        "pcf_ert_subnet_az2": my_settings.pcf_pcfertsubnetaz2,
+        "pcf_ert_subnet_az3": my_settings.pcf_pcfertsubnetaz3,
+        "pcf_services_subnet_az1": my_settings.pcf_pcfservicessubnetaz1,
+        "pcf_services_subnet_az2": my_settings.pcf_pcfservicessubnetaz2,
+        "pcf_services_subnet_az3": my_settings.pcf_pcfservicessubnetaz3,
+        "az1": my_settings.pcf_pcfavailabilityzone1,
+        "az2": my_settings.pcf_pcfavailabilityzone2,
+        "az3": my_settings.pcf_pcfavailabilityzone3,
+        "singleton_availability_zone": my_settings.pcf_pcfavailabilityzone1
     }
     with open("templates/bosh_az_config.j2.json", 'r') as f:
         az_template = Template(f.read())

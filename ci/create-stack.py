@@ -58,22 +58,21 @@ def create_stack(template_path: str, aws_region: str):
     sslcertificatearn = os.environ[aws_region.upper().replace('-', '_') + '_SSLCERTIFICATEARN']
 
     parameters = [
-        {"ParameterKey": "RdsPassword", "ParameterValue": password},
-        {"ParameterKey": "HostedZoneId", "ParameterValue": hostedzoneid},
-        {"ParameterKey": "SSLCertificateARN", "ParameterValue": sslcertificatearn},
-        {"ParameterKey": "OpsManagerAdminPassword", "ParameterValue": password},
-        {"ParameterKey": "Domain", "ParameterValue": domain},
         {"ParameterKey": "OpsManagerIngress", "ParameterValue": "0.0.0.0/0"},
-        {"ParameterKey": "ElbPrefix", "ParameterValue": "my-pcf-elb"},
-        {"ParameterKey": "PCFKeyPair", "ParameterValue": pcfkeypair},
+        {"ParameterKey": "RdsPassword", "ParameterValue": password},
         {"ParameterKey": "RdsUsername", "ParameterValue": "admin"},
-        {"ParameterKey": "DeploymentSize", "ParameterValue": "Starter"},
-        {"ParameterKey": "AdminEmail", "ParameterValue": "noreply@pivotal.io"},
+        {"ParameterKey": "SSLCertificateARN", "ParameterValue": sslcertificatearn},
         {"ParameterKey": "PivnetToken", "ParameterValue": pivnettoken},
-        {"ParameterKey": "SkipSSLValidation", "ParameterValue": "true"},
-        {"ParameterKey": "AcceptEULA", "ParameterValue": "Yes"},
+        {"ParameterKey": "AdminEmail", "ParameterValue": "noreply@pivotal.io"},
+        {"ParameterKey": "HostedZoneId", "ParameterValue": hostedzoneid},
+        {"ParameterKey": "Domain", "ParameterValue": domain},
+        {"ParameterKey": "OpsManagerAdminPassword", "ParameterValue": password},
+        {"ParameterKey": "PCFKeyPair", "ParameterValue": pcfkeypair},
         {"ParameterKey": "ForwardLogOutput", "ParameterValue": "true"},
-        {"ParameterKey": "QSS3BucketName", "ParameterValue": "aws-pcf-quickstart-templates"}
+        {"ParameterKey": "DeploymentSize", "ParameterValue": "Starter"},
+        {"ParameterKey": "SkipSSLValidation", "ParameterValue": "true"},
+        {"ParameterKey": "QSS3BucketName", "ParameterValue": "aws-pcf-quickstart-templates-1-12"},
+        {"ParameterKey": "AcceptEULA", "ParameterValue": "Yes"},
     ]
 
     client = boto3.client(

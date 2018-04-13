@@ -60,11 +60,10 @@ def configure_ert(my_settings: Settings):
 
 
 def configure_ert_resources(my_settings: Settings):
-    prefix = my_settings.stack_name
-    if my_settings.pcf_input_elbprefix != "":
-        prefix = my_settings.pcf_input_elbprefix
     ert_resource_ctx = {
-        "router_lb_name": "{prefix}".format(prefix=prefix)
+        "pcf_elb_tcp_name": my_settings.pcf_pcfelbtcpname,
+        "pcf_elb_ssh_name": my_settings.pcf_pcfelbsshname,
+        "pcf_elb_web_name": my_settings.pcf_pcfelbwebname,
     }
     with open("templates/ert_resources_config.j2.json", 'r') as f:
         ert_resource_template = Template(f.read())

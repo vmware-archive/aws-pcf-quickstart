@@ -9,6 +9,7 @@ Metadata:
     - Label:
         default: Amazon EC2 Configuration
       Parameters:
+      - EnvironmentID
       - PCFKeyPair
       - NATInstanceType
       - SSLCertificateARN
@@ -46,6 +47,8 @@ Metadata:
       Parameters:
       - AcceptEULA
     ParameterLabels:
+      EnvironmentID:
+        default: Environment ID
       RdsDBName:
         default: RDS DB Name
       RdsUsername:
@@ -89,22 +92,13 @@ Metadata:
       CompanyName:
         default: Custom Branding Company Name
 Parameters:
-  NATInstanceType:
+  EnvironmentID:
     Type: String
-    AllowedValues:
-    - t2.micro
-    - t2.small
-    - t2.medium
-    - t2.large
-    - t2.xlarge
-    - m4.large
-    - c4.large
-    - m4.xlarge
-    - c4.xlarge
-    - c4.8xlarge
-    ConstraintDescription: Instance Type must be of a valid EC2 type
-    Default: t2.medium
-    Description: Select the Instance Type to use for the NAT vm
+    MinLength: '1'
+    AllowedPattern: '[\w-_]*'
+    Default: pcf
+    Description: Prefix for various AWS resources created. At least 1 characters from
+      the set of alphanumeric, dashes, and underscores.
   OpsManagerIngress:
     Type: String
     Description: CIDR range allowed to connect to Pivotal Ops Manager and Bootstrap
@@ -127,18 +121,6 @@ Parameters:
     Type: String
     Description: ARN for pre-uploaded SSL certificate.
       The certificate should cover *.pcf_domain, *.sys.pcf_domain, *.apps.pcf_domain, *.login.pcf_domain, and *.uaa.pcf_domain
-  ElbPrefix:
-    Type: String
-    Description: Prefix for the name of the ELBs provisioned. (Required)
-    MinLength: 1
-    MaxLength: 19
-  AllowHttpOnElb:
-    Type: String
-    Default: 'true'
-    AllowedValues:
-    - 'true'
-    - 'false'
-    Description: Allow HTTP traffic on PCF-ELB port 80.
   PivnetToken:
     Type: String
     Description: Pivotal Network token to accept EULA (requires registration). To
@@ -248,18 +230,29 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
       Parameters:
-        01NATKeyPair: !Ref PCFKeyPair
-        02NATInstanceType: !Ref NATInstanceType
-        03OpsManagerIngress: !Ref OpsManagerIngress
-        04RdsDBName: !Ref RdsDBName
-        05RdsUsername: !Ref RdsUsername
-        06RdsPassword: !Ref RdsPassword
-        07SSLCertificateARN: !Ref SSLCertificateARN
-        08OpsManagerTemplate: !Sub https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/ops-manager.template
-        09ElbPrefix: !Ref ElbPrefix
-        10AllowHttpOnElb: !Ref AllowHttpOnElb
-        11PivnetToken: !Ref PivnetToken
-        12AdminEmail: !Ref AdminEmail
+        EnvironmentID: !Ref EnvironmentID
+        AvailabilityZone1:
+          Fn::Select:
+          - 0
+          - Fn::GetAZs: !Ref AWS::Region
+        AvailabilityZone2:
+          Fn::Select:
+          - 1
+          - Fn::GetAZs: !Ref AWS::Region
+        AvailabilityZone3:
+          Fn::Select:
+          - 2
+          - Fn::GetAZs: !Ref AWS::Region
+        OpsManAMI: !FindInMap
+        - AMIMapping
+        - !Ref AWS::Region
+        - opsman
+        OpsManIngressCidr: !Ref OpsManagerIngress
+        OpsManSSHKeyPairName: !Ref PCFKeyPair
+        RDSDBName: !Ref RdsDBName
+        RDSUsername: !Ref RdsUsername
+        RDSPassword: !Ref RdsPassword
+        ERTCertificateARN: !Ref SSLCertificateARN
       TemplateURL: !Sub https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/cloud-formation.template
   CustomResourceSQSQueue:
     Type: AWS::SQS::Queue
@@ -296,7 +289,6 @@ Resources:
     DependsOn:
     - CustomResourceSQSQueuePolicy
     - BootstrapInstance
-    - OpsManagerInstance
     - DNSOpsMan
     - DNSSys
     - DNSStar
@@ -385,75 +377,45 @@ Resources:
       Value: !Sub |
         {
         "PcfRdsPassword": "${RdsPassword}",
-        "PcfPublicSubnetId2": "${PCFBase.Outputs.PcfPublicSubnetId2}",
-        "PcfElasticRuntimeS3PackagesBucket": "${PCFBase.Outputs.PcfElasticRuntimeS3PackagesBucket}",
-        "PcfDeploymentSize": "${DeploymentSize}",
-        "PcfPublicSubnetAvailabilityZone": "${PCFBase.Outputs.PcfPublicSubnetAvailabilityZone}",
-        "PcfIamRole": "${PCFBase.Outputs.PcfIamRole}",
-        "PcfElasticRuntimeS3ResourcesBucket": "${PCFBase.Outputs.PcfElasticRuntimeS3ResourcesBucket}",
         "PcfRdsPort": "${PCFBase.Outputs.PcfRdsPort}",
-        "PcfOpsManagerS3Bucket": "${PCFBase.Outputs.PcfOpsManagerS3Bucket}",
-        "PcfIamUserName": "${PCFBase.Outputs.PcfIamUserName}",
-        "PcfPublicSubnetAvailabilityZone2": "${PCFBase.Outputs.PcfPublicSubnetAvailabilityZone2}",
-        "PcfPrivateSubnetId": "${PCFBase.Outputs.PcfPrivateSubnetId}",
-        "PcfPublicSubnetId": "${PCFBase.Outputs.PcfPublicSubnetId}",
-        "PcfRdsDBName": "${PCFBase.Outputs.PcfRdsDBName}",
-        "PcfVmsSecurityGroupId": "${PCFBase.Outputs.PcfVmsSecurityGroupId}",
-        "PcfElbTcpDnsName": "${PCFBase.Outputs.PcfElbTcpDnsName}",
-        "PcfPrivateSubnet2AvailabilityZone": "${PCFBase.Outputs.PcfPrivateSubnet2AvailabilityZone}",
-        "PcfWaitHandle": "${WaitHandle}",
-        "PcfOpsManagerAdminPassword": "${OpsManagerAdminPassword}",
         "PcfRdsAddress": "${PCFBase.Outputs.PcfRdsAddress}",
-        "PcfElbDnsName": "${PCFBase.Outputs.PcfElbDnsName}",
-        "PcfOpsManagerInstanceIP": "${OpsManagerEIP}",
-        "PcfPrivateSubnetAvailabilityZone": "${PCFBase.Outputs.PcfPrivateSubnetAvailabilityZone}",
-        "PcfCustomResourceSQSQueueUrl": "${CustomResourceSQSQueue}",
+        "PcfRdsUsername": "${PCFBase.Outputs.PcfRdsUsername}",
+        "PcfDeploymentSize": "${DeploymentSize}",
         "PcfVpc": "${PCFBase.Outputs.PcfVpc}",
+        "PcfAvailabilityZone1": "${PCFBase.Outputs.PcfManagementSubnetAZ1AvailabilityZone}",
+        "PcfAvailabilityZone2": "${PCFBase.Outputs.PcfManagementSubnetAZ2AvailabilityZone}",
+        "PcfAvailabilityZone3": "${PCFBase.Outputs.PcfManagementSubnetAZ3AvailabilityZone}",
+        "PcfManagementSubnetAZ1": "${PCFBase.Outputs.PcfManagementSubnetAZ1}",
+        "PcfManagementSubnetAZ2": "${PCFBase.Outputs.PcfManagementSubnetAZ2}",
+        "PcfManagementSubnetAZ3": "${PCFBase.Outputs.PcfManagementSubnetAZ3}",
+        "PcfERTSubnetAZ1": "${PCFBase.Outputs.PcfERTSubnetAZ1}",
+        "PcfERTSubnetAZ2": "${PCFBase.Outputs.PcfERTSubnetAZ2}",
+        "PcfERTSubnetAZ3": "${PCFBase.Outputs.PcfERTSubnetAZ3}",
+        "PcfServicesSubnetAZ1": "${PCFBase.Outputs.PcfServicesSubnetAZ1}",
+        "PcfServicesSubnetAZ2": "${PCFBase.Outputs.PcfServicesSubnetAZ2}",
+        "PcfServicesSubnetAZ3": "${PCFBase.Outputs.PcfServicesSubnetAZ3}",
+        "PcfOpsManagerS3Bucket": "${PCFBase.Outputs.PcfOpsManagerS3Bucket}",
+        "PcfElasticRuntimeS3BuildpacksBucket": "${PCFBase.Outputs.PcfElasticRuntimeS3BuildpacksBucket}",
         "PcfElasticRuntimeS3DropletsBucket": "${PCFBase.Outputs.PcfElasticRuntimeS3DropletsBucket}",
-        "PcfPrivateSubnet2Id": "${PCFBase.Outputs.PcfPrivateSubnet2Id}",
+        "PcfElasticRuntimeS3PackagesBucket": "${PCFBase.Outputs.PcfElasticRuntimeS3PackagesBucket}",
+        "PcfElasticRuntimeS3ResourcesBucket": "${PCFBase.Outputs.PcfElasticRuntimeS3ResourcesBucket}",
         "PcfIamUserAccessKey": "${PcfIamUserAccessKey}",
         "PcfIamUserSecretAccessKey": "${PcfIamUserAccessKey.SecretAccessKey}",
-        "PcfElbSshDnsName": "${PCFBase.Outputs.PcfElbSshDnsName}",
-        "PcfElasticRuntimeS3BuildpacksBucket": "${PCFBase.Outputs.PcfElasticRuntimeS3BuildpacksBucket}",
-        "PcfOpsManagerSecurityGroupId": "${PCFBase.Outputs.PcfOpsManagerSecurityGroupId}",
-        "PcfRdsUsername": "${PCFBase.Outputs.PcfRdsUsername}",
+        "PcfVmsSecurityGroupId": "${PCFBase.Outputs.PcfVmsSecurityGroup}",
+        "PcfElbTcpName": "${PCFBase.Outputs.PcfElbTcpName}",
+        "PcfElbSshName": "${PCFBase.Outputs.PcfElbSshName}",
+        "PcfElbWebName": "${PCFBase.Outputs.PcfElbWebName}",
+        "PcfWaitHandle": "${WaitHandle}",
+        "PcfCustomResourceSQSQueueUrl": "${CustomResourceSQSQueue}",
+        "PcfOpsManagerAdminPassword": "${OpsManagerAdminPassword}",
         "PcfCompanyName": "${CompanyName}"
         }
-  OpsManagerInstance:
-    Type: AWS::EC2::Instance
-    Properties:
-      ImageId:
-        !FindInMap
-        - AMIMapping
-        - !Ref AWS::Region
-        - opsman
-      InstanceType: m4.large
-      IamInstanceProfile: !GetAtt PCFBase.Outputs.PcfIamInstanceProfile
-      KeyName: !Ref PCFKeyPair
-      Monitoring: true
-      BlockDeviceMappings:
-      - DeviceName: /dev/xvda
-        Ebs:
-          DeleteOnTermination: true
-          VolumeSize: 100
-          VolumeType: gp2
-      NetworkInterfaces:
-      - AssociatePublicIpAddress: 'true'
-        DeviceIndex: '0'
-        GroupSet:
-        - !GetAtt PCFBase.Outputs.PcfOpsManagerSecurityGroupId
-        SubnetId: !GetAtt PCFBase.Outputs.PcfPublicSubnetId
-      SourceDestCheck: true
-      Tags:
-      - Key: Name
-        Value: PCF Ops Manager
   BootstrapInstance:
     Type: AWS::EC2::Instance
     CreationPolicy:
       ResourceSignal:
         Timeout: PT30M
     DependsOn:
-    - OpsManagerInstance
     - PCFEmitLogsPolicy
     - PCFParameterStorePolicy
     - PCFDescribeStackPolicy
@@ -477,8 +439,8 @@ Resources:
       - AssociatePublicIpAddress: 'true'
         DeviceIndex: '0'
         GroupSet:
-        - !GetAtt PCFBase.Outputs.PcfOpsManagerSecurityGroupId
-        SubnetId: !GetAtt PCFBase.Outputs.PcfPublicSubnetId
+        - !GetAtt PCFBase.Outputs.PcfOpsManSecurityGroup
+        SubnetId: !GetAtt PCFBase.Outputs.PcfPublicSubnetAZ1
       SourceDestCheck: true
       Tags:
       - Key: Name
@@ -550,7 +512,7 @@ Resources:
                 fi
             b_etc_hosts_override:
               command: !Sub
-                echo "${OpsManagerInstance.PrivateIp} opsman.${Domain}" >> /etc/hosts
+                echo "${PCFBase.Outputs.PcfOpsManPrivateIPAddress} opsman.${Domain}" >> /etc/hosts
             c_chmod_stuff:
               command: |
                 mkdir -p /home/ubuntu/quickstart/state
@@ -559,11 +521,6 @@ Resources:
               command: cp /home/ubuntu/quickstart/version_config.json /var/local/version_config.json
             e_install_delete_daemon:
               command: /home/ubuntu/quickstart/daemon/install.sh
-  OpsManagerEIP:
-    Type: AWS::EC2::EIP
-    Properties:
-      InstanceId: !Ref OpsManagerInstance
-      Domain: vpc
   BootstrapEIP:
     Type: AWS::EC2::EIP
     Properties:
@@ -575,7 +532,7 @@ Resources:
       HostedZoneId: !Ref HostedZoneId
       Name: !Sub opsman.${Domain}
       ResourceRecords:
-      - !Ref OpsManagerEIP
+      - !GetAtt PCFBase.Outputs.PcfOpsManIPAddress
       TTL: 60
       Type: A
   DNS:
@@ -594,7 +551,7 @@ Resources:
       Name:
         Fn::Sub: '*.${Domain}'
       ResourceRecords:
-      - !GetAtt PCFBase.Outputs.PcfElbDnsName
+      - !GetAtt PCFBase.Outputs.PcfElbWebDnsName
       TTL: 60
       Type: CNAME
   DNSSsh:
@@ -613,7 +570,7 @@ Resources:
       Name:
         Fn::Sub: '*.sys.${Domain}'
       ResourceRecords:
-      - !GetAtt PCFBase.Outputs.PcfElbDnsName
+      - !GetAtt PCFBase.Outputs.PcfElbWebDnsName
       TTL: 60
       Type: CNAME
   DNSApps:
@@ -623,7 +580,7 @@ Resources:
       Name:
         Fn::Sub: '*.apps.${Domain}'
       ResourceRecords:
-      - !GetAtt PCFBase.Outputs.PcfElbDnsName
+      - !GetAtt PCFBase.Outputs.PcfElbWebDnsName
       TTL: 60
       Type: CNAME
 Outputs:

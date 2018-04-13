@@ -6,7 +6,7 @@
   "diego_cell": {"instances": 3},
   "diego_database": {"instances": 1},
   "doppler": {"instances": 1},
-  "etcd_tls_server": {"instances": 1},
+  "ha_proxy": {"instances": 0},
   "loggregator_trafficcontroller": {"instances": 1},
   "nats": {"instances": 1},
   "router": {"instances": 1},

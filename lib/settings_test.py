@@ -35,10 +35,6 @@ input_params = {
                     'ParameterKey': 'PCFKeyPair'
                 },
                 {
-                    'ParameterValue': 'elb-pre-yo',
-                    'ParameterKey': 'ElbPrefix'
-                },
-                {
                     'ParameterValue': 'abc123',
                     'ParameterKey': 'PivnetToken'
                 },
@@ -59,8 +55,9 @@ param_json_doc = """
 {
   "PcfRdsPassword": "monkey123",
   "PcfRdsUsername": "admin",
-  "PcfPrivateSubnetAvailabilityZone": "canada-1a",
-  "PcfPrivateSubnet2AvailabilityZone": "canada-1b",
+  "PcfAvailabilityZone1": "canada-1a",
+  "PcfAvailabilityZone2": "canada-1b",
+  "PcfAvailabilityZone3": "canada-1c",
   "PcfOpsManagerAdminPassword": "monkey123",
   "PcfDeploymentSize": "Starter"
 }
@@ -132,7 +129,6 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(self.settings.pcf_input_pivnettoken, "abc123")
         self.assertEqual(self.settings.pcf_input_pcfkeypair, "my-key")
         self.assertEqual(self.settings.pcf_input_adminemail, "admin@example.com")
-        self.assertEqual(self.settings.pcf_input_elbprefix, "elb-pre-yo")
         self.assertEqual(self.settings.pcf_input_hostedzoneid, "my-zone-id")
         self.assertEqual(self.settings.pcf_input_domain, "pcf.example.com")
         self.assertEqual(self.settings.pcf_opsmanageradminpassword, "monkey123")
@@ -156,8 +152,9 @@ class TestSettings(unittest.TestCase):
     def test_parses_paramaters(self):
         self.assertEqual(self.settings.pcf_rdsusername, "admin")
         self.assertEqual(self.settings.pcf_rdspassword, "monkey123")
-        self.assertEqual(self.settings.pcf_privatesubnetavailabilityzone, "canada-1a")
-        self.assertEqual(self.settings.pcf_privatesubnet2availabilityzone, "canada-1b")
+        self.assertEqual(self.settings.pcf_pcfavailabilityzone1, "canada-1a")
+        self.assertEqual(self.settings.pcf_pcfavailabilityzone2, "canada-1b")
+        self.assertEqual(self.settings.pcf_pcfavailabilityzone3, "canada-1c")
         self.assertEqual(self.settings.pcf_pcfdeploymentsize, "Starter")
 
     def test_default_values(self):

@@ -35,18 +35,15 @@ class Settings:
         self.parse_version_config(read_version_config())
 
         self.zones = [
-            self.pcf_privatesubnetavailabilityzone,
-            self.pcf_privatesubnet2availabilityzone
+            self.pcf_pcfavailabilityzone1,
+            self.pcf_pcfavailabilityzone2,
+            self.pcf_pcfavailabilityzone3,
         ]
 
     def parse_meta(self, meta):
         self.stack_name = meta["StackName"]
         self.stack_id = meta["StackId"]
         self.region = meta["Region"]
-
-    @property
-    def pcf_elbdnsname(self):
-        return self.parameters["PcfElbDnsName"]
 
     @property
     def pcf_elasticruntimes3buildpacksbucket(self):
@@ -77,20 +74,52 @@ class Settings:
         return self.parameters["PcfVmsSecurityGroupId"]
 
     @property
-    def pcf_privatesubnetavailabilityzone(self):
-        return self.parameters["PcfPrivateSubnetAvailabilityZone"]
+    def pcf_pcfavailabilityzone1(self):
+        return self.parameters["PcfAvailabilityZone1"]
 
     @property
-    def pcf_privatesubnet2availabilityzone(self):
-        return self.parameters["PcfPrivateSubnet2AvailabilityZone"]
+    def pcf_pcfavailabilityzone2(self):
+        return self.parameters["PcfAvailabilityZone2"]
 
     @property
-    def pcf_privatesubnetid(self):
-        return self.parameters["PcfPrivateSubnetId"]
+    def pcf_pcfavailabilityzone3(self):
+        return self.parameters["PcfAvailabilityZone3"]
 
     @property
-    def pcf_privatesubnet2id(self):
-        return self.parameters["PcfPrivateSubnet2Id"]
+    def pcf_pcfertsubnetaz1(self):
+        return self.parameters["PcfERTSubnetAZ1"]
+
+    @property
+    def pcf_pcfertsubnetaz2(self):
+        return self.parameters["PcfERTSubnetAZ2"]
+
+    @property
+    def pcf_pcfertsubnetaz3(self):
+        return self.parameters["PcfERTSubnetAZ3"]
+
+    @property
+    def pcf_pcfmanagementsubnetaz1(self):
+        return self.parameters["PcfManagementSubnetAZ1"]
+
+    @property
+    def pcf_pcfmanagementsubnetaz2(self):
+        return self.parameters["PcfManagementSubnetAZ2"]
+
+    @property
+    def pcf_pcfmanagementsubnetaz3(self):
+        return self.parameters["PcfManagementSubnetAZ3"]
+
+    @property
+    def pcf_pcfservicessubnetaz1(self):
+        return self.parameters["PcfServicesSubnetAZ1"]
+
+    @property
+    def pcf_pcfservicessubnetaz2(self):
+        return self.parameters["PcfServicesSubnetAZ2"]
+
+    @property
+    def pcf_pcfservicessubnetaz3(self):
+        return self.parameters["PcfServicesSubnetAZ3"]
 
     @property
     def pcf_rdsaddress(self):
@@ -141,8 +170,16 @@ class Settings:
         return self.parameters["PcfWaitHandle"]
 
     @property
-    def pcf_pcfopsmanagerinstanceip(self):
-        return self.parameters["PcfOpsManagerInstanceIP"]
+    def pcf_pcfelbtcpname(self):
+        return self.parameters["PcfElbTcpName"]
+
+    @property
+    def pcf_pcfelbsshname(self):
+        return self.parameters["PcfElbSshName"]
+
+    @property
+    def pcf_pcfelbwebname(self):
+        return self.parameters["PcfElbWebName"]
 
     @property
     def pcf_input_pivnettoken(self):
@@ -155,10 +192,6 @@ class Settings:
     @property
     def pcf_input_adminemail(self):
         return self.input_parameters["AdminEmail"]
-
-    @property
-    def pcf_input_elbprefix(self):
-        return self.input_parameters["ElbPrefix"]
 
     @property
     def pcf_input_hostedzoneid(self):

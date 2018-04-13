@@ -109,7 +109,7 @@ resources:
     api_token: {{pivnet_token}}
     copy_metadata: true
     product_slug: elastic-runtime
-    product_version: 1\.11\.*
+    product_version: 1\.12\.*
 
 - name: opsman-tile
   type: pivnet
@@ -117,7 +117,7 @@ resources:
     api_token: {{pivnet_token}}
     copy_metadata: true
     product_slug: ops-manager
-    product_version: 1\.11\.*
+    product_version: 1\.12\.*
 
 - name: packer-result
   type: s3

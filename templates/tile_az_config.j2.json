@@ -8,6 +8,6 @@
   {% endfor %}
   ],
   "network": {
-    "name": "ert-network"
+    "name": "pcf-ert-network"
   }
 }
