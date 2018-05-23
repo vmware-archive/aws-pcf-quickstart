@@ -1228,7 +1228,7 @@
         "DisableApiTermination": "false",
         "InstanceInitiatedShutdownBehavior": "stop",
         "ImageId": { "Ref": "OpsManAMI" },
-        "InstanceType": "m3.large",
+        "InstanceType": "m4.large",
         "KeyName": { "Ref": "OpsManSSHKeyPairName" },
         "BlockDeviceMappings": [
           {
