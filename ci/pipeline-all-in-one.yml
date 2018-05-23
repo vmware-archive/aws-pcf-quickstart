@@ -222,14 +222,14 @@ jobs:
         - -exc
         - |
           set +e
-          diff quickstart-repo/cloudformation/cf-cloudformation-base.json ert-tile/cf-cloudformation.json
+          diff quickstart-repo/cloudformation/cf-cloudformation-base.json ert-tile/*cf-cloudformation*.json
           if [ $? -eq 0 ]; then
             echo "No diff"
             exit 0
           else
-            curl -X POST -H 'Content-type: application/json' \
-              --data '{"channel": "#amazon", "username": "Concourse CI", "icon_emoji": ":sad_panda:", "text":"Cloud Formation base template changed <@prasad>. Action required."}' \
-              {{slack_hook}}
+            # curl -X POST -H 'Content-type: application/json' \
+            #   --data '{"channel": "#amazon", "username": "Concourse CI", "icon_emoji": ":sad_panda:", "text":"Cloud Formation base template changed <@prasad>. Action required."}' \
+            #   ((slack_hook))
             exit 1
           fi
 
