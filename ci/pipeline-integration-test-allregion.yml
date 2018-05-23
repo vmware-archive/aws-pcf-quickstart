@@ -13,8 +13,8 @@ resources:
   source:
     branch: master
     uri: https://github.com/cf-platform-eng/aws-pcf-quickstart
-    username: {{github_user_name}}
-    password: {{github_access_token}}
+    username: ((github_user_name))
+    password: ((github_access_token))
     ignore_paths:
       - ci/*.yml
 
@@ -23,7 +23,7 @@ resources:
   source:
     owner: pivotal-cf
     repository: om
-    access_token: {{github_access_token}}
+    # access_token: ((github_access_token))
     version: v0.0.22
 
 - name: aws-pcf-concourse-state
@@ -32,8 +32,8 @@ resources:
     bucket: aws-pcf-concourse-state
     region_name: us-west-2
     versioned_file: stackid
-    access_key_id: {{aws_admin_key_id}}
-    secret_access_key: {{aws_admin_secret_access_key}}
+    access_key_id: ((aws_admin_key_id))
+    secret_access_key: ((aws_admin_secret_access_key))
 
 - name: quickstart-scripts-alpha
   type: s3
@@ -41,8 +41,8 @@ resources:
     bucket: aws-pcf-quickstart-templates
     region_name: us-west-2
     versioned_file: quickstart-pivotal-cloudfoundry/scripts/quickstart.tgz
-    access_key_id: {{s3_access_key_id}}
-    secret_access_key: {{s3_secret_access_key}}
+    access_key_id: ((s3_access_key_id))
+    secret_access_key: ((s3_secret_access_key))
 
 - name: pivotal-cloudfoundry-template-alpha
   type: s3
@@ -50,8 +50,8 @@ resources:
     bucket: aws-pcf-quickstart-templates
     region_name: us-west-2
     versioned_file: quickstart-pivotal-cloudfoundry/templates/pivotal-cloudfoundry.template
-    access_key_id: {{s3_access_key_id}}
-    secret_access_key: {{s3_secret_access_key}}
+    access_key_id: ((s3_access_key_id))
+    secret_access_key: ((s3_secret_access_key))
 
 - name: aws-pcf-pointless-semver
   type: s3
@@ -59,8 +59,8 @@ resources:
     bucket: aws-pcf-concourse-state
     region_name: us-west-2
     versioned_file: pointless_semver
-    access_key_id: {{aws_admin_key_id}}
-    secret_access_key: {{aws_admin_secret_access_key}}
+    access_key_id: ((aws_admin_key_id))
+    secret_access_key: ((aws_admin_secret_access_key))
 
 - name: cancel-us-east-1-resource
   type: s3
@@ -68,8 +68,8 @@ resources:
     bucket: aws-pcf-concourse-state
     region_name: us-west-2
     versioned_file: cancel-us-east-1-state/state
-    access_key_id: {{aws_admin_key_id}}
-    secret_access_key: {{aws_admin_secret_access_key}}
+    access_key_id: ((aws_admin_key_id))
+    secret_access_key: ((aws_admin_secret_access_key))
 
 - name: cancel-us-west-1-resource
   type: s3
@@ -77,8 +77,8 @@ resources:
     bucket: aws-pcf-concourse-state
     region_name: us-west-2
     versioned_file: cancel-us-west-1-state/state
-    access_key_id: {{aws_admin_key_id}}
-    secret_access_key: {{aws_admin_secret_access_key}}
+    access_key_id: ((aws_admin_key_id))
+    secret_access_key: ((aws_admin_secret_access_key))
 
 - name: cancel-us-west-2-resource
   type: s3
@@ -86,8 +86,8 @@ resources:
     bucket: aws-pcf-concourse-state
     region_name: us-west-2
     versioned_file: cancel-us-west-2-state/state
-    access_key_id: {{aws_admin_key_id}}
-    secret_access_key: {{aws_admin_secret_access_key}}
+    access_key_id: ((aws_admin_key_id))
+    secret_access_key: ((aws_admin_secret_access_key))
 
 - name: cancel-eu-central-1-resource
   type: s3
@@ -95,8 +95,8 @@ resources:
     bucket: aws-pcf-concourse-state
     region_name: us-west-2
     versioned_file: cancel-eu-central-1-state/state
-    access_key_id: {{aws_admin_key_id}}
-    secret_access_key: {{aws_admin_secret_access_key}}
+    access_key_id: ((aws_admin_key_id))
+    secret_access_key: ((aws_admin_secret_access_key))
 
 - name: cancel-eu-west-1-resource
   type: s3
@@ -104,8 +104,8 @@ resources:
     bucket: aws-pcf-concourse-state
     region_name: us-west-2
     versioned_file: cancel-eu-west-1-state/state
-    access_key_id: {{aws_admin_key_id}}
-    secret_access_key: {{aws_admin_secret_access_key}}
+    access_key_id: ((aws_admin_key_id))
+    secret_access_key: ((aws_admin_secret_access_key))
 
 - name: cancel-ap-southeast-1-resource
   type: s3
@@ -113,8 +113,8 @@ resources:
     bucket: aws-pcf-concourse-state
     region_name: us-west-2
     versioned_file: cancel-ap-southeast-1-state/state
-    access_key_id: {{aws_admin_key_id}}
-    secret_access_key: {{aws_admin_secret_access_key}}
+    access_key_id: ((aws_admin_key_id))
+    secret_access_key: ((aws_admin_secret_access_key))
 
 - name: cancel-ap-southeast-2-resource
   type: s3
@@ -122,8 +122,8 @@ resources:
     bucket: aws-pcf-concourse-state
     region_name: us-west-2
     versioned_file: cancel-ap-southeast-2-state/state
-    access_key_id: {{aws_admin_key_id}}
-    secret_access_key: {{aws_admin_secret_access_key}}
+    access_key_id: ((aws_admin_key_id))
+    secret_access_key: ((aws_admin_secret_access_key))
 
 - name: cancel-ap-northeast-1-resource
   type: s3
@@ -131,8 +131,8 @@ resources:
     bucket: aws-pcf-concourse-state
     region_name: us-west-2
     versioned_file: cancel-ap-northeast-1-state/state
-    access_key_id: {{aws_admin_key_id}}
-    secret_access_key: {{aws_admin_secret_access_key}}
+    access_key_id: ((aws_admin_key_id))
+    secret_access_key: ((aws_admin_secret_access_key))
 
 - name: cancel-ap-northeast-2-resource
   type: s3
@@ -140,8 +140,8 @@ resources:
     bucket: aws-pcf-concourse-state
     region_name: us-west-2
     versioned_file: cancel-ap-northeast-2-state/state
-    access_key_id: {{aws_admin_key_id}}
-    secret_access_key: {{aws_admin_secret_access_key}}
+    access_key_id: ((aws_admin_key_id))
+    secret_access_key: ((aws_admin_secret_access_key))
 
 - name: cancel-sa-east-1-resource
   type: s3
@@ -149,38 +149,38 @@ resources:
     bucket: aws-pcf-concourse-state
     region_name: us-west-2
     versioned_file: cancel-sa-east-1-state/state
-    access_key_id: {{aws_admin_key_id}}
-    secret_access_key: {{aws_admin_secret_access_key}}
+    access_key_id: ((aws_admin_key_id))
+    secret_access_key: ((aws_admin_secret_access_key))
 
 - name: slack-alert
   type: slack-notification
   source:
-    url: {{slack_hook}}
+    url: ((slack_hook))
 
 
 templates:
 params: &some_values
-  AWS_CF_PASSWORD: {{aws_cf_password}}
-  AWS_CF_DOMAIN: {{aws_cf_domain}}
-  AWS_CF_HOSTEDZONEID: {{aws_cf_hostedzoneid}}
-  AWS_CF_PCFKEYPAIR: {{aws_cf_pcfkeypair}}
-  AWS_CF_PIVNETTOKEN: {{aws_cf_pivnettoken}}
-  AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
-  AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}
-  US_EAST_1_SSLCERTIFICATEARN: {{us_east_1_sslcertificatearn}}
-  US_EAST_2_SSLCERTIFICATEARN: {{us_east_2_sslcertificatearn}}
-  US_WEST_1_SSLCERTIFICATEARN: {{us_west_1_sslcertificatearn}}
-  US_WEST_2_SSLCERTIFICATEARN: {{us_west_2_sslcertificatearn}}
-  CA_CENTRAL_1_SSLCERTIFICATEARN: {{ca_central_1_sslcertificatearn}}
-  EU_CENTRAL_1_SSLCERTIFICATEARN: {{eu_central_1_sslcertificatearn}}
-  EU_WEST_1_SSLCERTIFICATEARN: {{eu_west_1_sslcertificatearn}}
-  EU_WEST_2_SSLCERTIFICATEARN: {{eu_west_2_sslcertificatearn}}
-  AP_SOUTHEAST_1_SSLCERTIFICATEARN: {{ap_southeast_1_sslcertificatearn}}
-  AP_SOUTHEAST_2_SSLCERTIFICATEARN: {{ap_southeast_2_sslcertificatearn}}
-  AP_NORTHEAST_2_SSLCERTIFICATEARN: {{ap_northeast_2_sslcertificatearn}}
-  AP_NORTHEAST_1_SSLCERTIFICATEARN: {{ap_northeast_1_sslcertificatearn}}
-  AP_SOUTH_1_SSLCERTIFICATEARN: {{ap_south_1_sslcertificatearn}}
-  SA_EAST_1_SSLCERTIFICATEARN: {{sa_east_1_sslcertificatearn}}
+  AWS_CF_PASSWORD: ((aws_cf_password))
+  AWS_CF_DOMAIN: ((aws_cf_domain))
+  AWS_CF_HOSTEDZONEID: ((aws_cf_hostedzoneid))
+  AWS_CF_PCFKEYPAIR: ((aws_cf_pcfkeypair))
+  AWS_CF_PIVNETTOKEN: ((aws_cf_pivnettoken))
+  AWS_ACCESS_KEY_ID: ((aws_admin_key_id))
+  AWS_SECRET_ACCESS_KEY: ((aws_admin_secret_access_key))
+  US_EAST_1_SSLCERTIFICATEARN: ((us_east_1_sslcertificatearn))
+  US_EAST_2_SSLCERTIFICATEARN: ((us_east_2_sslcertificatearn))
+  US_WEST_1_SSLCERTIFICATEARN: ((us_west_1_sslcertificatearn))
+  US_WEST_2_SSLCERTIFICATEARN: ((us_west_2_sslcertificatearn))
+  CA_CENTRAL_1_SSLCERTIFICATEARN: ((ca_central_1_sslcertificatearn))
+  EU_CENTRAL_1_SSLCERTIFICATEARN: ((eu_central_1_sslcertificatearn))
+  EU_WEST_1_SSLCERTIFICATEARN: ((eu_west_1_sslcertificatearn))
+  EU_WEST_2_SSLCERTIFICATEARN: ((eu_west_2_sslcertificatearn))
+  AP_SOUTHEAST_1_SSLCERTIFICATEARN: ((ap_southeast_1_sslcertificatearn))
+  AP_SOUTHEAST_2_SSLCERTIFICATEARN: ((ap_southeast_2_sslcertificatearn))
+  AP_NORTHEAST_2_SSLCERTIFICATEARN: ((ap_northeast_2_sslcertificatearn))
+  AP_NORTHEAST_1_SSLCERTIFICATEARN: ((ap_northeast_1_sslcertificatearn))
+  AP_SOUTH_1_SSLCERTIFICATEARN: ((ap_south_1_sslcertificatearn))
+  SA_EAST_1_SSLCERTIFICATEARN: ((sa_east_1_sslcertificatearn))
 
 run: &run
   path: bash
@@ -216,8 +216,8 @@ on_failure: &on_failure
             repository: python
             tag: "3"
         params:
-          AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
-          AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}
+          AWS_ACCESS_KEY_ID: ((aws_admin_key_id))
+          AWS_SECRET_ACCESS_KEY: ((aws_admin_secret_access_key))
         run:
           path: bash
           args:
@@ -248,8 +248,8 @@ check_task: &check_task
     - name: om-release
     - name: quickstart-repo
     params:
-      AWS_CF_PASSWORD: {{aws_cf_password}}
-      AWS_CF_DOMAIN: {{aws_cf_domain}}
+      AWS_CF_PASSWORD: ((aws_cf_password))
+      AWS_CF_DOMAIN: ((aws_cf_domain))
     run:
       path: bash
       args:
@@ -275,9 +275,9 @@ delete_task: &delete_task
     - name: quickstart-repo
     - name: aws-pcf-concourse-state
     params:
-      AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
-      AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}
-      AWS_INTEGRATION_REGION: {{aws_integration_region}}
+      AWS_ACCESS_KEY_ID: ((aws_admin_key_id))
+      AWS_SECRET_ACCESS_KEY: ((aws_admin_secret_access_key))
+      AWS_INTEGRATION_REGION: ((aws_integration_region))
     run:
       path: bash
       args:
@@ -300,8 +300,8 @@ delete_task: &delete_task
               repository: python
               tag: "3"
           params:
-            AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
-            AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}
+            AWS_ACCESS_KEY_ID: ((aws_admin_key_id))
+            AWS_SECRET_ACCESS_KEY: ((aws_admin_secret_access_key))
           run:
             path: bash
             args:
@@ -323,8 +323,8 @@ toggle_cancel_task: &toggle_cancel_task
     outputs:
     - name: output
     params:
-      AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
-      AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}
+      AWS_ACCESS_KEY_ID: ((aws_admin_key_id))
+      AWS_SECRET_ACCESS_KEY: ((aws_admin_secret_access_key))
     run:
       path: bash
       args:
@@ -355,8 +355,8 @@ jobs:
       outputs:
       - name: output
       params:
-        AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
-        AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}
+        AWS_ACCESS_KEY_ID: ((aws_admin_key_id))
+        AWS_SECRET_ACCESS_KEY: ((aws_admin_secret_access_key))
       run:
         path: bash
         args:
@@ -777,4 +777,3 @@ jobs:
       file: output/stackid
   - *check_task
   - *delete_task
-

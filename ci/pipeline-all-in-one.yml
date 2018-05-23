@@ -29,8 +29,8 @@ resources:
   type: ami
   check_every: 1h
   source:
-    aws_access_key_id: {{aws_admin_key_id}}
-    aws_secret_access_key: {{aws_admin_secret_access_key}}
+    aws_access_key_id: ((aws_admin_key_id))
+    aws_secret_access_key: ((aws_admin_secret_access_key))
     region: us-west-1
     filters:
       owner-id: "099720109477"
@@ -44,8 +44,8 @@ resources:
   source:
     branch: master
     uri: https://github.com/cf-platform-eng/aws-pcf-quickstart
-    username: {{github_user_name}}
-    password: {{github_access_token}}
+    username: ((github_user_name))
+    password: ((github_access_token))
     ignore_paths:
       - ci/*.yml
 
@@ -54,8 +54,8 @@ resources:
   source:
     branch: develop
     uri: https://github.com/cf-platform-eng/quickstart-pivotal-cloudfoundry
-    username: {{github_user_name}}
-    password: {{github_access_token}}
+    username: ((github_user_name))
+    password: ((github_access_token))
 
 - name: cloud-formation-template-alpha
   type: s3
@@ -63,8 +63,8 @@ resources:
     bucket: aws-pcf-quickstart-templates
     region_name: us-west-2
     versioned_file: quickstart-pivotal-cloudfoundry/templates/cloud-formation.template
-    access_key_id: {{s3_access_key_id}}
-    secret_access_key: {{s3_secret_access_key}}
+    access_key_id: ((s3_access_key_id))
+    secret_access_key: ((s3_secret_access_key))
 
 - name: ops-manager-template-alpha
   type: s3
@@ -72,8 +72,8 @@ resources:
     bucket: aws-pcf-quickstart-templates
     region_name: us-west-2
     versioned_file: quickstart-pivotal-cloudfoundry/templates/ops-manager.template
-    access_key_id: {{s3_access_key_id}}
-    secret_access_key: {{s3_secret_access_key}}
+    access_key_id: ((s3_access_key_id))
+    secret_access_key: ((s3_secret_access_key))
 
 - name: pivotal-cloudfoundry-template-alpha
   type: s3
@@ -81,8 +81,8 @@ resources:
     bucket: aws-pcf-quickstart-templates
     region_name: us-west-2
     versioned_file: quickstart-pivotal-cloudfoundry/templates/pivotal-cloudfoundry.template
-    access_key_id: {{s3_access_key_id}}
-    secret_access_key: {{s3_secret_access_key}}
+    access_key_id: ((s3_access_key_id))
+    secret_access_key: ((s3_secret_access_key))
 
 - name: quickstart-scripts-alpha
   type: s3
@@ -90,8 +90,8 @@ resources:
     bucket: aws-pcf-quickstart-templates
     region_name: us-west-2
     versioned_file: quickstart-pivotal-cloudfoundry/scripts/quickstart.tgz
-    access_key_id: {{s3_access_key_id}}
-    secret_access_key: {{s3_secret_access_key}}
+    access_key_id: ((s3_access_key_id))
+    secret_access_key: ((s3_secret_access_key))
 
 - name: ami-version
   type: semver
@@ -100,13 +100,13 @@ resources:
     uri: https://github.com/cf-platform-eng/aws-pcf-quickstart
     branch: ami_version
     file: ami_version
-    username: {{github_user_name}}
-    password: {{github_access_token}}
+    username: ((github_user_name))
+    password: ((github_access_token))
 
 - name: ert-tile
   type: pivnet
   source:
-    api_token: {{pivnet_token}}
+    api_token: ((pivnet_token))
     copy_metadata: true
     product_slug: elastic-runtime
     product_version: 1\.12\.*
@@ -114,7 +114,7 @@ resources:
 - name: opsman-tile
   type: pivnet
   source:
-    api_token: {{pivnet_token}}
+    api_token: ((pivnet_token))
     copy_metadata: true
     product_slug: ops-manager
     product_version: 1\.12\.*
@@ -125,8 +125,8 @@ resources:
     bucket: aws-pcf-quickstart-releases
     region_name: us-west-2
     regexp: packer-result-(.*).json
-    access_key_id: {{s3_access_key_id}}
-    secret_access_key: {{s3_secret_access_key}}
+    access_key_id: ((s3_access_key_id))
+    secret_access_key: ((s3_secret_access_key))
 
 - name: ami-mapping
   type: s3
@@ -134,8 +134,8 @@ resources:
     bucket: aws-pcf-quickstart-releases
     region_name: us-west-2
     regexp: ami-mapping-(.*).json
-    access_key_id: {{s3_access_key_id}}
-    secret_access_key: {{s3_secret_access_key}}
+    access_key_id: ((s3_access_key_id))
+    secret_access_key: ((s3_secret_access_key))
 
 - name: awslogs-agent-setup
   type: webpage
@@ -155,22 +155,22 @@ resources:
     bucket: aws-pcf-concourse-state
     region_name: us-west-2
     versioned_file: stackid
-    access_key_id: {{aws_admin_key_id}}
-    secret_access_key: {{aws_admin_secret_access_key}}
+    access_key_id: ((aws_admin_key_id))
+    secret_access_key: ((aws_admin_secret_access_key))
 
 - name: quickstart-github-release
   type: github-release
   source:
     owner: cf-platform-eng
     repository: aws-pcf-quickstart
-    access_token: {{github_access_token}}
+    access_token: ((github_access_token))
 
 - name: pivnet-release
   type: github-release
   source:
     owner: pivotal-cf
     repository: pivnet-cli
-    access_token: {{github_access_token}}
+    # access_token: ((github_access_token))
     version: v0.0.49
 
 - name: om-release
@@ -178,7 +178,7 @@ resources:
   source:
     owner: pivotal-cf
     repository: om
-    access_token: {{github_access_token}}
+    # access_token: ((github_access_token))
     version: v0.0.24
 
 - name: version
@@ -188,13 +188,13 @@ resources:
     uri: https://github.com/cf-platform-eng/aws-pcf-quickstart
     branch: quickstart_release_version
     file: quickstart_release_version
-    username: {{github_user_name}}
-    password: {{github_access_token}}
+    username: ((github_user_name))
+    password: ((github_access_token))
 
 - name: slack-alert
   type: slack-notification
   source:
-    url: {{slack_hook}}
+    url: ((slack_hook))
 
 
 jobs:
@@ -205,7 +205,7 @@ jobs:
     trigger: true
     params:
       globs:
-      - cf-cloudformation.json
+      - '*cf-cloudformation*.json'
   - task: diff-templates
     config:
       platform: linux
@@ -283,8 +283,8 @@ jobs:
       outputs:
       - name: output
       params:
-        AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
-        AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}
+        AWS_ACCESS_KEY_ID: ((aws_admin_key_id))
+        AWS_SECRET_ACCESS_KEY: ((aws_admin_secret_access_key))
       run:
         path: bash
         args:
@@ -342,8 +342,8 @@ jobs:
       outputs:
       - name: output
       params:
-        AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
-        AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}
+        AWS_ACCESS_KEY_ID: ((aws_admin_key_id))
+        AWS_SECRET_ACCESS_KEY: ((aws_admin_secret_access_key))
       run:
         path: bash
         args:
@@ -432,7 +432,7 @@ jobs:
       outputs:
       - name: output
       params:
-        PIVNET_TOKEN: {{pivnet_token}}
+        PIVNET_TOKEN: ((pivnet_token))
       run:
         path: bash
         args:
@@ -490,28 +490,28 @@ jobs:
       outputs:
       - name: output
       params:
-        AWS_CF_PASSWORD: {{aws_cf_password}}
-        AWS_CF_DOMAIN: {{aws_cf_domain}}
-        AWS_CF_HOSTEDZONEID: {{aws_cf_hostedzoneid}}
-        AWS_CF_PCFKEYPAIR: {{aws_cf_pcfkeypair}}
-        AWS_CF_PIVNETTOKEN: {{aws_cf_pivnettoken}}
-        AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
-        AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}
-        AWS_INTEGRATION_REGION: {{aws_integration_region}}
-        US_EAST_1_SSLCERTIFICATEARN: {{us_east_1_sslcertificatearn}}
-        US_EAST_2_SSLCERTIFICATEARN: {{us_east_2_sslcertificatearn}}
-        US_WEST_1_SSLCERTIFICATEARN: {{us_west_1_sslcertificatearn}}
-        US_WEST_2_SSLCERTIFICATEARN: {{us_west_2_sslcertificatearn}}
-        CA_CENTRAL_1_SSLCERTIFICATEARN: {{ca_central_1_sslcertificatearn}}
-        EU_WEST_1_SSLCERTIFICATEARN: {{eu_west_1_sslcertificatearn}}
-        EU_CENTRAL_1_SSLCERTIFICATEARN: {{eu_central_1_sslcertificatearn}}
-        EU_WEST_2_SSLCERTIFICATEARN: {{eu_west_2_sslcertificatearn}}
-        AP_SOUTHEAST_1_SSLCERTIFICATEARN: {{ap_southeast_1_sslcertificatearn}}
-        AP_SOUTHEAST_2_SSLCERTIFICATEARN: {{ap_southeast_2_sslcertificatearn}}
-        AP_NORTHEAST_2_SSLCERTIFICATEARN: {{ap_northeast_2_sslcertificatearn}}
-        AP_NORTHEAST_1_SSLCERTIFICATEARN: {{ap_northeast_1_sslcertificatearn}}
-        AP_SOUTH_1_SSLCERTIFICATEARN: {{ap_south_1_sslcertificatearn}}
-        SA_EAST_1_SSLCERTIFICATEARN: {{sa_east_1_sslcertificatearn}}
+        AWS_CF_PASSWORD: ((aws_cf_password))
+        AWS_CF_DOMAIN: ((aws_cf_domain))
+        AWS_CF_HOSTEDZONEID: ((aws_cf_hostedzoneid))
+        AWS_CF_PCFKEYPAIR: ((aws_cf_pcfkeypair))
+        AWS_CF_PIVNETTOKEN: ((aws_cf_pivnettoken))
+        AWS_ACCESS_KEY_ID: ((aws_admin_key_id))
+        AWS_SECRET_ACCESS_KEY: ((aws_admin_secret_access_key))
+        AWS_INTEGRATION_REGION: ((aws_integration_region))
+        US_EAST_1_SSLCERTIFICATEARN: ((us_east_1_sslcertificatearn))
+        US_EAST_2_SSLCERTIFICATEARN: ((us_east_2_sslcertificatearn))
+        US_WEST_1_SSLCERTIFICATEARN: ((us_west_1_sslcertificatearn))
+        US_WEST_2_SSLCERTIFICATEARN: ((us_west_2_sslcertificatearn))
+        CA_CENTRAL_1_SSLCERTIFICATEARN: ((ca_central_1_sslcertificatearn))
+        EU_WEST_1_SSLCERTIFICATEARN: ((eu_west_1_sslcertificatearn))
+        EU_CENTRAL_1_SSLCERTIFICATEARN: ((eu_central_1_sslcertificatearn))
+        EU_WEST_2_SSLCERTIFICATEARN: ((eu_west_2_sslcertificatearn))
+        AP_SOUTHEAST_1_SSLCERTIFICATEARN: ((ap_southeast_1_sslcertificatearn))
+        AP_SOUTHEAST_2_SSLCERTIFICATEARN: ((ap_southeast_2_sslcertificatearn))
+        AP_NORTHEAST_2_SSLCERTIFICATEARN: ((ap_northeast_2_sslcertificatearn))
+        AP_NORTHEAST_1_SSLCERTIFICATEARN: ((ap_northeast_1_sslcertificatearn))
+        AP_SOUTH_1_SSLCERTIFICATEARN: ((ap_south_1_sslcertificatearn))
+        SA_EAST_1_SSLCERTIFICATEARN: ((sa_east_1_sslcertificatearn))
       run:
         path: bash
         args:
@@ -542,8 +542,8 @@ jobs:
                 repository: python
                 tag: "3"
             params:
-              AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
-              AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}
+              AWS_ACCESS_KEY_ID: ((aws_admin_key_id))
+              AWS_SECRET_ACCESS_KEY: ((aws_admin_secret_access_key))
             run:
               path: bash
               args:
@@ -579,8 +579,8 @@ jobs:
       - name: om-release
       - name: quickstart-repo
       params:
-        AWS_CF_PASSWORD: {{aws_cf_password}}
-        AWS_CF_DOMAIN: {{aws_cf_domain}}
+        AWS_CF_PASSWORD: ((aws_cf_password))
+        AWS_CF_DOMAIN: ((aws_cf_domain))
       run:
         path: bash
         args:
@@ -615,9 +615,9 @@ jobs:
       - name: quickstart-repo
       - name: aws-pcf-concourse-state
       params:
-        AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
-        AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}
-        AWS_INTEGRATION_REGION: {{aws_integration_region}}
+        AWS_ACCESS_KEY_ID: ((aws_admin_key_id))
+        AWS_SECRET_ACCESS_KEY: ((aws_admin_secret_access_key))
+        AWS_INTEGRATION_REGION: ((aws_integration_region))
       run:
         path: bash
         args:
@@ -640,8 +640,8 @@ jobs:
                 repository: python
                 tag: "3"
             params:
-              AWS_ACCESS_KEY_ID: {{aws_admin_key_id}}
-              AWS_SECRET_ACCESS_KEY: {{aws_admin_secret_access_key}}
+              AWS_ACCESS_KEY_ID: ((aws_admin_key_id))
+              AWS_SECRET_ACCESS_KEY: ((aws_admin_secret_access_key))
             run:
               path: bash
               args:
@@ -786,7 +786,7 @@ jobs:
       - name: quickstart-repo
       - name: version
       params:
-        GITHUB_ACCESS_TOKEN: {{github_access_token}}
+        GITHUB_ACCESS_TOKEN: ((github_access_token))
       run:
         path: bash
         args:
