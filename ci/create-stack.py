@@ -71,7 +71,7 @@ def create_stack(template_path: str, aws_region: str):
         {"ParameterKey": "ForwardLogOutput", "ParameterValue": "true"},
         {"ParameterKey": "DeploymentSize", "ParameterValue": "Starter"},
         {"ParameterKey": "SkipSSLValidation", "ParameterValue": "true"},
-        {"ParameterKey": "QSS3BucketName", "ParameterValue": "aws-pcf-quickstart-templates"},
+        {"ParameterKey": "QSS3BucketName", "ParameterValue": "snw-aws-pcf-quickstart-templates"},
         {"ParameterKey": "AcceptEULA", "ParameterValue": "Yes"},
     ]
 
