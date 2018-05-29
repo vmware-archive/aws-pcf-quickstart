@@ -170,7 +170,7 @@ resources:
   source:
     owner: pivotal-cf
     repository: pivnet-cli
-    # access_token: ((github_access_token))
+    access_token: ((github_access_token))
     version: v0.0.49
 
 - name: om-release
@@ -178,7 +178,7 @@ resources:
   source:
     owner: pivotal-cf
     repository: om
-    # access_token: ((github_access_token))
+    access_token: ((github_access_token))
     version: v0.0.24
 
 - name: version
