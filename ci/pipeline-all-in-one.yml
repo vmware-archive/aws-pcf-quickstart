@@ -60,7 +60,7 @@ resources:
 - name: cloud-formation-template-alpha
   type: s3
   source:
-    bucket: aws-pcf-quickstart-templates
+    bucket: snw-aws-pcf-quickstart-templates
     region_name: us-west-2
     versioned_file: quickstart-pivotal-cloudfoundry/templates/cloud-formation.template
     access_key_id: ((s3_access_key_id))
@@ -69,7 +69,7 @@ resources:
 - name: ops-manager-template-alpha
   type: s3
   source:
-    bucket: aws-pcf-quickstart-templates
+    bucket: snw-aws-pcf-quickstart-templates
     region_name: us-west-2
     versioned_file: quickstart-pivotal-cloudfoundry/templates/ops-manager.template
     access_key_id: ((s3_access_key_id))
@@ -78,7 +78,7 @@ resources:
 - name: pivotal-cloudfoundry-template-alpha
   type: s3
   source:
-    bucket: aws-pcf-quickstart-templates
+    bucket: snw-aws-pcf-quickstart-templates
     region_name: us-west-2
     versioned_file: quickstart-pivotal-cloudfoundry/templates/pivotal-cloudfoundry.template
     access_key_id: ((s3_access_key_id))
@@ -87,7 +87,7 @@ resources:
 - name: quickstart-scripts-alpha
   type: s3
   source:
-    bucket: aws-pcf-quickstart-templates
+    bucket: snw-aws-pcf-quickstart-templates
     region_name: us-west-2
     versioned_file: quickstart-pivotal-cloudfoundry/scripts/quickstart.tgz
     access_key_id: ((s3_access_key_id))
@@ -109,7 +109,7 @@ resources:
     api_token: ((pivnet_token))
     copy_metadata: true
     product_slug: elastic-runtime
-    product_version: 1\.12\.*
+    product_version: 2\.1\.4\.*
 
 - name: opsman-tile
   type: pivnet
@@ -117,12 +117,12 @@ resources:
     api_token: ((pivnet_token))
     copy_metadata: true
     product_slug: ops-manager
-    product_version: 1\.12\.*
+    product_version: 2\.1\.3\.*
 
 - name: packer-result
   type: s3
   source:
-    bucket: aws-pcf-quickstart-releases
+    bucket: snw-aws-pcf-quickstart-releases
     region_name: us-west-2
     regexp: packer-result-(.*).json
     access_key_id: ((s3_access_key_id))
@@ -131,7 +131,7 @@ resources:
 - name: ami-mapping
   type: s3
   source:
-    bucket: aws-pcf-quickstart-releases
+    bucket: snw-aws-pcf-quickstart-releases
     region_name: us-west-2
     regexp: ami-mapping-(.*).json
     access_key_id: ((s3_access_key_id))
@@ -152,7 +152,7 @@ resources:
 - name: aws-pcf-concourse-state
   type: s3
   source:
-    bucket: aws-pcf-concourse-state
+    bucket: snw-aws-pcf-concourse-state
     region_name: us-west-2
     versioned_file: stackid
     access_key_id: ((aws_admin_key_id))
@@ -191,47 +191,47 @@ resources:
     username: ((github_user_name))
     password: ((github_access_token))
 
-- name: slack-alert
-  type: slack-notification
-  source:
-    url: ((slack_hook))
+# - name: slack-alert
+#   type: slack-notification
+#   source:
+#     url: ((slack_hook))
 
 
 jobs:
-- name: diff-templates
-  plan:
-  - get: quickstart-repo
-  - get: ert-tile
-    trigger: true
-    params:
-      globs:
-      - '*cf-cloudformation*.json'
-  - task: diff-templates
-    config:
-      platform: linux
-      image_resource:
-        type: docker-image
-        source:
-          repository: cfplatformeng/quickstart-ci
-      inputs:
-      - name: ert-tile
-      - name: quickstart-repo
-      run:
-        path: bash
-        args:
-        - -exc
-        - |
-          set +e
-          diff quickstart-repo/cloudformation/cf-cloudformation-base.json ert-tile/*cf-cloudformation*.json
-          if [ $? -eq 0 ]; then
-            echo "No diff"
-            exit 0
-          else
-            # curl -X POST -H 'Content-type: application/json' \
-            #   --data '{"channel": "#amazon", "username": "Concourse CI", "icon_emoji": ":sad_panda:", "text":"Cloud Formation base template changed <@prasad>. Action required."}' \
-            #   ((slack_hook))
-            exit 1
-          fi
+# - name: diff-templates
+#   plan:
+#   - get: quickstart-repo
+#   - get: ert-tile
+#     trigger: true
+#     params:
+#       globs:
+#       - '*cf-cloudformation*.json'
+#   - task: diff-templates
+#     config:
+#       platform: linux
+#       image_resource:
+#         type: docker-image
+#         source:
+#           repository: cfplatformeng/quickstart-ci
+#       inputs:
+#       - name: ert-tile
+#       - name: quickstart-repo
+#       run:
+#         path: bash
+#         args:
+#         - -exc
+#         - |
+#           set +e
+#           diff quickstart-repo/cloudformation/cf-cloudformation-base.json ert-tile/*cf-cloudformation*.json
+#           if [ $? -eq 0 ]; then
+#             echo "No diff"
+#             exit 0
+#           else
+#             # curl -X POST -H 'Content-type: application/json' \
+#             #   --data '{"channel": "#amazon", "username": "Concourse CI", "icon_emoji": ":sad_panda:", "text":"Cloud Formation base template changed <@prasad>. Action required."}' \
+#             #   ((slack_hook))
+#             exit 1
+#           fi
 
 - name: unit-test
   plan:
@@ -520,17 +520,17 @@ jobs:
           # run create stack from the template before
           pushd quickstart-repo
           pip install -r requirements.txt
-          python ./ci/create-stack.py '../pivotal-cloudfoundry-template-alpha/pivotal-cloudfoundry.template'
+          python ./ci/create-stack.py '../pivotal-cloudfoundry-template-alpha/pivotal-cloudfoundry.template' eu-central-1
           popd
           cp quickstart-repo/stackid output/stackid
     on_failure:
       aggregate:
-        - put: slack-alert
-          params:
-            icon_emoji: ":sad_panda:"
-            username: Concourse CI
-            channel: "#amazon"
-            text: "Integration test failed"
+        # - put: slack-alert
+        #   params:
+        #     icon_emoji: ":sad_panda:"
+        #     username: Concourse CI
+        #     channel: "#amazon"
+        #     text: "Integration test failed"
         - task: delete-buckets
           config:
             inputs:

@@ -29,7 +29,7 @@ resources:
 - name: aws-pcf-concourse-state
   type: s3
   source:
-    bucket: aws-pcf-concourse-state
+    bucket: snw-aws-pcf-concourse-state
     region_name: us-west-2
     versioned_file: stackid
     access_key_id: ((aws_admin_key_id))
@@ -38,7 +38,7 @@ resources:
 - name: quickstart-scripts-alpha
   type: s3
   source:
-    bucket: aws-pcf-quickstart-templates
+    bucket: snw-aws-pcf-quickstart-templates
     region_name: us-west-2
     versioned_file: quickstart-pivotal-cloudfoundry/scripts/quickstart.tgz
     access_key_id: ((s3_access_key_id))
@@ -47,7 +47,7 @@ resources:
 - name: pivotal-cloudfoundry-template-alpha
   type: s3
   source:
-    bucket: aws-pcf-quickstart-templates
+    bucket: snw-aws-pcf-quickstart-templates
     region_name: us-west-2
     versioned_file: quickstart-pivotal-cloudfoundry/templates/pivotal-cloudfoundry.template
     access_key_id: ((s3_access_key_id))
@@ -56,7 +56,7 @@ resources:
 - name: aws-pcf-pointless-semver
   type: s3
   source:
-    bucket: aws-pcf-concourse-state
+    bucket: snw-aws-pcf-concourse-state
     region_name: us-west-2
     versioned_file: pointless_semver
     access_key_id: ((aws_admin_key_id))
@@ -65,7 +65,7 @@ resources:
 - name: cancel-us-east-1-resource
   type: s3
   source:
-    bucket: aws-pcf-concourse-state
+    bucket: snw-aws-pcf-concourse-state
     region_name: us-west-2
     versioned_file: cancel-us-east-1-state/state
     access_key_id: ((aws_admin_key_id))
@@ -74,7 +74,7 @@ resources:
 - name: cancel-us-west-1-resource
   type: s3
   source:
-    bucket: aws-pcf-concourse-state
+    bucket: snw-aws-pcf-concourse-state
     region_name: us-west-2
     versioned_file: cancel-us-west-1-state/state
     access_key_id: ((aws_admin_key_id))
@@ -83,7 +83,7 @@ resources:
 - name: cancel-us-west-2-resource
   type: s3
   source:
-    bucket: aws-pcf-concourse-state
+    bucket: snw-aws-pcf-concourse-state
     region_name: us-west-2
     versioned_file: cancel-us-west-2-state/state
     access_key_id: ((aws_admin_key_id))
@@ -92,7 +92,7 @@ resources:
 - name: cancel-eu-central-1-resource
   type: s3
   source:
-    bucket: aws-pcf-concourse-state
+    bucket: snw-aws-pcf-concourse-state
     region_name: us-west-2
     versioned_file: cancel-eu-central-1-state/state
     access_key_id: ((aws_admin_key_id))
@@ -101,7 +101,7 @@ resources:
 - name: cancel-eu-west-1-resource
   type: s3
   source:
-    bucket: aws-pcf-concourse-state
+    bucket: snw-aws-pcf-concourse-state
     region_name: us-west-2
     versioned_file: cancel-eu-west-1-state/state
     access_key_id: ((aws_admin_key_id))
@@ -110,7 +110,7 @@ resources:
 - name: cancel-ap-southeast-1-resource
   type: s3
   source:
-    bucket: aws-pcf-concourse-state
+    bucket: snw-aws-pcf-concourse-state
     region_name: us-west-2
     versioned_file: cancel-ap-southeast-1-state/state
     access_key_id: ((aws_admin_key_id))
@@ -119,7 +119,7 @@ resources:
 - name: cancel-ap-southeast-2-resource
   type: s3
   source:
-    bucket: aws-pcf-concourse-state
+    bucket: snw-aws-pcf-concourse-state
     region_name: us-west-2
     versioned_file: cancel-ap-southeast-2-state/state
     access_key_id: ((aws_admin_key_id))
@@ -128,7 +128,7 @@ resources:
 - name: cancel-ap-northeast-1-resource
   type: s3
   source:
-    bucket: aws-pcf-concourse-state
+    bucket: snw-aws-pcf-concourse-state
     region_name: us-west-2
     versioned_file: cancel-ap-northeast-1-state/state
     access_key_id: ((aws_admin_key_id))
@@ -137,7 +137,7 @@ resources:
 - name: cancel-ap-northeast-2-resource
   type: s3
   source:
-    bucket: aws-pcf-concourse-state
+    bucket: snw-aws-pcf-concourse-state
     region_name: us-west-2
     versioned_file: cancel-ap-northeast-2-state/state
     access_key_id: ((aws_admin_key_id))
@@ -146,7 +146,7 @@ resources:
 - name: cancel-sa-east-1-resource
   type: s3
   source:
-    bucket: aws-pcf-concourse-state
+    bucket: snw-aws-pcf-concourse-state
     region_name: us-west-2
     versioned_file: cancel-sa-east-1-state/state
     access_key_id: ((aws_admin_key_id))
