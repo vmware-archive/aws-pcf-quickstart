@@ -91,7 +91,7 @@ def create_stack(template_path: str, aws_region: str):
             Capabilities=[
                 'CAPABILITY_IAM',
             ],
-            DisableRollback=true,
+            DisableRollback=True,
         )
         stack_id = create_response.get("StackId")
         print("Created stack: {}".format(stack_id))
