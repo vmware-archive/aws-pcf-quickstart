@@ -26,16 +26,10 @@
   ".properties.networking_poe_ssl_certs": {
     "value": [
 			{
-				"guid": {
-					"value": "01234567-89ab-cdef-0123-456789abcdef"
-				},
-				"name": {
-					"value": "Default_Cert"
-				},
+				"name": "Default_Cert",
 				"certificate": {
-					"value": {
-						"private_key_pem": "{{key}}"
-					}
+					"cert_pem": "{{cert}}",
+					"private_key_pem": "{{key}}"
 				}
 			}
 		]
