@@ -34,7 +34,6 @@
 				},
 				"certificate": {
 					"value": {
-						"cert_pem": "{{cert}}",
 						"private_key_pem": "{{key}}"
 					}
 				}
