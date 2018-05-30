@@ -67,7 +67,8 @@ def configure_ert_resources(my_settings: Settings):
     }
     with open("templates/ert_resources_config.j2.json", 'r') as f:
         ert_resource_template = Template(f.read())
-    ert_resource_config = om_manager.format_om_json_str(ert_resource_template.render(ert_resource_ctx))
+    ert_resource_config = om_manager.format_om_json_str(
+        ert_resource_template.render(ert_resource_ctx))
     cmd = "{om_with_auth} configure-product -n cf -pr '{ert_resources}'".format(
         om_with_auth=om_manager.get_om_with_auth(my_settings),
         ert_resources=ert_resource_config
@@ -93,6 +94,8 @@ def configure_ert_multiaz_resources(my_settings: Settings):
 
 def configure_ert_config(my_settings: Settings):
     cert, key = generate_ssl_cert(my_settings)
+    credhub_encryption_key = ''.join(random.choice(
+        string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(32))
     ert_config_template_ctx = {
         "pcf_rds_address": my_settings.pcf_rdsaddress,
         "pcf_rds_username": my_settings.pcf_rdsusername,
@@ -109,12 +112,14 @@ def configure_ert_config(my_settings: Settings):
         "s3_endpoint": my_settings.get_s3_endpoint(),
         "s3_region": my_settings.region,
         "pcf_skipsslvalidation": my_settings.pcf_input_skipsslvalidation,
+        "credhub_encryption_key": credhub_encryption_key,
         "cert": cert.replace("\n", "\\n"),
         "key": key.replace("\n", "\\n")
     }
     with open("templates/ert_config.j2.json", 'r') as f:
         ert_template = Template(f.read())
-    ert_config = om_manager.format_om_json_str(ert_template.render(ert_config_template_ctx))
+    ert_config = om_manager.format_om_json_str(
+        ert_template.render(ert_config_template_ctx))
     cmd = "{om_with_auth} configure-product -n cf -p '{ert_config}'".format(
         om_with_auth=om_manager.get_om_with_auth(my_settings),
         ert_config=ert_config
@@ -129,7 +134,8 @@ def configure_tile_az(my_settings: Settings, tile_name: str):
     }
     with open("templates/tile_az_config.j2.json", 'r') as f:
         az_template = Template(f.read())
-    az_config = om_manager.format_om_json_str(az_template.render(az_template_ctx))
+    az_config = om_manager.format_om_json_str(
+        az_template.render(az_template_ctx))
     cmd = "{om_with_auth} configure-product -n {tile_name} -pn '{az_config}'".format(
         om_with_auth=om_manager.get_om_with_auth(my_settings),
         tile_name=tile_name,
@@ -175,7 +181,8 @@ def modify_vm_types(my_settings: Settings):
             for a in additional_types:
                 response_json["vm_types"].append(a)
 
-    out, err, return_code = om_manager.curl_payload(my_settings, path, json.dumps(response_json), 'PUT')
+    out, err, return_code = om_manager.curl_payload(
+        my_settings, path, json.dumps(response_json), 'PUT')
     if return_code != 0:
         if out != "":
             print(out)

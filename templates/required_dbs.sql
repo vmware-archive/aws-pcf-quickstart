@@ -10,5 +10,6 @@ CREATE database if not exists nfsvolume;
 CREATE database if not exists networkpolicyserver;
 CREATE database if not exists silk;
 CREATE database if not exists locket;
+CREATE database if not exists credhub;
 
 SHOW DATABASES;
