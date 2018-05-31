@@ -2,92 +2,125 @@
   "AWSTemplateFormatVersion": "2010-09-09",
   "Conditions": {
     "CreateRDS": {
-      "Fn::And":[
-        { "Fn::Not": [ { "Fn::Equals": [ { "Ref": "RDSDBName"}, "" ]}]},
-        { "Fn::Not": [ { "Fn::Equals": [ { "Ref": "RDSUsername"}, "" ]}]},
-        { "Fn::Not": [ { "Fn::Equals": [ { "Ref": "RDSPassword"}, "" ]}]}
+      "Fn::And": [
+        {
+          "Fn::Not": [
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "RDSDBName"
+                },
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "Fn::Not": [
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "RDSUsername"
+                },
+                ""
+              ]
+            }
+          ]
+        },
+        {
+          "Fn::Not": [
+            {
+              "Fn::Equals": [
+                {
+                  "Ref": "RDSPassword"
+                },
+                ""
+              ]
+            }
+          ]
+        }
       ]
     }
   },
   "Description": "CloudFormation template for configuring Pivotal Cloud Foundry on AWS QS(qs-1ngltrcp5)",
   "Mappings": {
-    "NATRegionToAmiMap" : {
-      "us-east-1" : {
-        "id" : "ami-303b1458"
+    "NATRegionToAmiMap": {
+      "us-east-1": {
+        "id": "ami-303b1458"
       },
-      "us-west-1" : {
-        "id" : "ami-7da94839"
+      "us-west-1": {
+        "id": "ami-7da94839"
       },
-      "us-west-2" : {
-        "id" : "ami-69ae8259"
+      "us-west-2": {
+        "id": "ami-69ae8259"
       },
-      "eu-west-1" : {
-        "id" : "ami-6975eb1e"
+      "eu-west-1": {
+        "id": "ami-6975eb1e"
       },
-      "eu-central-1" : {
-        "id" : "ami-46073a5b"
+      "eu-central-1": {
+        "id": "ami-46073a5b"
       },
-      "ap-southeast-1" : {
-        "id" : "ami-b49dace6"
+      "ap-southeast-1": {
+        "id": "ami-b49dace6"
       },
-      "ap-northeast-1" : {
-        "id" : "ami-03cf3903"
+      "ap-northeast-1": {
+        "id": "ami-03cf3903"
       },
-      "ap-southeast-2" : {
-        "id" : "ami-e7ee9edd"
+      "ap-southeast-2": {
+        "id": "ami-e7ee9edd"
       },
-      "sa-east-1" : {
-        "id" : "ami-fbfa41e6"
+      "sa-east-1": {
+        "id": "ami-fbfa41e6"
       }
     }
   },
-  "Parameters" : {
-    "EnvironmentID" : {
-      "Type" : "String",
-      "Default" : "pcf-env-id",
-      "Description" : "Default: pcf-env-id"
+  "Parameters": {
+    "EnvironmentID": {
+      "Type": "String",
+      "Default": "pcf-env-id",
+      "Description": "Default: pcf-env-id"
     },
-    "AvailabilityZone1" : {
-      "Type" : "String",
-      "Description" : "Example: us-west-2a"
+    "AvailabilityZone1": {
+      "Type": "String",
+      "Description": "Example: us-west-2a"
     },
-    "AvailabilityZone2" : {
-      "Type" : "String",
-      "Description" : "Example: us-west-2b"
+    "AvailabilityZone2": {
+      "Type": "String",
+      "Description": "Example: us-west-2b"
     },
-    "AvailabilityZone3" : {
-      "Type" : "String",
-      "Description" : "Example: us-west-2c"
+    "AvailabilityZone3": {
+      "Type": "String",
+      "Description": "Example: us-west-2c"
     },
-    "OpsManAMI" : {
+    "OpsManAMI": {
       "Type": "String",
       "Description": "Exampe: ami-6e799016"
     },
-    "OpsManIngressCidr" : {
+    "OpsManIngressCidr": {
       "Type": "String",
       "Default": "0.0.0.0/0",
       "Description": "Allow ingress traffic to the Ops Manager VM from this CIDR range"
     },
-    "OpsManSSHKeyPairName" : {
+    "OpsManSSHKeyPairName": {
       "Type": "AWS::EC2::KeyPair::KeyName",
       "Description": "Select the SSH keypair to use for the Ops Manager VM"
     },
-    "RDSDBName" : {
+    "RDSDBName": {
       "Type": "String",
       "AllowedPattern": "([a-zA-Z][a-zA-Z0-9]{3,}|^$)",
       "Description": "RDS database name (leave blank to skip RDS). Nust begin with a letter and contain only alphanumeric characters."
     },
-    "RDSUsername" : {
+    "RDSUsername": {
       "Type": "String",
       "Description": "RDS database username (leave blank to skip RDS)"
     },
-    "RDSPassword" : {
+    "RDSPassword": {
       "Type": "String",
       "NoEcho": "true",
       "AllowedPattern": "(.{8,}|^$)",
       "Description": "RDS database password (leave blank to skip RDS, must be 8+ chars)"
     },
-    "ERTCertificateARN" : {
+    "ERTCertificateARN": {
       "Type": "String",
       "Description": "ARN for pre-uploaded certificate for the ERT"
     }
@@ -103,7 +136,17 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": {"Fn::Join": ["",[ { "Ref": "EnvironmentID" }, "-vpc" ] ] }
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "EnvironmentID"
+                  },
+                  "-vpc"
+                ]
+              ]
+            }
           }
         ]
       }
@@ -112,14 +155,26 @@
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "CidrBlock": "10.0.0.0/24",
-        "AvailabilityZone": { "Ref": "AvailabilityZone1" },
+        "AvailabilityZone": {
+          "Ref": "AvailabilityZone1"
+        },
         "VpcId": {
           "Ref": "PcfVPC"
         },
         "Tags": [
           {
             "Key": "Name",
-            "Value": {"Fn::Join": ["",[ { "Ref": "EnvironmentID" }, "-public-subnet-az1" ] ] }
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "EnvironmentID"
+                  },
+                  "-public-subnet-az1"
+                ]
+              ]
+            }
           }
         ]
       }
@@ -128,14 +183,26 @@
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "CidrBlock": "10.0.1.0/24",
-        "AvailabilityZone": { "Ref": "AvailabilityZone2" },
+        "AvailabilityZone": {
+          "Ref": "AvailabilityZone2"
+        },
         "VpcId": {
           "Ref": "PcfVPC"
         },
         "Tags": [
           {
             "Key": "Name",
-            "Value": {"Fn::Join": ["",[ { "Ref": "EnvironmentID" }, "-public-subnet-az2" ] ] }
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "EnvironmentID"
+                  },
+                  "-public-subnet-az2"
+                ]
+              ]
+            }
           }
         ]
       }
@@ -144,14 +211,26 @@
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "CidrBlock": "10.0.2.0/24",
-        "AvailabilityZone": { "Ref": "AvailabilityZone3" },
+        "AvailabilityZone": {
+          "Ref": "AvailabilityZone3"
+        },
         "VpcId": {
           "Ref": "PcfVPC"
         },
         "Tags": [
           {
             "Key": "Name",
-            "Value": {"Fn::Join": ["",[ { "Ref": "EnvironmentID" }, "-public-subnet-az3" ] ] }
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "EnvironmentID"
+                  },
+                  "-public-subnet-az3"
+                ]
+              ]
+            }
           }
         ]
       }
@@ -160,14 +239,26 @@
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "CidrBlock": "10.0.4.0/24",
-        "AvailabilityZone": { "Ref": "AvailabilityZone1" },
+        "AvailabilityZone": {
+          "Ref": "AvailabilityZone1"
+        },
         "VpcId": {
           "Ref": "PcfVPC"
         },
         "Tags": [
           {
             "Key": "Name",
-            "Value": {"Fn::Join": ["",[ { "Ref": "EnvironmentID" }, "-ert-subnet-az1" ] ] }
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "EnvironmentID"
+                  },
+                  "-ert-subnet-az1"
+                ]
+              ]
+            }
           }
         ]
       }
@@ -176,14 +267,26 @@
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "CidrBlock": "10.0.5.0/24",
-        "AvailabilityZone": { "Ref": "AvailabilityZone2" },
+        "AvailabilityZone": {
+          "Ref": "AvailabilityZone2"
+        },
         "VpcId": {
           "Ref": "PcfVPC"
         },
         "Tags": [
           {
             "Key": "Name",
-            "Value": {"Fn::Join": ["",[ { "Ref": "EnvironmentID" }, "-ert-subnet-az2" ] ] }
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "EnvironmentID"
+                  },
+                  "-ert-subnet-az2"
+                ]
+              ]
+            }
           }
         ]
       }
@@ -192,14 +295,26 @@
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "CidrBlock": "10.0.6.0/24",
-        "AvailabilityZone": { "Ref": "AvailabilityZone3" },
+        "AvailabilityZone": {
+          "Ref": "AvailabilityZone3"
+        },
         "VpcId": {
           "Ref": "PcfVPC"
         },
         "Tags": [
           {
             "Key": "Name",
-            "Value": {"Fn::Join": ["",[ { "Ref": "EnvironmentID" }, "-ert-subnet-az3" ] ] }
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "EnvironmentID"
+                  },
+                  "-ert-subnet-az3"
+                ]
+              ]
+            }
           }
         ]
       }
@@ -208,14 +323,26 @@
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "CidrBlock": "10.0.16.0/28",
-        "AvailabilityZone": { "Ref": "AvailabilityZone1" },
+        "AvailabilityZone": {
+          "Ref": "AvailabilityZone1"
+        },
         "VpcId": {
           "Ref": "PcfVPC"
         },
         "Tags": [
           {
             "Key": "Name",
-            "Value": {"Fn::Join": ["",[ { "Ref": "EnvironmentID" }, "-management-subnet-az1" ] ] }
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "EnvironmentID"
+                  },
+                  "-management-subnet-az1"
+                ]
+              ]
+            }
           }
         ]
       }
@@ -224,14 +351,26 @@
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "CidrBlock": "10.0.16.16/28",
-        "AvailabilityZone": { "Ref": "AvailabilityZone2" },
+        "AvailabilityZone": {
+          "Ref": "AvailabilityZone2"
+        },
         "VpcId": {
           "Ref": "PcfVPC"
         },
         "Tags": [
           {
             "Key": "Name",
-            "Value": {"Fn::Join": ["",[ { "Ref": "EnvironmentID" }, "-management-subnet-az2" ] ] }
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "EnvironmentID"
+                  },
+                  "-management-subnet-az2"
+                ]
+              ]
+            }
           }
         ]
       }
@@ -240,14 +379,26 @@
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "CidrBlock": "10.0.16.32/28",
-        "AvailabilityZone": { "Ref": "AvailabilityZone3" },
+        "AvailabilityZone": {
+          "Ref": "AvailabilityZone3"
+        },
         "VpcId": {
           "Ref": "PcfVPC"
         },
         "Tags": [
           {
             "Key": "Name",
-            "Value": {"Fn::Join": ["",[ { "Ref": "EnvironmentID" }, "-management-subnet-az3" ] ] }
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "EnvironmentID"
+                  },
+                  "-management-subnet-az3"
+                ]
+              ]
+            }
           }
         ]
       }
@@ -256,14 +407,26 @@
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "CidrBlock": "10.0.12.0/24",
-        "AvailabilityZone": { "Ref": "AvailabilityZone1" },
+        "AvailabilityZone": {
+          "Ref": "AvailabilityZone1"
+        },
         "VpcId": {
           "Ref": "PcfVPC"
         },
         "Tags": [
           {
             "Key": "Name",
-            "Value": {"Fn::Join": ["",[ { "Ref": "EnvironmentID" }, "-rds-subnet-az1" ] ] }
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "EnvironmentID"
+                  },
+                  "-rds-subnet-az1"
+                ]
+              ]
+            }
           }
         ]
       }
@@ -272,14 +435,26 @@
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "CidrBlock": "10.0.13.0/24",
-        "AvailabilityZone": { "Ref": "AvailabilityZone2" },
+        "AvailabilityZone": {
+          "Ref": "AvailabilityZone2"
+        },
         "VpcId": {
           "Ref": "PcfVPC"
         },
         "Tags": [
           {
             "Key": "Name",
-            "Value": {"Fn::Join": ["",[ { "Ref": "EnvironmentID" }, "-rds-subnet-az2" ] ] }
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "EnvironmentID"
+                  },
+                  "-rds-subnet-az2"
+                ]
+              ]
+            }
           }
         ]
       }
@@ -288,14 +463,26 @@
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "CidrBlock": "10.0.14.0/24",
-        "AvailabilityZone": { "Ref": "AvailabilityZone3" },
+        "AvailabilityZone": {
+          "Ref": "AvailabilityZone3"
+        },
         "VpcId": {
           "Ref": "PcfVPC"
         },
         "Tags": [
           {
             "Key": "Name",
-            "Value": {"Fn::Join": ["",[ { "Ref": "EnvironmentID" }, "-rds-subnet-az3" ] ] }
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "EnvironmentID"
+                  },
+                  "-rds-subnet-az3"
+                ]
+              ]
+            }
           }
         ]
       }
@@ -306,31 +493,65 @@
       "Properties": {
         "AllocatedStorage": "100",
         "DBInstanceClass": "db.m4.large",
-        "DBInstanceIdentifier": {"Fn::Join": ["",[ { "Ref": "EnvironmentID" }, "-rds" ] ] },
-        "Engine": "MySQL",
-        "EngineVersion": "5.6.35",
+        "DBInstanceIdentifier": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "EnvironmentID"
+              },
+              "-rds"
+            ]
+          ]
+        },
+        "Engine": "mariadb",
+        "EngineVersion": "10.1.31",
         "MultiAZ": "True",
-        "DBName": {"Ref": "RDSDBName"},
+        "DBName": {
+          "Ref": "RDSDBName"
+        },
         "Iops": "1000",
-        "MasterUsername": {"Ref": "RDSUsername"},
-        "MasterUserPassword": {"Ref": "RDSPassword"},
+        "MasterUsername": {
+          "Ref": "RDSUsername"
+        },
+        "MasterUserPassword": {
+          "Ref": "RDSPassword"
+        },
         "PubliclyAccessible": "False",
-        "VPCSecurityGroups": [{"Ref": "PcfRdsSecurityGroup"}],
-        "DBSubnetGroupName": {"Ref": "PcfRdsSubnetGroup"}
+        "VPCSecurityGroups": [
+          {
+            "Ref": "PcfRdsSecurityGroup"
+          }
+        ],
+        "DBSubnetGroupName": {
+          "Ref": "PcfRdsSubnetGroup"
+        }
       }
     },
     "PcfServicesSubnetAZ1": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "CidrBlock": "10.0.8.0/24",
-        "AvailabilityZone": { "Ref": "AvailabilityZone1" },
+        "AvailabilityZone": {
+          "Ref": "AvailabilityZone1"
+        },
         "VpcId": {
           "Ref": "PcfVPC"
         },
         "Tags": [
           {
             "Key": "Name",
-            "Value": {"Fn::Join": ["",[ { "Ref": "EnvironmentID" }, "-services-subnet-az1" ] ] }
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "EnvironmentID"
+                  },
+                  "-services-subnet-az1"
+                ]
+              ]
+            }
           }
         ]
       }
@@ -339,14 +560,26 @@
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "CidrBlock": "10.0.9.0/24",
-        "AvailabilityZone": { "Ref": "AvailabilityZone2" },
+        "AvailabilityZone": {
+          "Ref": "AvailabilityZone2"
+        },
         "VpcId": {
           "Ref": "PcfVPC"
         },
         "Tags": [
           {
             "Key": "Name",
-            "Value": {"Fn::Join": ["",[ { "Ref": "EnvironmentID" }, "-services-subnet-az2" ] ] }
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "EnvironmentID"
+                  },
+                  "-services-subnet-az2"
+                ]
+              ]
+            }
           }
         ]
       }
@@ -355,27 +588,48 @@
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "CidrBlock": "10.0.10.0/24",
-        "AvailabilityZone": { "Ref": "AvailabilityZone3" },
+        "AvailabilityZone": {
+          "Ref": "AvailabilityZone3"
+        },
         "VpcId": {
           "Ref": "PcfVPC"
         },
         "Tags": [
           {
             "Key": "Name",
-            "Value": {"Fn::Join": ["",[ { "Ref": "EnvironmentID" }, "-services-subnet-az3" ] ] }
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "EnvironmentID"
+                  },
+                  "-services-subnet-az3"
+                ]
+              ]
+            }
           }
         ]
       }
     },
     "PcfInternetGateway": {
       "Type": "AWS::EC2::InternetGateway",
-      "Properties": {
-      }
+      "Properties": {}
     },
     "PcfDHCPOptions": {
       "Type": "AWS::EC2::DHCPOptions",
       "Properties": {
-        "DomainName": {"Fn::Join": ["",[ { "Ref": "AWS::Region" }, ".compute.internal" ] ] },
+        "DomainName": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "AWS::Region"
+              },
+              ".compute.internal"
+            ]
+          ]
+        },
         "DomainNameServers": [
           "AmazonProvidedDNS"
         ]
@@ -1143,7 +1397,9 @@
             "LoadBalancerPort": "4443",
             "Protocol": "SSL",
             "InstanceProtocol": "TCP",
-            "SSLCertificateId": {"Ref": "ERTCertificateARN" },
+            "SSLCertificateId": {
+              "Ref": "ERTCertificateARN"
+            },
             "PolicyNames": [
               "ELBSecurityPolicy-2016-08"
             ]
@@ -1153,7 +1409,9 @@
             "LoadBalancerPort": "443",
             "Protocol": "HTTPS",
             "InstanceProtocol": "HTTP",
-            "SSLCertificateId": {"Ref": "ERTCertificateARN" },
+            "SSLCertificateId": {
+              "Ref": "ERTCertificateARN"
+            },
             "PolicyNames": [
               "ELBSecurityPolicy-2016-08"
             ]
@@ -1190,14 +1448,32 @@
       "Properties": {
         "DisableApiTermination": "false",
         "InstanceInitiatedShutdownBehavior": "stop",
-        "ImageId": {"Fn::FindInMap" : [ "NATRegionToAmiMap", { "Ref" : "AWS::Region" }, "id"]},
+        "ImageId": {
+          "Fn::FindInMap": [
+            "NATRegionToAmiMap",
+            {
+              "Ref": "AWS::Region"
+            },
+            "id"
+          ]
+        },
         "InstanceType": "t2.medium",
         "Monitoring": "false",
         "SourceDestCheck": "false",
         "Tags": [
           {
             "Key": "Name",
-            "Value": {"Fn::Join": ["",[ { "Ref": "EnvironmentID" }, "-nat" ] ] }
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "EnvironmentID"
+                  },
+                  "-nat"
+                ]
+              ]
+            }
           }
         ],
         "NetworkInterfaces": [
@@ -1227,9 +1503,13 @@
       "Properties": {
         "DisableApiTermination": "false",
         "InstanceInitiatedShutdownBehavior": "stop",
-        "ImageId": { "Ref": "OpsManAMI" },
+        "ImageId": {
+          "Ref": "OpsManAMI"
+        },
         "InstanceType": "m4.large",
-        "KeyName": { "Ref": "OpsManSSHKeyPairName" },
+        "KeyName": {
+          "Ref": "OpsManSSHKeyPairName"
+        },
         "BlockDeviceMappings": [
           {
             "DeviceName": "/dev/xvda",
@@ -1244,7 +1524,17 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": {"Fn::Join": ["",[ { "Ref": "EnvironmentID" }, "-ops-manager" ] ] }
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "EnvironmentID"
+                  },
+                  "-ops-manager"
+                ]
+              ]
+            }
           }
         ],
         "NetworkInterfaces": [
@@ -1367,7 +1657,17 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": {"Fn::Join": ["",[ { "Ref": "EnvironmentID" }, "-rds-subnet-group" ] ] }
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "EnvironmentID"
+                  },
+                  "-rds-subnet-group"
+                ]
+              ]
+            }
           }
         ]
       }
@@ -1382,7 +1682,17 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": {"Fn::Join": ["",[ { "Ref": "EnvironmentID" }, "-vms-security-group" ] ] }
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "EnvironmentID"
+                  },
+                  "-vms-security-group"
+                ]
+              ]
+            }
           }
         ]
       }
@@ -1397,7 +1707,17 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": {"Fn::Join": ["",[ { "Ref": "EnvironmentID" }, "-ops-manager-security-group" ] ] }
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "EnvironmentID"
+                  },
+                  "-ops-manager-security-group"
+                ]
+              ]
+            }
           }
         ]
       }
@@ -1412,7 +1732,17 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": {"Fn::Join": ["",[ { "Ref": "EnvironmentID" }, "-elb-security-group" ] ] }
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "EnvironmentID"
+                  },
+                  "-elb-security-group"
+                ]
+              ]
+            }
           }
         ]
       }
@@ -1427,7 +1757,17 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": {"Fn::Join": ["",[ { "Ref": "EnvironmentID" }, "-rds-security-group" ] ] }
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "EnvironmentID"
+                  },
+                  "-rds-security-group"
+                ]
+              ]
+            }
           }
         ]
       }
@@ -1442,7 +1782,17 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": {"Fn::Join": ["",[ { "Ref": "EnvironmentID" }, "-nat-security-group" ] ] }
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "EnvironmentID"
+                  },
+                  "-nat-security-group"
+                ]
+              ]
+            }
           }
         ]
       }
@@ -1457,7 +1807,17 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": {"Fn::Join": ["",[ { "Ref": "EnvironmentID" }, "-ssh-elb-security-group" ] ] }
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "EnvironmentID"
+                  },
+                  "-ssh-elb-security-group"
+                ]
+              ]
+            }
           }
         ]
       }
@@ -1472,7 +1832,17 @@
         "Tags": [
           {
             "Key": "Name",
-            "Value": {"Fn::Join": ["",[ { "Ref": "EnvironmentID" }, "-tcp-elb-security-group" ] ] }
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Ref": "EnvironmentID"
+                  },
+                  "-tcp-elb-security-group"
+                ]
+              ]
+            }
           }
         ]
       }
@@ -2134,9 +2504,11 @@
       "Type": "AWS::IAM::InstanceProfile",
       "Properties": {
         "Path": "/",
-        "Roles": [ {
-          "Ref": "PcfIamRole"
-        } ]
+        "Roles": [
+          {
+            "Ref": "PcfIamRole"
+          }
+        ]
       }
     },
     "PcfIamRole": {
@@ -2147,22 +2519,28 @@
       ],
       "Properties": {
         "AssumeRolePolicyDocument": {
-          "Version" : "2012-10-17",
-          "Statement": [ {
-            "Effect": "Allow",
-            "Principal": {
-              "Service": [ "ec2.amazonaws.com" ]
-            },
-            "Action": [ "sts:AssumeRole" ]
-          } ]
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "ec2.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
         },
-        "Policies": [  ]
+        "Policies": []
       }
     },
-    "PcfIamPolicy" : {
+    "PcfIamPolicy": {
       "Type": "AWS::IAM::ManagedPolicy",
       "Properties": {
-        "PolicyDocument" : {
+        "PolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [
             {
@@ -2228,7 +2606,6 @@
                   ]
                 }
               ]
-
             },
             {
               "Sid": "AllowToCreateInstanceWithCurrentInstanceProfile",
@@ -2248,14 +2625,18 @@
             {
               "Sid": "OpsManagerS3Permissions",
               "Effect": "Allow",
-              "Action": ["s3:*"],
+              "Action": [
+                "s3:*"
+              ],
               "Resource": [
                 {
                   "Fn::Join": [
                     "",
                     [
                       "arn:aws:s3:::",
-                      {"Ref": "PcfOpsManBucket"}
+                      {
+                        "Ref": "PcfOpsManBucket"
+                      }
                     ]
                   ]
                 },
@@ -2264,7 +2645,9 @@
                     "",
                     [
                       "arn:aws:s3:::",
-                      {"Ref": "PcfOpsManBucket"},
+                      {
+                        "Ref": "PcfOpsManBucket"
+                      },
                       "/*"
                     ]
                   ]
@@ -2274,7 +2657,9 @@
                     "",
                     [
                       "arn:aws:s3:::",
-                      {"Ref": "PcfPackagesBucket"}
+                      {
+                        "Ref": "PcfPackagesBucket"
+                      }
                     ]
                   ]
                 },
@@ -2283,7 +2668,9 @@
                     "",
                     [
                       "arn:aws:s3:::",
-                      {"Ref": "PcfPackagesBucket"},
+                      {
+                        "Ref": "PcfPackagesBucket"
+                      },
                       "/*"
                     ]
                   ]
@@ -2293,7 +2680,9 @@
                     "",
                     [
                       "arn:aws:s3:::",
-                      {"Ref": "PcfDropletsBucket"}
+                      {
+                        "Ref": "PcfDropletsBucket"
+                      }
                     ]
                   ]
                 },
@@ -2302,7 +2691,9 @@
                     "",
                     [
                       "arn:aws:s3:::",
-                      {"Ref": "PcfDropletsBucket"},
+                      {
+                        "Ref": "PcfDropletsBucket"
+                      },
                       "/*"
                     ]
                   ]
@@ -2312,7 +2703,9 @@
                     "",
                     [
                       "arn:aws:s3:::",
-                      {"Ref": "PcfResourcesBucket"}
+                      {
+                        "Ref": "PcfResourcesBucket"
+                      }
                     ]
                   ]
                 },
@@ -2321,7 +2714,9 @@
                     "",
                     [
                       "arn:aws:s3:::",
-                      {"Ref": "PcfResourcesBucket"},
+                      {
+                        "Ref": "PcfResourcesBucket"
+                      },
                       "/*"
                     ]
                   ]
@@ -2331,7 +2726,9 @@
                     "",
                     [
                       "arn:aws:s3:::",
-                      {"Ref": "PcfBuildpacksBucket"}
+                      {
+                        "Ref": "PcfBuildpacksBucket"
+                      }
                     ]
                   ]
                 },
@@ -2340,7 +2737,9 @@
                     "",
                     [
                       "arn:aws:s3:::",
-                      {"Ref": "PcfBuildpacksBucket"},
+                      {
+                        "Ref": "PcfBuildpacksBucket"
+                      },
                       "/*"
                     ]
                   ]
@@ -2378,7 +2777,9 @@
                 "ec2:DeleteVolume",
                 "ec2:DetachVolume"
               ],
-              "Resource": ["*"]
+              "Resource": [
+                "*"
+              ]
             },
             {
               "Sid": "OpsManagerElbPermissions",
@@ -2388,13 +2789,33 @@
                 "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
                 "elasticloadbalancing:RegisterInstancesWithLoadBalancer"
               ],
-              "Resource": ["*"]
+              "Resource": [
+                "*"
+              ]
             }
           ]
         },
-        "Description" : {"Fn::Join": [ "", ["Managed policy for OpsManager and BOSH director in ", {"Ref": "AWS::StackName"}]]},
-        "Roles" : [ { "Ref" : "PcfIamRole" } ],
-        "Users" : [ { "Ref" : "PcfIamUser" } ]
+        "Description": {
+          "Fn::Join": [
+            "",
+            [
+              "Managed policy for OpsManager and BOSH director in ",
+              {
+                "Ref": "AWS::StackName"
+              }
+            ]
+          ]
+        },
+        "Roles": [
+          {
+            "Ref": "PcfIamRole"
+          }
+        ],
+        "Users": [
+          {
+            "Ref": "PcfIamUser"
+          }
+        ]
       }
     },
     "PcfIamUser": {
@@ -2410,134 +2831,266 @@
   },
   "Outputs": {
     "PcfVpc": {
-      "Value": {"Ref": "PcfVPC"}
+      "Value": {
+        "Ref": "PcfVPC"
+      }
     },
     "PcfIamInstanceProfile": {
-      "Value": { "Ref": "PcfIamInstanceProfile" }
+      "Value": {
+        "Ref": "PcfIamInstanceProfile"
+      }
     },
     "PcfOpsManagerS3Bucket": {
-      "Value": {"Ref": "PcfOpsManBucket"}
+      "Value": {
+        "Ref": "PcfOpsManBucket"
+      }
     },
     "PcfElasticRuntimeS3BuildpacksBucket": {
-      "Value": {"Ref": "PcfBuildpacksBucket"}
+      "Value": {
+        "Ref": "PcfBuildpacksBucket"
+      }
     },
     "PcfElasticRuntimeS3DropletsBucket": {
-      "Value": {"Ref": "PcfDropletsBucket"}
+      "Value": {
+        "Ref": "PcfDropletsBucket"
+      }
     },
     "PcfElasticRuntimeS3PackagesBucket": {
-      "Value": {"Ref": "PcfPackagesBucket"}
+      "Value": {
+        "Ref": "PcfPackagesBucket"
+      }
     },
     "PcfElasticRuntimeS3ResourcesBucket": {
-      "Value": {"Ref": "PcfResourcesBucket"}
+      "Value": {
+        "Ref": "PcfResourcesBucket"
+      }
     },
     "PcfERTSubnetAZ1": {
-      "Value": {"Ref": "PcfERTSubnetAZ1"}
+      "Value": {
+        "Ref": "PcfERTSubnetAZ1"
+      }
     },
     "PcfERTSubnetAZ2": {
-      "Value": {"Ref": "PcfERTSubnetAZ2"}
+      "Value": {
+        "Ref": "PcfERTSubnetAZ2"
+      }
     },
     "PcfERTSubnetAZ3": {
-      "Value": {"Ref": "PcfERTSubnetAZ3"}
+      "Value": {
+        "Ref": "PcfERTSubnetAZ3"
+      }
     },
     "PcfERTSubnetAZ1AvailabilityZone": {
-      "Value": { "Fn::GetAtt" : [ "PcfERTSubnetAZ1", "AvailabilityZone" ] }
+      "Value": {
+        "Fn::GetAtt": [
+          "PcfERTSubnetAZ1",
+          "AvailabilityZone"
+        ]
+      }
     },
     "PcfERTSubnetAZ2AvailabilityZone": {
-      "Value": { "Fn::GetAtt" : [ "PcfERTSubnetAZ2", "AvailabilityZone" ] }
+      "Value": {
+        "Fn::GetAtt": [
+          "PcfERTSubnetAZ2",
+          "AvailabilityZone"
+        ]
+      }
     },
     "PcfERTSubnetAZ3AvailabilityZone": {
-      "Value": { "Fn::GetAtt" : [ "PcfERTSubnetAZ3", "AvailabilityZone" ] }
+      "Value": {
+        "Fn::GetAtt": [
+          "PcfERTSubnetAZ3",
+          "AvailabilityZone"
+        ]
+      }
     },
     "PcfManagementSubnetAZ1": {
-      "Value": {"Ref": "PcfManagementSubnetAZ1"}
+      "Value": {
+        "Ref": "PcfManagementSubnetAZ1"
+      }
     },
     "PcfManagementSubnetAZ2": {
-      "Value": {"Ref": "PcfManagementSubnetAZ2"}
+      "Value": {
+        "Ref": "PcfManagementSubnetAZ2"
+      }
     },
     "PcfManagementSubnetAZ3": {
-      "Value": {"Ref": "PcfManagementSubnetAZ3"}
+      "Value": {
+        "Ref": "PcfManagementSubnetAZ3"
+      }
     },
     "PcfManagementSubnetAZ1AvailabilityZone": {
-      "Value": { "Fn::GetAtt" : [ "PcfManagementSubnetAZ1", "AvailabilityZone" ] }
+      "Value": {
+        "Fn::GetAtt": [
+          "PcfManagementSubnetAZ1",
+          "AvailabilityZone"
+        ]
+      }
     },
     "PcfManagementSubnetAZ2AvailabilityZone": {
-      "Value": { "Fn::GetAtt" : [ "PcfManagementSubnetAZ2", "AvailabilityZone" ] }
+      "Value": {
+        "Fn::GetAtt": [
+          "PcfManagementSubnetAZ2",
+          "AvailabilityZone"
+        ]
+      }
     },
     "PcfManagementSubnetAZ3AvailabilityZone": {
-      "Value": { "Fn::GetAtt" : [ "PcfManagementSubnetAZ3", "AvailabilityZone" ] }
+      "Value": {
+        "Fn::GetAtt": [
+          "PcfManagementSubnetAZ3",
+          "AvailabilityZone"
+        ]
+      }
     },
     "PcfServicesSubnetAZ1": {
-      "Value": {"Ref": "PcfServicesSubnetAZ1"}
+      "Value": {
+        "Ref": "PcfServicesSubnetAZ1"
+      }
     },
     "PcfServicesSubnetAZ2": {
-      "Value": {"Ref": "PcfServicesSubnetAZ2"}
+      "Value": {
+        "Ref": "PcfServicesSubnetAZ2"
+      }
     },
     "PcfServicesSubnetAZ3": {
-      "Value": {"Ref": "PcfServicesSubnetAZ3"}
+      "Value": {
+        "Ref": "PcfServicesSubnetAZ3"
+      }
     },
     "PcfServicesSubnetAZ1AvailabilityZone": {
-      "Value": { "Fn::GetAtt" : [ "PcfServicesSubnetAZ1", "AvailabilityZone" ] }
+      "Value": {
+        "Fn::GetAtt": [
+          "PcfServicesSubnetAZ1",
+          "AvailabilityZone"
+        ]
+      }
     },
     "PcfServicesSubnetAZ2AvailabilityZone": {
-      "Value": { "Fn::GetAtt" : [ "PcfServicesSubnetAZ2", "AvailabilityZone" ] }
+      "Value": {
+        "Fn::GetAtt": [
+          "PcfServicesSubnetAZ2",
+          "AvailabilityZone"
+        ]
+      }
     },
     "PcfServicesSubnetAZ3AvailabilityZone": {
-      "Value": { "Fn::GetAtt" : [ "PcfServicesSubnetAZ3", "AvailabilityZone" ] }
+      "Value": {
+        "Fn::GetAtt": [
+          "PcfServicesSubnetAZ3",
+          "AvailabilityZone"
+        ]
+      }
     },
     "PcfVmsSecurityGroup": {
-      "Value": { "Ref" : "PcfVmsSecurityGroup" }
+      "Value": {
+        "Ref": "PcfVmsSecurityGroup"
+      }
     },
     "PcfRdsAddress": {
       "Condition": "CreateRDS",
-      "Value": { "Fn::GetAtt": [ "PcfRds", "Endpoint.Address"]}
+      "Value": {
+        "Fn::GetAtt": [
+          "PcfRds",
+          "Endpoint.Address"
+        ]
+      }
     },
     "PcfRdsPort": {
       "Condition": "CreateRDS",
-      "Value": {"Fn::GetAtt": [ "PcfRds", "Endpoint.Port"] }
+      "Value": {
+        "Fn::GetAtt": [
+          "PcfRds",
+          "Endpoint.Port"
+        ]
+      }
     },
     "PcfRdsUsername": {
       "Condition": "CreateRDS",
-      "Value": {"Ref": "RDSUsername"}
+      "Value": {
+        "Ref": "RDSUsername"
+      }
     },
     "PcfRdsDBName": {
       "Condition": "CreateRDS",
-      "Value": {"Ref": "RDSDBName"}
+      "Value": {
+        "Ref": "RDSDBName"
+      }
     },
     "PcfElbWebName": {
-      "Value": { "Ref": "PcfElbWeb" }
+      "Value": {
+        "Ref": "PcfElbWeb"
+      }
     },
     "PcfElbWebDnsName": {
-      "Value": { "Fn::GetAtt": [ "PcfElbWeb", "DNSName"]}
+      "Value": {
+        "Fn::GetAtt": [
+          "PcfElbWeb",
+          "DNSName"
+        ]
+      }
     },
     "PcfElbSshName": {
-      "Value": { "Ref": "PcfElbSsh" }
+      "Value": {
+        "Ref": "PcfElbSsh"
+      }
     },
     "PcfElbSshDnsName": {
-      "Value": { "Fn::GetAtt": [ "PcfElbSsh", "DNSName"]}
+      "Value": {
+        "Fn::GetAtt": [
+          "PcfElbSsh",
+          "DNSName"
+        ]
+      }
     },
     "PcfElbTcpName": {
-      "Value": { "Ref": "PcfElbTcp" }
+      "Value": {
+        "Ref": "PcfElbTcp"
+      }
     },
     "PcfElbTcpDnsName": {
-      "Value": { "Fn::GetAtt": [ "PcfElbTcp", "DNSName"]}
+      "Value": {
+        "Fn::GetAtt": [
+          "PcfElbTcp",
+          "DNSName"
+        ]
+      }
     },
     "PcfOpsManIPAddress": {
-      "Value": { "Fn::GetAtt": [ "PcfOpsManInstance", "PublicIp"]}
+      "Value": {
+        "Fn::GetAtt": [
+          "PcfOpsManInstance",
+          "PublicIp"
+        ]
+      }
     },
     "PcfOpsManPrivateIPAddress": {
-      "Value": { "Fn::GetAtt": [ "PcfOpsManInstance", "PrivateIp"]}
+      "Value": {
+        "Fn::GetAtt": [
+          "PcfOpsManInstance",
+          "PrivateIp"
+        ]
+      }
     },
     "PcfIamUserName": {
-      "Value": {"Ref": "PcfIamUser"}
+      "Value": {
+        "Ref": "PcfIamUser"
+      }
     },
     "PcfIamRole": {
-      "Value": {"Ref": "PcfIamRole"}
+      "Value": {
+        "Ref": "PcfIamRole"
+      }
     },
     "PcfOpsManSecurityGroup": {
-      "Value": { "Ref" : "PcfOpsManSecurityGroup" }
+      "Value": {
+        "Ref": "PcfOpsManSecurityGroup"
+      }
     },
     "PcfPublicSubnetAZ1": {
-      "Value": {"Ref": "PcfPublicSubnetAZ1"}
+      "Value": {
+        "Ref": "PcfPublicSubnetAZ1"
+      }
     }
   }
 }
