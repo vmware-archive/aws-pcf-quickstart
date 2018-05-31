@@ -70,10 +70,10 @@
   ".properties.credhub_database.external.port": {
     "value": "3306"
   },
-  ".properties.credhub_database.external.credhub_username": {
+  ".properties.credhub_database.external.username": {
     "value": "{{pcf_rds_username}}"
   },
-  ".properties.credhub_database.external.credhub_password": {
+  ".properties.credhub_database.external.password": {
     "value": {
       "secret": "{{pcf_rds_password}}"
     }
