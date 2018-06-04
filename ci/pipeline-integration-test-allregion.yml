@@ -1,6 +1,5 @@
 ---
 resource_types:
-
 - name: slack-notification
   type: docker-image
   source:
@@ -23,7 +22,7 @@ resources:
   source:
     owner: pivotal-cf
     repository: om
-    # access_token: ((github_access_token))
+    access_token: ((github_access_token))
     version: v0.0.22
 
 - name: aws-pcf-concourse-state
@@ -35,15 +34,6 @@ resources:
     access_key_id: ((aws_admin_key_id))
     secret_access_key: ((aws_admin_secret_access_key))
 
-- name: quickstart-scripts-alpha
-  type: s3
-  source:
-    bucket: snw-aws-pcf-quickstart-templates
-    region_name: us-west-2
-    versioned_file: quickstart-pivotal-cloudfoundry/scripts/quickstart.tgz
-    access_key_id: ((s3_access_key_id))
-    secret_access_key: ((s3_secret_access_key))
-
 - name: pivotal-cloudfoundry-template-alpha
   type: s3
   source:
@@ -53,110 +43,10 @@ resources:
     access_key_id: ((s3_access_key_id))
     secret_access_key: ((s3_secret_access_key))
 
-- name: aws-pcf-pointless-semver
-  type: s3
-  source:
-    bucket: snw-aws-pcf-concourse-state
-    region_name: us-west-2
-    versioned_file: pointless_semver
-    access_key_id: ((aws_admin_key_id))
-    secret_access_key: ((aws_admin_secret_access_key))
-
-- name: cancel-us-east-1-resource
-  type: s3
-  source:
-    bucket: snw-aws-pcf-concourse-state
-    region_name: us-west-2
-    versioned_file: cancel-us-east-1-state/state
-    access_key_id: ((aws_admin_key_id))
-    secret_access_key: ((aws_admin_secret_access_key))
-
-- name: cancel-us-west-1-resource
-  type: s3
-  source:
-    bucket: snw-aws-pcf-concourse-state
-    region_name: us-west-2
-    versioned_file: cancel-us-west-1-state/state
-    access_key_id: ((aws_admin_key_id))
-    secret_access_key: ((aws_admin_secret_access_key))
-
-- name: cancel-us-west-2-resource
-  type: s3
-  source:
-    bucket: snw-aws-pcf-concourse-state
-    region_name: us-west-2
-    versioned_file: cancel-us-west-2-state/state
-    access_key_id: ((aws_admin_key_id))
-    secret_access_key: ((aws_admin_secret_access_key))
-
-- name: cancel-eu-central-1-resource
-  type: s3
-  source:
-    bucket: snw-aws-pcf-concourse-state
-    region_name: us-west-2
-    versioned_file: cancel-eu-central-1-state/state
-    access_key_id: ((aws_admin_key_id))
-    secret_access_key: ((aws_admin_secret_access_key))
-
-- name: cancel-eu-west-1-resource
-  type: s3
-  source:
-    bucket: snw-aws-pcf-concourse-state
-    region_name: us-west-2
-    versioned_file: cancel-eu-west-1-state/state
-    access_key_id: ((aws_admin_key_id))
-    secret_access_key: ((aws_admin_secret_access_key))
-
-- name: cancel-ap-southeast-1-resource
-  type: s3
-  source:
-    bucket: snw-aws-pcf-concourse-state
-    region_name: us-west-2
-    versioned_file: cancel-ap-southeast-1-state/state
-    access_key_id: ((aws_admin_key_id))
-    secret_access_key: ((aws_admin_secret_access_key))
-
-- name: cancel-ap-southeast-2-resource
-  type: s3
-  source:
-    bucket: snw-aws-pcf-concourse-state
-    region_name: us-west-2
-    versioned_file: cancel-ap-southeast-2-state/state
-    access_key_id: ((aws_admin_key_id))
-    secret_access_key: ((aws_admin_secret_access_key))
-
-- name: cancel-ap-northeast-1-resource
-  type: s3
-  source:
-    bucket: snw-aws-pcf-concourse-state
-    region_name: us-west-2
-    versioned_file: cancel-ap-northeast-1-state/state
-    access_key_id: ((aws_admin_key_id))
-    secret_access_key: ((aws_admin_secret_access_key))
-
-- name: cancel-ap-northeast-2-resource
-  type: s3
-  source:
-    bucket: snw-aws-pcf-concourse-state
-    region_name: us-west-2
-    versioned_file: cancel-ap-northeast-2-state/state
-    access_key_id: ((aws_admin_key_id))
-    secret_access_key: ((aws_admin_secret_access_key))
-
-- name: cancel-sa-east-1-resource
-  type: s3
-  source:
-    bucket: snw-aws-pcf-concourse-state
-    region_name: us-west-2
-    versioned_file: cancel-sa-east-1-state/state
-    access_key_id: ((aws_admin_key_id))
-    secret_access_key: ((aws_admin_secret_access_key))
-
 - name: slack-alert
   type: slack-notification
   source:
     url: ((slack_hook))
-
 
 templates:
 params: &some_values
@@ -168,29 +58,17 @@ params: &some_values
   AWS_ACCESS_KEY_ID: ((aws_admin_key_id))
   AWS_SECRET_ACCESS_KEY: ((aws_admin_secret_access_key))
   US_EAST_1_SSLCERTIFICATEARN: ((us_east_1_sslcertificatearn))
-  US_EAST_2_SSLCERTIFICATEARN: ((us_east_2_sslcertificatearn))
   US_WEST_1_SSLCERTIFICATEARN: ((us_west_1_sslcertificatearn))
   US_WEST_2_SSLCERTIFICATEARN: ((us_west_2_sslcertificatearn))
-  CA_CENTRAL_1_SSLCERTIFICATEARN: ((ca_central_1_sslcertificatearn))
   EU_CENTRAL_1_SSLCERTIFICATEARN: ((eu_central_1_sslcertificatearn))
   EU_WEST_1_SSLCERTIFICATEARN: ((eu_west_1_sslcertificatearn))
-  EU_WEST_2_SSLCERTIFICATEARN: ((eu_west_2_sslcertificatearn))
-  AP_SOUTHEAST_1_SSLCERTIFICATEARN: ((ap_southeast_1_sslcertificatearn))
   AP_SOUTHEAST_2_SSLCERTIFICATEARN: ((ap_southeast_2_sslcertificatearn))
-  AP_NORTHEAST_2_SSLCERTIFICATEARN: ((ap_northeast_2_sslcertificatearn))
-  AP_NORTHEAST_1_SSLCERTIFICATEARN: ((ap_northeast_1_sslcertificatearn))
-  AP_SOUTH_1_SSLCERTIFICATEARN: ((ap_south_1_sslcertificatearn))
-  SA_EAST_1_SSLCERTIFICATEARN: ((sa_east_1_sslcertificatearn))
 
 run: &run
   path: bash
   args:
   - -exc
   - |
-    if [ $(cat cancel-check/state) == true ]; then
-      exit 1
-    fi
-
     pushd quickstart-repo
     pip install -r requirements.txt
     python ./ci/create-stack.py '../pivotal-cloudfoundry-template-alpha/pivotal-cloudfoundry.template' ${AWS_INTEGRATION_REGION}
@@ -201,9 +79,6 @@ on_failure: &on_failure
   aggregate:
     - put: slack-alert
       params:
-        icon_emoji: ":sad_panda:"
-        username: Concourse CI
-        channel: "@jshah"
         text: "Region Integration test failed"
     - task: delete-buckets
       config:
@@ -312,171 +187,13 @@ delete_task: &delete_task
               python ./ci/delete-buckets.py
               popd
 
-toggle_cancel_task: &toggle_cancel_task
-  task: toggle_cancel_task
-  config:
-    platform: linux
-    image_resource:
-      type: docker-image
-      source:
-        repository: cfplatformeng/quickstart-ci
-    outputs:
-    - name: output
-    params:
-      AWS_ACCESS_KEY_ID: ((aws_admin_key_id))
-      AWS_SECRET_ACCESS_KEY: ((aws_admin_secret_access_key))
-    run:
-      path: bash
-      args:
-      - -exc
-      - |
-        echo "true" > output/state
-
-
-job_trigger: &job_trigger
-  get: aws-pcf-pointless-semver
-  trigger: true
-  passed: [manual-trigger]
-
-
 jobs:
-- name: manual-trigger
-  plan:
-  - get: aws-pcf-pointless-semver
-    params:
-      bump: patch
-  - task: toggle
-    config:
-      platform: linux
-      image_resource:
-        type: docker-image
-        source:
-          repository: cfplatformeng/quickstart-ci
-      outputs:
-      - name: output
-      params:
-        AWS_ACCESS_KEY_ID: ((aws_admin_key_id))
-        AWS_SECRET_ACCESS_KEY: ((aws_admin_secret_access_key))
-      run:
-        path: bash
-        args:
-        - -exc
-        - |
-          echo "false" > output/state
-  - put: aws-pcf-pointless-semver
-    params:
-      file: aws-pcf-pointless-semver/version
-  - put: cancel-us-east-1-resource
-    params:
-      file: output/state
-  - put: cancel-us-west-1-resource
-    params:
-      file: output/state
-  - put: cancel-us-west-2-resource
-    params:
-      file: output/state
-  - put: cancel-eu-central-1-resource
-    params:
-      file: output/state
-  - put: cancel-eu-west-1-resource
-    params:
-      file: output/state
-  - put: cancel-ap-southeast-1-resource
-    params:
-      file: output/state
-  - put: cancel-ap-southeast-2-resource
-    params:
-      file: output/state
-  - put: cancel-ap-northeast-1-resource
-    params:
-      file: output/state
-  - put: cancel-ap-northeast-2-resource
-    params:
-      file: output/state
-  - put: cancel-sa-east-1-resource
-    params:
-      file: output/state
-
-- name: cancel-us-east-1
-  plan:
-  - *toggle_cancel_task
-  - put: cancel-us-east-1-resource
-    params:
-      file: output/state
-
-- name: cancel-us-west-1
-  plan:
-  - *toggle_cancel_task
-  - put: cancel-us-west-1-resource
-    params:
-      file: output/state
-
-- name: cancel-us-west-2
-  plan:
-  - *toggle_cancel_task
-  - put: cancel-us-west-2-resource
-    params:
-      file: output/state
-
-- name: cancel-eu-central-1
-  plan:
-  - *toggle_cancel_task
-  - put: cancel-eu-central-1-resource
-    params:
-      file: output/state
-
-- name: cancel-eu-west-1
-  plan:
-  - *toggle_cancel_task
-  - put: cancel-eu-west-1-resource
-    params:
-      file: output/state
-
-- name: cancel-ap-southeast-1
-  plan:
-  - *toggle_cancel_task
-  - put: cancel-ap-southeast-1-resource
-    params:
-      file: output/state
-
-- name: cancel-ap-southeast-2
-  plan:
-  - *toggle_cancel_task
-  - put: cancel-ap-southeast-2-resource
-    params:
-      file: output/state
-
-- name: cancel-ap-northeast-1
-  plan:
-  - *toggle_cancel_task
-  - put: cancel-ap-northeast-1-resource
-    params:
-      file: output/state
-
-- name: cancel-ap-northeast-2
-  plan:
-  - *toggle_cancel_task
-  - put: cancel-ap-northeast-2-resource
-    params:
-      file: output/state
-
-- name: cancel-sa-east-1
-  plan:
-  - *toggle_cancel_task
-  - put: cancel-sa-east-1-resource
-    params:
-      file: output/state
-
-- name: us-east-1
+- name: us-east-1-deploy
   serial_groups: [integration]
   plan:
-  - *job_trigger
-  - get: quickstart-repo
-  - get: quickstart-scripts-alpha
-  - get: pivotal-cloudfoundry-template-alpha
-  - get: aws-pcf-concourse-state
-  - get: om-release
-  - get: cancel-us-east-1-resource
+  - aggregate:
+    - get: quickstart-repo
+    - get: pivotal-cloudfoundry-template-alpha
   - task: integration-test
     config:
       platform: linux
@@ -484,8 +201,6 @@ jobs:
       inputs:
       - name: quickstart-repo
       - name: pivotal-cloudfoundry-template-alpha
-      - name: cancel-us-east-1-resource
-        path: cancel-check
       outputs:
       - name: output
       params:
@@ -496,18 +211,35 @@ jobs:
   - put: aws-pcf-concourse-state
     params:
       file: output/stackid
-  - *check_task
-  - *delete_task
 
-- name: us-west-1
+- name: us-east-1-test-cf
   serial_groups: [integration]
   plan:
-  - *job_trigger
-  - get: quickstart-repo
-  - get: quickstart-scripts-alpha
-  - get: pivotal-cloudfoundry-template-alpha
-  - get: om-release
-  - get: cancel-us-west-1-resource
+  - aggregate:
+    - get: om-release
+    - get: quickstart-repo
+      passed:
+      - us-east-1-deploy
+      trigger: true
+  - *check_task
+
+- name: us-east-1-delete
+  serial_groups: [integration]
+  plan:
+  - aggregate:
+    - get: quickstart-repo
+      passed:
+      - us-east-1-test-cf
+      trigger: true
+    - get: aws-pcf-concourse-state
+  - *delete_task
+
+- name: us-west-1-deploy
+  serial_groups: [integration]
+  plan:
+  - aggregate:
+    - get: quickstart-repo
+    - get: pivotal-cloudfoundry-template-alpha
   - task: integration-test
     config:
       platform: linux
@@ -515,8 +247,6 @@ jobs:
       inputs:
       - name: quickstart-repo
       - name: pivotal-cloudfoundry-template-alpha
-      - name: cancel-us-west-1-resource
-        path: cancel-check
       outputs:
       - name: output
       params:
@@ -527,18 +257,35 @@ jobs:
   - put: aws-pcf-concourse-state
     params:
       file: output/stackid
-  - *check_task
-  - *delete_task
 
-- name: us-west-2
+- name: us-west-1-test-cf
   serial_groups: [integration]
   plan:
-  - *job_trigger
-  - get: quickstart-repo
-  - get: quickstart-scripts-alpha
-  - get: pivotal-cloudfoundry-template-alpha
-  - get: om-release
-  - get: cancel-us-west-2-resource
+  - aggregate:
+    - get: om-release
+    - get: quickstart-repo
+      passed:
+      - us-west-1-deploy
+      trigger: true
+  - *check_task
+
+- name: us-west-1-delete
+  serial_groups: [integration]
+  plan:
+  - aggregate:
+    - get: quickstart-repo
+      passed:
+      - us-west-1-test-cf
+      trigger: true
+    - get: aws-pcf-concourse-state
+  - *delete_task
+
+- name: us-west-2-deploy
+  serial_groups: [integration]
+  plan:
+  - aggregate:
+    - get: quickstart-repo
+    - get: pivotal-cloudfoundry-template-alpha
   - task: integration-test
     config:
       platform: linux
@@ -546,8 +293,6 @@ jobs:
       inputs:
       - name: quickstart-repo
       - name: pivotal-cloudfoundry-template-alpha
-      - name: cancel-us-west-2-resource
-        path: cancel-check
       outputs:
       - name: output
       params:
@@ -558,18 +303,34 @@ jobs:
   - put: aws-pcf-concourse-state
     params:
       file: output/stackid
-  - *check_task
-  - *delete_task
 
-- name: eu-central-1
+- name: us-west-2-test-cf
   serial_groups: [integration]
   plan:
-  - *job_trigger
+  - aggregate:
+    - get: om-release
+    - get: quickstart-repo
+      passed:
+      - us-west-2-deploy
+      trigger: true
+  - *check_task
+
+- name: us-west-2-delete
+  serial_groups: [integration]
+  plan:
+  - aggregate:
+    - get: quickstart-repo
+      passed:
+      - us-west-2-test-cf
+      trigger: true
+    - get: aws-pcf-concourse-state
+  - *delete_task
+
+- name: eu-central-1-deploy
+  serial_groups: [integration]
+  plan:
   - get: quickstart-repo
-  - get: quickstart-scripts-alpha
   - get: pivotal-cloudfoundry-template-alpha
-  - get: om-release
-  - get: cancel-eu-central-1-resource
   - task: integration-test
     config:
       platform: linux
@@ -577,8 +338,6 @@ jobs:
       inputs:
       - name: quickstart-repo
       - name: pivotal-cloudfoundry-template-alpha
-      - name: cancel-eu-central-1-resource
-        path: cancel-check
       outputs:
       - name: output
       params:
@@ -589,18 +348,34 @@ jobs:
   - put: aws-pcf-concourse-state
     params:
       file: output/stackid
-  - *check_task
-  - *delete_task
 
-- name: eu-west-1
+- name: eu-central-1-test-cf
   serial_groups: [integration]
   plan:
-  - *job_trigger
+  - aggregate:
+    - get: om-release
+    - get: quickstart-repo
+      passed:
+      - eu-central-1-deploy
+      trigger: true
+  - *check_task
+
+- name: eu-central-1-delete
+  serial_groups: [integration]
+  plan:
+  - aggregate:
+    - get: quickstart-repo
+      passed:
+      - eu-central-1-test-cf
+      trigger: true
+    - get: aws-pcf-concourse-state
+  - *delete_task
+
+- name: eu-west-1-deploy
+  serial_groups: [integration]
+  plan:
   - get: quickstart-repo
-  - get: quickstart-scripts-alpha
   - get: pivotal-cloudfoundry-template-alpha
-  - get: om-release
-  - get: cancel-eu-west-1-resource
   - task: integration-test
     config:
       platform: linux
@@ -608,8 +383,6 @@ jobs:
       inputs:
       - name: quickstart-repo
       - name: pivotal-cloudfoundry-template-alpha
-      - name: cancel-eu-west-1-resource
-        path: cancel-check
       outputs:
       - name: output
       params:
@@ -620,18 +393,34 @@ jobs:
   - put: aws-pcf-concourse-state
     params:
       file: output/stackid
-  - *check_task
-  - *delete_task
 
-- name: ap-southeast-1
+- name: eu-west-1-test-cf
   serial_groups: [integration]
   plan:
-  - *job_trigger
+  - aggregate:
+    - get: om-release
+    - get: quickstart-repo
+      passed:
+      - eu-west-1-deploy
+      trigger: true
+  - *check_task
+
+- name: eu-west-1-delete
+  serial_groups: [integration]
+  plan:
+  - aggregate:
+    - get: quickstart-repo
+      passed:
+      - eu-west-1-test-cf
+      trigger: true
+    - get: aws-pcf-concourse-state
+  - *delete_task
+
+- name: ap-southeast-2-deploy
+  serial_groups: [integration]
+  plan:
   - get: quickstart-repo
-  - get: quickstart-scripts-alpha
   - get: pivotal-cloudfoundry-template-alpha
-  - get: om-release
-  - get: cancel-ap-southeast-1-resource
   - task: integration-test
     config:
       platform: linux
@@ -639,39 +428,6 @@ jobs:
       inputs:
       - name: quickstart-repo
       - name: pivotal-cloudfoundry-template-alpha
-      - name: cancel-ap-southeast-1-resource
-        path: cancel-check
-      outputs:
-      - name: output
-      params:
-        <<: *some_values
-        AWS_INTEGRATION_REGION: ap-southeast-1
-      run: *run
-    on_failure: *on_failure
-  - put: aws-pcf-concourse-state
-    params:
-      file: output/stackid
-  - *check_task
-  - *delete_task
-
-- name: ap-southeast-2
-  serial_groups: [integration]
-  plan:
-  - *job_trigger
-  - get: quickstart-repo
-  - get: quickstart-scripts-alpha
-  - get: pivotal-cloudfoundry-template-alpha
-  - get: om-release
-  - get: cancel-ap-southeast-2-resource
-  - task: integration-test
-    config:
-      platform: linux
-      <<: *image_resource
-      inputs:
-      - name: quickstart-repo
-      - name: pivotal-cloudfoundry-template-alpha
-      - name: cancel-ap-southeast-2-resource
-        path: cancel-check
       outputs:
       - name: output
       params:
@@ -682,98 +438,25 @@ jobs:
   - put: aws-pcf-concourse-state
     params:
       file: output/stackid
-  - *check_task
-  - *delete_task
 
-- name: ap-northeast-1
+- name: ap-southeast-2-test-cf
   serial_groups: [integration]
   plan:
-  - *job_trigger
-  - get: quickstart-repo
-  - get: quickstart-scripts-alpha
-  - get: pivotal-cloudfoundry-template-alpha
-  - get: om-release
-  - get: cancel-ap-northeast-1-resource
-  - task: integration-test
-    config:
-      platform: linux
-      <<: *image_resource
-      inputs:
-      - name: quickstart-repo
-      - name: pivotal-cloudfoundry-template-alpha
-      - name: cancel-ap-northeast-1-resource
-        path: cancel-check
-      outputs:
-      - name: output
-      params:
-        <<: *some_values
-        AWS_INTEGRATION_REGION: ap-northeast-1
-      run: *run
-    on_failure: *on_failure
-  - put: aws-pcf-concourse-state
-    params:
-      file: output/stackid
+  - aggregate:
+    - get: om-release
+    - get: quickstart-repo
+      passed:
+      - ap-southeast-2-deploy
+      trigger: true
   - *check_task
-  - *delete_task
 
-- name: ap-northeast-2
+- name: ap-southeast-2-delete
   serial_groups: [integration]
   plan:
-  - *job_trigger
-  - get: quickstart-repo
-  - get: quickstart-scripts-alpha
-  - get: pivotal-cloudfoundry-template-alpha
-  - get: om-release
-  - get: cancel-ap-northeast-2-resource
-  - task: integration-test
-    config:
-      platform: linux
-      <<: *image_resource
-      inputs:
-      - name: quickstart-repo
-      - name: pivotal-cloudfoundry-template-alpha
-      - name: cancel-ap-northeast-2-resource
-        path: cancel-check
-      outputs:
-      - name: output
-      params:
-        <<: *some_values
-        AWS_INTEGRATION_REGION: ap-northeast-2
-      run: *run
-    on_failure: *on_failure
-  - put: aws-pcf-concourse-state
-    params:
-      file: output/stackid
-  - *check_task
-  - *delete_task
-
-- name: sa-east-1
-  serial_groups: [integration]
-  plan:
-  - *job_trigger
-  - get: quickstart-repo
-  - get: quickstart-scripts-alpha
-  - get: pivotal-cloudfoundry-template-alpha
-  - get: om-release
-  - get: cancel-sa-east-1-resource
-  - task: integration-test
-    config:
-      platform: linux
-      <<: *image_resource
-      inputs:
-      - name: quickstart-repo
-      - name: pivotal-cloudfoundry-template-alpha
-      - name: cancel-sa-east-1-resource
-        path: cancel-check
-      outputs:
-      - name: output
-      params:
-        <<: *some_values
-        AWS_INTEGRATION_REGION: sa-east-1
-      run: *run
-    on_failure: *on_failure
-  - put: aws-pcf-concourse-state
-    params:
-      file: output/stackid
-  - *check_task
+  - aggregate:
+    - get: quickstart-repo
+      passed:
+      - ap-southeast-2-test-cf
+      trigger: true
+    - get: aws-pcf-concourse-state
   - *delete_task
