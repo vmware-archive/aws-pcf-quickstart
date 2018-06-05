@@ -34,7 +34,7 @@ def delete_bucket(bucket_name: str, region: str, key: str, secret: str):
     try:
         while True:
             contents = s3_client.list_object_versions(
-                Bucket=bucket_name).get('Contents')
+                Bucket=bucket_name).get('Versions')
             if contents is None:
                 break
             s3_client.delete_objects(Bucket=bucket_name, Delete={
