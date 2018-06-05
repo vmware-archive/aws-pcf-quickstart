@@ -22,7 +22,6 @@ import botocore
 import botocore.exceptions
 import os
 
-
 def delete_bucket(bucket_name: str, region: str, key: str, secret: str):
     print("Deleting bucket {}".format(bucket_name))
     s3_client = boto3.client(
@@ -32,14 +31,21 @@ def delete_bucket(bucket_name: str, region: str, key: str, secret: str):
         aws_secret_access_key=secret
     )
     try:
-        contents = s3_client.list_objects(Bucket=bucket_name).get('Contents')
-        while contents is not None:
-            delete_keys = [{'Key': o.get('Key')} for o in contents]
-            s3_client.delete_objects(Bucket=bucket_name, Delete={
-                'Objects': delete_keys
-            })
-            s3_client.object_versions.delete(Bucket=bucket_name)
-            contents = s3_client.list_objects(Bucket=bucket_name).get('Contents')
+        objects = []
+        for k in ["Versions", "DeleteMarkers"]:
+            response = s3.list_object_versions(Bucket=bucket_name)[k]
+            objects.extend(map(lambda o : {'Key': o['Key'], 'VersionId': o['VersionId']}, response) 
+            
+        response = s3_client.list_object(Bucket=bucket_name).get('Contents')
+        objects.extend(map(lambda o : {'Key': o['Key']}, response)
+                       
+#        for delete_objects in objects[: results is not None:
+#            delete_keys = [{'Key': o.get('Key')} for o in contents]
+#            for key in delete_keys
+            
+        s3_client.delete_objects(Bucket=bucket_name, Delete={
+            'Objects': objects
+        })
         s3_client.delete_bucket(Bucket=bucket_name)
     except botocore.exceptions.ClientError as e:
         error = e.response.get('Error')
