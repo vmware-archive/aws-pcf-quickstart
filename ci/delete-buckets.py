@@ -32,13 +32,15 @@ def delete_bucket(bucket_name: str, region: str, key: str, secret: str):
         aws_secret_access_key=secret
     )
     try:
-        contents = s3_client.list_objects(Bucket=bucket_name).get('Contents')
         while contents is not None:
-            delete_keys = [{'Key': o.get('Key')} for o in contents]
+            contents = s3_client.list_object_versions(
+                Bucket=bucket_name).get('Contents')
+            if contents is None:
+                break
             s3_client.delete_objects(Bucket=bucket_name, Delete={
-                'Objects': delete_keys
+                'Objects': contents
             })
-            contents = s3_client.list_objects(Bucket=bucket_name).get('Contents')
+
         s3_client.delete_bucket(Bucket=bucket_name)
     except botocore.exceptions.ClientError as e:
         error = e.response.get('Error')
@@ -69,7 +71,8 @@ def main():
         response = s3_client.get_bucket_location(Bucket=bucket_name)
         bucket_region = response.get('LocationConstraint')
         if bucket_name.startswith(prefix):
-            delete_bucket(bucket_name, bucket_region, aws_access_key_id, aws_secret_access_key)
+            delete_bucket(bucket_name, bucket_region,
+                          aws_access_key_id, aws_secret_access_key)
 
 
 if __name__ == "__main__":
