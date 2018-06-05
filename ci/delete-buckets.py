@@ -41,6 +41,15 @@ def delete_bucket(bucket_name: str, region: str, key: str, secret: str):
                 'Objects': contents
             })
 
+        while True:
+            contents = s3_client.list_object_versions(
+                Bucket=bucket_name).get('DeleteMarkers')
+            if contents is None:
+                break
+            s3_client.delete_objects(Bucket=bucket_name, Delete={
+                'Objects': contents
+            })
+
         s3_client.delete_bucket(Bucket=bucket_name)
     except botocore.exceptions.ClientError as e:
         error = e.response.get('Error')
