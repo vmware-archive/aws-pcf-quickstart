@@ -32,7 +32,7 @@ def delete_bucket(bucket_name: str, region: str, key: str, secret: str):
         aws_secret_access_key=secret
     )
     try:
-        while contents is not None:
+        while True:
             contents = s3_client.list_object_versions(
                 Bucket=bucket_name).get('Contents')
             if contents is None:

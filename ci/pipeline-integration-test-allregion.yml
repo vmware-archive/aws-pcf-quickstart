@@ -216,22 +216,24 @@ jobs:
   serial_groups: [integration]
   plan:
   - aggregate:
-    - get: om-release
-    - get: quickstart-repo
+    #we don't actually use this, but its a better trigger than the repo
+    - get: aws-pcf-concourse-state
       passed:
       - us-east-1-deploy
       trigger: true
+    - get: om-release
+    - get: quickstart-repo
   - *check_task
 
 - name: us-east-1-delete
   serial_groups: [integration]
   plan:
   - aggregate:
-    - get: quickstart-repo
+    - get: aws-pcf-concourse-state
       passed:
       - us-east-1-test-cf
       trigger: true
-    - get: aws-pcf-concourse-state
+    - get: quickstart-repo
   - *delete_task
 
 - name: us-west-1-deploy
@@ -262,22 +264,23 @@ jobs:
   serial_groups: [integration]
   plan:
   - aggregate:
-    - get: om-release
-    - get: quickstart-repo
+    - get: aws-pcf-concourse-state
       passed:
       - us-west-1-deploy
       trigger: true
+    - get: om-release
+    - get: quickstart-repo
   - *check_task
 
 - name: us-west-1-delete
   serial_groups: [integration]
   plan:
   - aggregate:
-    - get: quickstart-repo
+    - get: aws-pcf-concourse-state
       passed:
       - us-west-1-test-cf
       trigger: true
-    - get: aws-pcf-concourse-state
+    - get: quickstart-repo
   - *delete_task
 
 - name: us-west-2-deploy
@@ -308,22 +311,23 @@ jobs:
   serial_groups: [integration]
   plan:
   - aggregate:
-    - get: om-release
-    - get: quickstart-repo
+    - get: aws-pcf-concourse-state
       passed:
       - us-west-2-deploy
       trigger: true
+    - get: om-release
+    - get: quickstart-repo
   - *check_task
 
 - name: us-west-2-delete
   serial_groups: [integration]
   plan:
   - aggregate:
-    - get: quickstart-repo
+    - get: aws-pcf-concourse-state
       passed:
       - us-west-2-test-cf
       trigger: true
-    - get: aws-pcf-concourse-state
+    - get: quickstart-repo
   - *delete_task
 
 - name: eu-central-1-deploy
@@ -353,22 +357,23 @@ jobs:
   serial_groups: [integration]
   plan:
   - aggregate:
-    - get: om-release
-    - get: quickstart-repo
+    - get: aws-pcf-concourse-state
       passed:
       - eu-central-1-deploy
       trigger: true
+    - get: om-release
+    - get: quickstart-repo
   - *check_task
 
 - name: eu-central-1-delete
   serial_groups: [integration]
   plan:
   - aggregate:
-    - get: quickstart-repo
-      passed:
-      - eu-central-1-test-cf
-      trigger: true
     - get: aws-pcf-concourse-state
+      #passed:
+      #- eu-central-1-test-cf
+      #trigger: true
+    - get: quickstart-repo
   - *delete_task
 
 - name: eu-west-1-deploy
@@ -398,22 +403,23 @@ jobs:
   serial_groups: [integration]
   plan:
   - aggregate:
-    - get: om-release
-    - get: quickstart-repo
+    - get: aws-pcf-concourse-state
       passed:
       - eu-west-1-deploy
       trigger: true
+    - get: om-release
+    - get: quickstart-repo
   - *check_task
 
 - name: eu-west-1-delete
   serial_groups: [integration]
   plan:
   - aggregate:
-    - get: quickstart-repo
+    - get: aws-pcf-concourse-state
       passed:
       - eu-west-1-test-cf
       trigger: true
-    - get: aws-pcf-concourse-state
+    - get: quickstart-repo
   - *delete_task
 
 - name: ap-southeast-2-deploy
@@ -443,20 +449,21 @@ jobs:
   serial_groups: [integration]
   plan:
   - aggregate:
-    - get: om-release
-    - get: quickstart-repo
+    - get: aws-pcf-concourse-state
       passed:
       - ap-southeast-2-deploy
       trigger: true
+    - get: om-release
+    - get: quickstart-repo
   - *check_task
 
 - name: ap-southeast-2-delete
   serial_groups: [integration]
   plan:
   - aggregate:
-    - get: quickstart-repo
+    - get: aws-pcf-concourse-state
       passed:
       - ap-southeast-2-test-cf
       trigger: true
-    - get: aws-pcf-concourse-state
+    - get: quickstart-repo
   - *delete_task
