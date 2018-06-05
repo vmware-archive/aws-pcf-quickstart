@@ -37,6 +37,8 @@ def delete_bucket(bucket_name: str, region: str, key: str, secret: str):
                 Bucket=bucket_name).get('Versions')
             if contents is None:
                 break
+            delete_keys = [{'Key': o.get('Key'), 'VersionId': o.get(
+                'VersionId')} for o in contents]
             s3_client.delete_objects(Bucket=bucket_name, Delete={
                 'Objects': contents
             })
@@ -46,6 +48,8 @@ def delete_bucket(bucket_name: str, region: str, key: str, secret: str):
                 Bucket=bucket_name).get('DeleteMarkers')
             if contents is None:
                 break
+            delete_keys = [{'Key': o.get('Key'), 'VersionId': o.get('VersionId')
+                            } for o in contents]
             s3_client.delete_objects(Bucket=bucket_name, Delete={
                 'Objects': contents
             })
