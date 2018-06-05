@@ -34,10 +34,10 @@ def delete_bucket(bucket_name: str, region: str, key: str, secret: str):
         objects = []
         for k in ["Versions", "DeleteMarkers"]:
             response = s3.list_object_versions(Bucket=bucket_name)[k]
-            objects.extend(map(lambda o : {'Key': o['Key'], 'VersionId': o['VersionId']}, response) 
+            objects.extend(map(lambda o : {'Key': o['Key'], 'VersionId': o['VersionId']}, response))
             
         response = s3_client.list_object(Bucket=bucket_name).get('Contents')
-        objects.extend(map(lambda o : {'Key': o['Key']}, response)
+        objects.extend(map(lambda o : {'Key': o['Key']}, response))
                        
 #        for delete_objects in objects[: results is not None:
 #            delete_keys = [{'Key': o.get('Key')} for o in contents]
