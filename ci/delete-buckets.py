@@ -38,9 +38,7 @@ def delete_bucket(bucket_name: str, region: str, key: str, secret: str):
             s3_client.delete_objects(Bucket=bucket_name, Delete={
                 'Objects': delete_keys
             })
-            s3_client.object_versions.delete(Bucket=bucket_name, Delete={
-                'Objects': delete_keys
-            })
+            s3_client.object_versions.delete(Bucket=bucket_name)
             contents = s3_client.list_objects(Bucket=bucket_name).get('Contents')
         s3_client.delete_bucket(Bucket=bucket_name)
     except botocore.exceptions.ClientError as e:
