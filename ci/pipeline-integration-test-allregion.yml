@@ -236,52 +236,52 @@ jobs:
     - get: quickstart-repo
   - *delete_task
 
-- name: us-west-1-deploy
-  serial_groups: [integration]
-  plan:
-  - aggregate:
-    - get: quickstart-repo
-    - get: pivotal-cloudfoundry-template-alpha
-  - task: integration-test
-    config:
-      platform: linux
-      <<: *image_resource
-      inputs:
-      - name: quickstart-repo
-      - name: pivotal-cloudfoundry-template-alpha
-      outputs:
-      - name: output
-      params:
-        <<: *some_values
-        AWS_INTEGRATION_REGION: us-west-1
-      run: *run
-    on_failure: *on_failure
-  - put: aws-pcf-concourse-state
-    params:
-      file: output/stackid
-
-- name: us-west-1-test-cf
-  serial_groups: [integration]
-  plan:
-  - aggregate:
-    - get: aws-pcf-concourse-state
-      passed:
-      - us-west-1-deploy
-      trigger: true
-    - get: om-release
-    - get: quickstart-repo
-  - *check_task
-
-- name: us-west-1-delete
-  serial_groups: [integration]
-  plan:
-  - aggregate:
-    - get: aws-pcf-concourse-state
-      passed:
-      - us-west-1-test-cf
-      trigger: true
-    - get: quickstart-repo
-  - *delete_task
+# - name: us-west-1-deploy
+#   serial_groups: [integration]
+#   plan:
+#   - aggregate:
+#     - get: quickstart-repo
+#     - get: pivotal-cloudfoundry-template-alpha
+#   - task: integration-test
+#     config:
+#       platform: linux
+#       <<: *image_resource
+#       inputs:
+#       - name: quickstart-repo
+#       - name: pivotal-cloudfoundry-template-alpha
+#       outputs:
+#       - name: output
+#       params:
+#         <<: *some_values
+#         AWS_INTEGRATION_REGION: us-west-1
+#       run: *run
+#     on_failure: *on_failure
+#   - put: aws-pcf-concourse-state
+#     params:
+#       file: output/stackid
+#
+# - name: us-west-1-test-cf
+#   serial_groups: [integration]
+#   plan:
+#   - aggregate:
+#     - get: aws-pcf-concourse-state
+#       passed:
+#       - us-west-1-deploy
+#       trigger: true
+#     - get: om-release
+#     - get: quickstart-repo
+#   - *check_task
+#
+# - name: us-west-1-delete
+#   serial_groups: [integration]
+#   plan:
+#   - aggregate:
+#     - get: aws-pcf-concourse-state
+#       passed:
+#       - us-west-1-test-cf
+#       trigger: true
+#     - get: quickstart-repo
+#   - *delete_task
 
 - name: us-west-2-deploy
   serial_groups: [integration]
@@ -370,9 +370,9 @@ jobs:
   plan:
   - aggregate:
     - get: aws-pcf-concourse-state
-      #passed:
-      #- eu-central-1-test-cf
-      #trigger: true
+      passed:
+      - eu-central-1-test-cf
+      trigger: true
     - get: quickstart-repo
   - *delete_task
 

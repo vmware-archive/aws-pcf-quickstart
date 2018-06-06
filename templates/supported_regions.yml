@@ -2,7 +2,7 @@
 supported_regions:
 - us-east-1
 - us-west-1
-- us-west-2
+#- us-west-2 (only 2 az)
 - eu-central-1
 - eu-west-1
 #- ap-southeast-1 (only 2 az)
