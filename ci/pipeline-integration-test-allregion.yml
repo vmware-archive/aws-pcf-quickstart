@@ -58,11 +58,11 @@ params: &some_values
   AWS_ACCESS_KEY_ID: ((aws_admin_key_id))
   AWS_SECRET_ACCESS_KEY: ((aws_admin_secret_access_key))
   US_EAST_1_SSLCERTIFICATEARN: ((us_east_1_sslcertificatearn))
-  US_WEST_1_SSLCERTIFICATEARN: ((us_west_1_sslcertificatearn))
   US_WEST_2_SSLCERTIFICATEARN: ((us_west_2_sslcertificatearn))
   EU_CENTRAL_1_SSLCERTIFICATEARN: ((eu_central_1_sslcertificatearn))
   EU_WEST_1_SSLCERTIFICATEARN: ((eu_west_1_sslcertificatearn))
   AP_SOUTHEAST_2_SSLCERTIFICATEARN: ((ap_southeast_2_sslcertificatearn))
+  AP_NORTHEAST_1_SSLCERTIFICATEARN: ((ap_northeast_1_sslcertificatearn))
 
 run: &run
   path: bash
@@ -235,53 +235,6 @@ jobs:
       trigger: true
     - get: quickstart-repo
   - *delete_task
-
-# - name: us-west-1-deploy
-#   serial_groups: [integration]
-#   plan:
-#   - aggregate:
-#     - get: quickstart-repo
-#     - get: pivotal-cloudfoundry-template-alpha
-#   - task: integration-test
-#     config:
-#       platform: linux
-#       <<: *image_resource
-#       inputs:
-#       - name: quickstart-repo
-#       - name: pivotal-cloudfoundry-template-alpha
-#       outputs:
-#       - name: output
-#       params:
-#         <<: *some_values
-#         AWS_INTEGRATION_REGION: us-west-1
-#       run: *run
-#     on_failure: *on_failure
-#   - put: aws-pcf-concourse-state
-#     params:
-#       file: output/stackid
-#
-# - name: us-west-1-test-cf
-#   serial_groups: [integration]
-#   plan:
-#   - aggregate:
-#     - get: aws-pcf-concourse-state
-#       passed:
-#       - us-west-1-deploy
-#       trigger: true
-#     - get: om-release
-#     - get: quickstart-repo
-#   - *check_task
-#
-# - name: us-west-1-delete
-#   serial_groups: [integration]
-#   plan:
-#   - aggregate:
-#     - get: aws-pcf-concourse-state
-#       passed:
-#       - us-west-1-test-cf
-#       trigger: true
-#     - get: quickstart-repo
-#   - *delete_task
 
 - name: us-west-2-deploy
   serial_groups: [integration]
@@ -464,6 +417,52 @@ jobs:
     - get: aws-pcf-concourse-state
       passed:
       - ap-southeast-2-test-cf
+      trigger: true
+    - get: quickstart-repo
+  - *delete_task
+
+- name: ap-northeast-1-deploy
+  serial_groups: [integration]
+  plan:
+  - get: quickstart-repo
+  - get: pivotal-cloudfoundry-template-alpha
+  - task: integration-test
+    config:
+      platform: linux
+      <<: *image_resource
+      inputs:
+      - name: quickstart-repo
+      - name: pivotal-cloudfoundry-template-alpha
+      outputs:
+      - name: output
+      params:
+        <<: *some_values
+        AWS_INTEGRATION_REGION: ap-northeast-1
+      run: *run
+    on_failure: *on_failure
+  - put: aws-pcf-concourse-state
+    params:
+      file: output/stackid
+
+- name: ap-northeast-1-test-cf
+  serial_groups: [integration]
+  plan:
+  - aggregate:
+    - get: aws-pcf-concourse-state
+      passed:
+      - ap-northeast-1-deploy
+      trigger: true
+    - get: om-release
+    - get: quickstart-repo
+  - *check_task
+
+- name: ap-northeast-1-delete
+  serial_groups: [integration]
+  plan:
+  - aggregate:
+    - get: aws-pcf-concourse-state
+      passed:
+      - ap-northeast-1-test-cf
       trigger: true
     - get: quickstart-repo
   - *delete_task
