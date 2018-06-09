@@ -60,7 +60,7 @@ resources:
 - name: cloud-formation-template-alpha
   type: s3
   source:
-    bucket: snw-aws-pcf-quickstart-templates
+    bucket: aws-1click-pcf-quickstart-templates
     region_name: us-west-2
     versioned_file: quickstart-pivotal-cloudfoundry/templates/cloud-formation.template
     access_key_id: ((s3_access_key_id))
@@ -69,7 +69,7 @@ resources:
 - name: ops-manager-template-alpha
   type: s3
   source:
-    bucket: snw-aws-pcf-quickstart-templates
+    bucket: aws-1click-pcf-quickstart-templates
     region_name: us-west-2
     versioned_file: quickstart-pivotal-cloudfoundry/templates/ops-manager.template
     access_key_id: ((s3_access_key_id))
@@ -78,7 +78,7 @@ resources:
 - name: pivotal-cloudfoundry-template-alpha
   type: s3
   source:
-    bucket: snw-aws-pcf-quickstart-templates
+    bucket: aws-1click-pcf-quickstart-templates
     region_name: us-west-2
     versioned_file: quickstart-pivotal-cloudfoundry/templates/pivotal-cloudfoundry.template
     access_key_id: ((s3_access_key_id))
@@ -87,7 +87,7 @@ resources:
 - name: quickstart-scripts-alpha
   type: s3
   source:
-    bucket: snw-aws-pcf-quickstart-templates
+    bucket: aws-1click-pcf-quickstart-templates
     region_name: us-west-2
     versioned_file: quickstart-pivotal-cloudfoundry/scripts/quickstart.tgz
     access_key_id: ((s3_access_key_id))
@@ -122,7 +122,7 @@ resources:
 - name: packer-result
   type: s3
   source:
-    bucket: snw-aws-pcf-quickstart-releases
+    bucket: aws-1click-pcf-quickstart-releases
     region_name: us-west-2
     regexp: packer-result-(.*).json
     access_key_id: ((s3_access_key_id))
@@ -131,7 +131,7 @@ resources:
 - name: ami-mapping
   type: s3
   source:
-    bucket: snw-aws-pcf-quickstart-releases
+    bucket: aws-1click-pcf-quickstart-releases
     region_name: us-west-2
     regexp: ami-mapping-(.*).json
     access_key_id: ((s3_access_key_id))
@@ -152,7 +152,7 @@ resources:
 - name: aws-pcf-concourse-state
   type: s3
   source:
-    bucket: snw-aws-pcf-concourse-state
+    bucket: aws-1click-pcf-concourse-state
     region_name: us-west-2
     versioned_file: stackid
     access_key_id: ((aws_admin_key_id))
