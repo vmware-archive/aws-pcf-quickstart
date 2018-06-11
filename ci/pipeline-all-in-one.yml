@@ -109,7 +109,7 @@ resources:
     api_token: ((pivnet_token))
     copy_metadata: true
     product_slug: elastic-runtime
-    product_version: 2\.1\.4\.*
+    product_version: 2\.1\.5\.*
 
 - name: opsman-tile
   type: pivnet
@@ -761,7 +761,7 @@ jobs:
           git config --global user.email "ci@example.com" #todo: better email....
 
           git add -A .
-          git commit -m "Commiting release candiate for PR"
+          git commit -m "Commiting release candidate for PR"
 
           popd
   - put: aws-quickstart-repo
