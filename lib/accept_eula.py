@@ -23,6 +23,7 @@ import requests
 
 import settings
 import util
+import authorization
 
 max_retries = 5
 
@@ -41,7 +42,8 @@ def accept_eulas(my_settings: settings.Settings):
 
 def accept_ert_eula(my_settings: settings.Settings):
     response, result = util.exponential_backoff(
-        functools.partial(post_eula, my_settings, "elastic-runtime", my_settings.ert_release_id),
+        functools.partial(post_eula, my_settings,
+                          "elastic-runtime", my_settings.ert_release_id),
         check_eula_succeeded
     )
     if result == EULAResult.SUCCESS:
@@ -52,7 +54,8 @@ def accept_ert_eula(my_settings: settings.Settings):
 
 def accept_stemcell_eula(my_settings: settings.Settings):
     response, result = util.exponential_backoff(
-        functools.partial(post_eula, my_settings, "stemcells", my_settings.stemcell_release_id),
+        functools.partial(post_eula, my_settings, "stemcells",
+                          my_settings.stemcell_release_id),
         check_eula_succeeded
     )
     if result == EULAResult.SUCCESS:
@@ -68,10 +71,15 @@ class EULAResult(enum.Enum):
 
 
 def post_eula(my_settings: settings.Settings, slug: str, release_id: int):
+    auth_header, success = authorization.header_value(my_settings)
+    if not success:
+        return None, EULAResult.FAILURE
+
     response = requests.post(
-        url='https://network.pivotal.io/api/v2/products/{}/releases/{}/eula_acceptance'.format(slug, release_id),
+        url='https://network.pivotal.io/api/v2/products/{}/releases/{}/eula_acceptance'.format(
+            slug, release_id),
         headers={
-            'Authorization': 'Token {}'.format(my_settings.pcf_input_pivnettoken),
+            'Authorization': auth_header,
             'Accept': 'application/json',
             'Content-Type': 'application/json',
             'User-Agent': 'PCF-Ecosystem-AWS-client'
