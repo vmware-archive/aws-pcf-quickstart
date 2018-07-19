@@ -26,60 +26,41 @@ import util
 
 max_retries = 5
 
-
-def check_eula_succeeded(returned):
-    response, result = returned
-    return result == EULAResult.SUCCESS
-
-
 def accept_eulas(my_settings: settings.Settings):
     out, err, exit_code = accept_ert_eula(my_settings)
     if exit_code != 0:
         return out, err, exit_code
-    return accept_stemcell_eula(my_settings)
-
+    out, err, exit_code = accept_stemcell_eula(my_settings)
+    if exit_code != 0:
+        return out, err, exit_code
+    return out, "", 0
 
 def accept_ert_eula(my_settings: settings.Settings):
-    response, result = util.exponential_backoff(
-        functools.partial(post_eula, my_settings, "elastic-runtime", my_settings.ert_release_id),
-        check_eula_succeeded
-    )
-    if result == EULAResult.SUCCESS:
-        return "Success", "", 0
-    else:
-        return "Failed to accept ERT EULA; status code from Pivotal Network {}".format(response.status_code), "", 1
+    out, err, exit_code = post_eula(my_settings, "elastic-runtime", my_settings.ert_release_id)
 
+    if exit_code != 0:
+        return "Failed to accept ERT EULA; got message from Pivotal Network: {}".format(out), err, exit_code
+    return "Success; {}".format(out), "", 0
 
 def accept_stemcell_eula(my_settings: settings.Settings):
-    response, result = util.exponential_backoff(
-        functools.partial(post_eula, my_settings, "stemcells", my_settings.stemcell_release_id),
-        check_eula_succeeded
-    )
-    if result == EULAResult.SUCCESS:
-        return "Success", "", 0
-    else:
-        return "Failed to accept stemcell EULA; status code from Pivotal Network {}".format(response.status_code), "", 1
+    out, err, exit_code = post_eula(my_settings, "stemcells", my_settings.stemcell_release_id)
 
-
-class EULAResult(enum.Enum):
-    SUCCESS = 0,
-    FAILURE = 1,
-    RETRY = 2
-
+    if exit_code != 0:
+        return "Failed to accept stemcell EULA; got message from Pivotal Network: {}".format(out), err, exit_code
+    return "Success; {}".format(out), "", 0
 
 def post_eula(my_settings: settings.Settings, slug: str, release_id: int):
-    response = requests.post(
-        url='https://network.pivotal.io/api/v2/products/{}/releases/{}/eula_acceptance'.format(slug, release_id),
-        headers={
-            'Authorization': 'Token {}'.format(my_settings.pcf_input_pivnettoken),
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'User-Agent': 'PCF-Ecosystem-AWS-client'
-        }
-    )
-    print(response)
-    if response.status_code < 300:
-        return response, EULAResult.SUCCESS
-    elif response.status_code >= 500:
-        return response, EULAResult.RETRY
-    return response, EULAResult.FAILURE
+    cmd = "pivnet login --api-token={token}".format(token=my_settings.pcf_input_pivnettoken)
+    out, err, exit_code = util.exponential_backoff_cmd(cmd)
+
+    if exit_code != 0:
+        return out, err, exit_code
+
+    cmd = "pivnet curl -X POST /products/{}/releases/{}/eula_acceptance".format(slug, release_id)
+    out, err, exit_code = util.exponential_backoff_cmd(cmd)
+    out_json = json.loads(out)
+
+    if exit_code != 0:
+        return out_json["message"], err, exit_code
+    if exit_code == 0:
+        return "accepted: {} at: {}".format(out_json["_links"]["eula"]["href"], out_json["accepted_at"]), err, exit_code

@@ -16,8 +16,8 @@
 # limitations under the License.
 
 import unittest
+import json
 
-import requests
 from mock import Mock, patch, mock_open
 
 import accept_eula
@@ -30,199 +30,80 @@ class TestAcceptEULA(unittest.TestCase):
         self.settings.region = 'canada-1a'
         self.settings.pcf_input_pivnettoken = 'MY-TOKEN'
         self.settings.ert_release_id = 1337
+        self.settings.stemcell_release_id = 7331
 
-    @patch("util.exponential_backoff")
-    def test_accept_ert_eula_success(self, mock_exponential_backoff):
-        response = Mock(requests.Response)
-        response.status_code = 200
-        mock_exponential_backoff.return_value = (response, accept_eula.EULAResult.SUCCESS)
+    @patch("util.exponential_backoff_cmd")
+    def test_accept_ert_eula_success(self, mock_exponential_backoff_cmd):
+        mock_exponential_backoff_cmd.side_effect = [login_success, accept_success]
         result = accept_eula.accept_ert_eula(self.settings)
-        self.assertEqual(result, ("Success", "", 0))
+        self.assertEqual(result, (
+            "Success; accepted: https://network.pivotal.io/api/v2/eulas/120 at: 2018-07-19", "", 0))
 
-    @patch("util.exponential_backoff")
-    def test_accept_ert_eula_fail(self, mock_exponential_backoff):
-        response = Mock(requests.Response)
-        response.status_code = 503
-        mock_exponential_backoff.return_value = (response, accept_eula.EULAResult.RETRY)
-
+    @patch("util.exponential_backoff_cmd")
+    def test_accept_ert_eula_fail(self, mock_exponential_backoff_cmd):
+        mock_exponential_backoff_cmd.side_effect = [login_success, accept_error]
         result = accept_eula.accept_ert_eula(self.settings)
-        self.assertEqual(result[2], 1)
+        self.assertEqual(result, (
+            "Failed to accept ERT EULA; got message from Pivotal Network: foo error message", "", 1))
 
-    @patch('requests.post')
-    def test_post_eula_success(self, mock_requests_post):
-        response = Mock(requests.Response)
-        response.status_code = 200
-        mock_requests_post.return_value = response
+    @patch("util.exponential_backoff_cmd")
+    def test_accept_stemcell_eula_success(self, mock_exponential_backoff_cmd):
+        mock_exponential_backoff_cmd.side_effect = [login_success, accept_success]
+        result = accept_eula.accept_stemcell_eula(self.settings)
+        self.assertEqual(result, (
+            "Success; accepted: https://network.pivotal.io/api/v2/eulas/120 at: 2018-07-19", "", 0))
 
+    @patch("util.exponential_backoff_cmd")
+    def test_accept_stemcell_eula_fail(self, mock_exponential_backoff_cmd):
+        mock_exponential_backoff_cmd.side_effect = [login_success, accept_error]
+        result = accept_eula.accept_stemcell_eula(self.settings)
+        self.assertEqual(result, (
+            "Failed to accept stemcell EULA; got message from Pivotal Network: foo error message", "", 1))
+
+    @patch("util.exponential_backoff_cmd")
+    def test_post_eula_success(self, mock_exponential_backoff_cmd):
+        mock_exponential_backoff_cmd.side_effect = [login_success, accept_success]
         result = accept_eula.post_eula(self.settings, 'my-awesome-product', 1337)
+        self.assertEqual(result, (
+            "accepted: https://network.pivotal.io/api/v2/eulas/120 at: 2018-07-19", "", 0))
 
-        self.assertEqual(result[0], response)
-        self.assertEqual(result[1], accept_eula.EULAResult.SUCCESS)
-
-        expected_headers = {
-            'Authorization': 'Token MY-TOKEN',
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'User-Agent': 'PCF-Ecosystem-AWS-client'
-        }
-
-        mock_requests_post.assert_called_with(
-            url='https://network.pivotal.io/api/v2/products/my-awesome-product/releases/1337/eula_acceptance',
-            headers=expected_headers
-        )
-
-    @patch('requests.post')
-    def test_post_eula_failure(self, mock_requests_post):
-        response = Mock(requests.Response)
-        response.status_code = 401
-        mock_requests_post.return_value = response
-
+    @patch("util.exponential_backoff_cmd")
+    def test_post_eula_login_error(self, mock_exponential_backoff_cmd):
+        mock_exponential_backoff_cmd.side_effect = [login_error]
         result = accept_eula.post_eula(self.settings, 'my-awesome-product', 1337)
+        self.assertEqual(result, (
+            "2018/07/19 15:51:00 Exiting with error: failed to fetch API token - received status 401", "", 1))
 
-        self.assertEqual(result[0], response)
-        self.assertEqual(result[1], accept_eula.EULAResult.FAILURE)
-
-    @patch('requests.post')
-    def test_post_eula_pivnet_failure(self, mock_requests_post):
-        response = Mock(requests.Response)
-        response.status_code = 502
-        mock_requests_post.return_value = response
-
-        result = accept_eula.post_eula(self.settings, 'my-awesome-product', 1337)
-
-        self.assertEqual(result[0], response)
-        self.assertEqual(result[1], accept_eula.EULAResult.RETRY)
-
-    @patch('accept_eula.post_eula')
-    @patch('time.sleep')
-    def test_exponential_backoff(self, mock_sleep, mock_post_eula):
-        retry_response = Mock(requests.Response)
-        retry_response.status_code = 502
-        success_response = Mock(requests.Response)
-        success_response.status_code = 200
-
-        mock_post_eula.side_effect = [
-            (retry_response, accept_eula.EULAResult.RETRY),
-            (retry_response, accept_eula.EULAResult.RETRY),
-            (success_response, accept_eula.EULAResult.SUCCESS)
+    @patch("util.exponential_backoff_cmd")
+    def test_accept_eulas_accepts_both_eulas(self, mock_exponential_backoff_cmd):
+        mock_exponential_backoff_cmd.side_effect = [
+            login_success,
+            accept_success,
+            login_success,
+            accept_success,
         ]
-
-        result = accept_eula.accept_ert_eula(self.settings)
-
-        self.assertEqual(mock_sleep.call_count, 2)
-        self.assertEqual(result[0], "Success")
-        self.assertEqual(result[2], 0)
-
-    @patch('accept_eula.accept_stemcell_eula')
-    @patch('accept_eula.accept_ert_eula')
-    def test_accept_eulas_accepts_both_eulas(self, mock_accept_ert_eula, mock_accept_stemcell_eula):
-        mock_accept_ert_eula.return_value = ("foo", "bar", 0)
-        mock_accept_stemcell_eula.return_value = ("bar", "baz", 42)
-
-        out, err, exit_code = accept_eula.accept_eulas(self.settings)
-
-        self.assertEqual(mock_accept_ert_eula.call_count, 1)
-        self.assertEqual(mock_accept_stemcell_eula.call_count, 1)
-
-        self.assertEqual(out, "bar")
-        self.assertEqual(err, "baz")
-        self.assertEqual(exit_code, 42)
-
-    @patch('accept_eula.accept_stemcell_eula')
-    @patch('accept_eula.accept_ert_eula')
-    def test_accept_eulas_elevates_error(self, mock_accept_ert_eula, mock_accept_stemcell_eula):
-        mock_accept_ert_eula.return_value = ("foo", "bar", 1)
-
-        accept_eula.accept_eulas(self.settings)
-
-        self.assertEqual(mock_accept_ert_eula.call_count, 1)
-        self.assertEqual(mock_accept_stemcell_eula.call_count, 0)
+        result = accept_eula.accept_eulas(self.settings)
+        self.assertEqual(result, (
+            "Success; accepted: https://network.pivotal.io/api/v2/eulas/120 at: 2018-07-19", "", 0))
 
 
-metadata_json = """
+login_success = ("Logged-in successfully", "", 0)
+login_error = ("2018/07/19 15:51:00 Exiting with error: failed to fetch API token - received status 401", "", 1)
+
+accept_success = ("""
 {
-  "Release": {
-    "ID": 5334,
-    "Version": "1.10.8",
-    "ReleaseType": "Security Release",
-    "EULASlug": "pivotal_software_eula",
-    "ReleaseDate": "2017-05-04",
-    "Description": "Please refer to the release notes",
-    "ReleaseNotesURL": "https://docs.pivotal.io/pivotalcf/1-10/pcf-release-notes/runtime-rn.html",
-    "Availability": "All Users",
-    "UserGroupIDs": null,
-    "Controlled": true,
-    "ECCN": "5D002",
-    "LicenseException": "ENC",
-    "EndOfSupportDate": "2017-12-31",
-    "EndOfGuidanceDate": "",
-    "EndOfAvailabilityDate": "",
-    "ProductFiles": [
-      {
-        "ID": 18379
-      },
-      {
-        "ID": 19963
-      },
-      {
-        "ID": 19960
-      }
-    ]
-  },
-  "ProductFiles": [
-    {
-      "File": "PCF Elastic Runtime 1.10 License",
-      "Description": "",
-      "UploadAs": "",
-      "AWSObjectKey": "product-files/elastic-runtime/open_source_license_PCF-Elastic-Runtime_-_1.10_-_GA.txt",
-      "FileType": "Open Source License",
-      "FileVersion": "1.0",
-      "SHA256": "",
-      "MD5": "",
-      "ID": 18379,
-      "Version": "",
-      "DocsURL": "",
-      "SystemRequirements": [],
-      "Platforms": null,
-      "IncludedFiles": []
-    },
-    {
-      "File": "PCF Cloudformation for AWS Setup",
-      "Description": "",
-      "UploadAs": "",
-      "AWSObjectKey": "product-files/elastic-runtime/pcf_1.10.8-build.7_cloudformation.json",
-      "FileType": "Software",
-      "FileVersion": "1.10.8-build.7",
-      "SHA256": "c5c044036453d1cf21b9c7cab91a4e5c9544fc10d36088016f4b161afc92e137",
-      "MD5": "",
-      "ID": 19963,
-      "Version": "",
-      "DocsURL": "",
-      "SystemRequirements": [],
-      "Platforms": null,
-      "IncludedFiles": []
-    },
-    {
-      "File": "PCF Elastic Runtime",
-      "Description": "",
-      "UploadAs": "",
-      "AWSObjectKey": "product-files/elastic-runtime/cf-1.10.8-build.7.pivotal",
-      "FileType": "Software",
-      "FileVersion": "1.10.8-build.7",
-      "SHA256": "70070bf22231d9971c97b8deb8c4cd5ba990d24101e5398d0ccc70778060dbea",
-      "MD5": "",
-      "ID": 19960,
-      "Version": "",
-      "DocsURL": "",
-      "SystemRequirements": [],
-      "Platforms": null,
-      "IncludedFiles": []
+  "_links": {
+    "eula": {
+      "href": "https://network.pivotal.io/api/v2/eulas/120"
     }
-  ],
-  "Dependencies": [],
-  "DependencySpecifiers": [],
-  "UpgradePaths": [],
-  "UpgradePathSpecifiers": [],
-  "FileGroups": null
+  },
+  "accepted_at": "2018-07-19"
 }
-"""
+""", "", 0)
+
+accept_error = ("""
+{
+  "message": "foo error message",
+  "status": 404
+}
+""", "", 1)
