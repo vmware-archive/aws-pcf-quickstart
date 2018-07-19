@@ -11,7 +11,7 @@ To run without any template or code changes:
 1. Create a new stack at https://console.aws.amazon.com/cloudformation by uploading `pivotal-cloudfoundry.template`
     * Set `Quick Start S3 Bucket Name` to `aws-pcf-quickstart-templates`
     * To toggle `Forward Log Output` to `true` to get feedback on changes in the event of failure
-    * Customize other parameters as needed per docs     
+    * Customize other parameters as needed per docs
 1. The full run takes ~2.5 hours. Once the `MyCustomBOSH` resource is completed, you can view installation progress from `https://opsman.[domain paramater value]`
     * View the logs https://console.aws.amazon.com/cloudwatch/
 
@@ -21,6 +21,7 @@ The project requires Python 3. Install requirements with
 
 ```bash
 pip install -r requirements.txt
+pip install mock
 ```
 
 Run the unit tests with
@@ -49,11 +50,11 @@ python -m unittest discover -v -s ./lib -p '*_test.py'
     * `[s3 bucket]/quickstart-pivotal-cloudfoundry/scripts/quickstart.tgz`
     * Make `quickstart.tgz` public
 1. Download the template `pivotal-cloudfoundry.template` from https://github.com/cf-platform-eng/quickstart-pivotal-cloudfoundry/blob/develop/templates/
-    * To PR any changes to `pivotal-cloudfoundry.template`, modify `templates/quickstart-template.j2.yml` 
+    * To PR any changes to `pivotal-cloudfoundry.template`, modify `templates/quickstart-template.j2.yml`
 1. Create a new stack https://console.aws.amazon.com/cloudformation by uploading `pivotal-cloudfoundry.template`
     * Set `Quick Start S3 Bucket Name` to the bucket you created
     * To toggle `Forward Log Output` to `true`
-    * Customize other parameters as needed per docs     
+    * Customize other parameters as needed per docs
 1. The full run takes ~2.5 hours. Once the `MyCustomBOSH` resource is completed, you can view installation progress from `https://opsman.[template domain]`
 
 # Contributing
@@ -61,4 +62,3 @@ We welcome comments, questions, and contributions from community members. Please
 
 * File Github issues for questions, bugs and new features and comment and vote on the ones that you are interested in.
 * If you want to contribute code, please make your code changes on a fork of this repository and submit a pull request to the master branch. We strongly suggest that you first file an issue to let us know of your intent, or comment on the issue you are planning to address.
-
