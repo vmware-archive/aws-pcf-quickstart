@@ -43,7 +43,7 @@ resources:
   type: git
   source:
     branch: master
-    uri: https://github.com/cf-platform-eng/aws-pcf-quickstart
+    uri: https://github.com/cf-platform-eng/aws-pcf-quickstart.git
     username: ((github_user_name))
     password: ((github_access_token))
     ignore_paths:
@@ -53,7 +53,7 @@ resources:
   type: git
   source:
     branch: develop
-    uri: https://github.com/cf-platform-eng/quickstart-pivotal-cloudfoundry
+    uri: https://github.com/cf-platform-eng/quickstart-pivotal-cloudfoundry.git
     username: ((github_user_name))
     password: ((github_access_token))
 
@@ -406,10 +406,6 @@ jobs:
   - get: om-release
   - get: quickstart-repo
     trigger: true
-    params:
-      ignore_paths:
-        - cloudformation/*
-        - ci/*.yml
     passed:
       - unit-test
   - get: ert-tile
@@ -676,7 +672,6 @@ jobs:
       - name: version
       outputs:
       - name: output
-      params:
       run:
         path: bash
         args:
