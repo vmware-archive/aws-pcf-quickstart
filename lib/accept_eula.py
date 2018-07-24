@@ -20,7 +20,9 @@ import functools
 import json
 
 import requests
-from lib import authorization, util, settings
+import authorization
+import util
+import settings
 
 max_retries = 5
 
@@ -68,7 +70,8 @@ class EULAResult(enum.Enum):
 
 
 def post_eula(my_settings: settings.Settings, slug: str, release_id: int):
-    auth_header, success = authorization.header_value(my_settings)
+    auth_header, success = authorization.header_value(
+        my_settings.pcf_input_pivnettoken)
     if not success:
         return None, EULAResult.FAILURE
 

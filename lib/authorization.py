@@ -16,20 +16,21 @@
 # limitations under the License.
 
 import re
-from lib import settings, util
-from lib import util
+import settings
+import util
 import functools
 import requests
 
 
-def header_value(my_settings: settings.Settings):
+def header_value(auth_token: str):
     success = False
-    if re.search("-r$", my_settings.pcf_input_pivnettoken):
+    if re.search("-r$", auth_token):
+        print("Refresh Token")
         # then it's a refresh token
         access_token, success = util.exponential_backoff(
             functools.partial(
                 refresh_token_grant,
-                my_settings.pcf_input_pivnettoken
+                auth_token
             ),
             check_refresh_succeeded
         )
@@ -39,9 +40,11 @@ def header_value(my_settings: settings.Settings):
     else:
         # it isn't a refresh token. It could be a legacy token... or just plain
         # wrong. Either way, hand back a legacy auth
-        authHeaderValue = "Token {}".format(my_settings.pcf_input_pivnettoken)
+        authHeaderValue = "Token {}".format(auth_token)
+        print("Legacy Token")
         success = True
 
+    print("Auth token success is {}".format(success))
     return authHeaderValue, success
 
 
