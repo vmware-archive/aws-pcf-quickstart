@@ -20,16 +20,13 @@ import functools
 import json
 
 import requests
-
-import settings
-import util
-import authorization
+from lib import authorization, util, settings
 
 max_retries = 5
 
 
 def check_eula_succeeded(returned):
-    response, result = returned
+    _, result = returned
     return result == EULAResult.SUCCESS
 
 

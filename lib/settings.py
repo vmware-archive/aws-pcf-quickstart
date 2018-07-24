@@ -138,10 +138,6 @@ class Settings:
         return self.parameters["PcfRdsPort"]
 
     @property
-    def pcf_elasticruntimes3buildpacksbucket(self):
-        return self.parameters["PcfElasticRuntimeS3BuildpacksBucket"]
-
-    @property
     def pcf_elasticruntimes3dropletsbucket(self):
         return self.parameters["PcfElasticRuntimeS3DropletsBucket"]
 
@@ -248,7 +244,8 @@ class Settings:
         param_results = response['Stacks'][0].get("Parameters")
 
         for result in param_results:
-            self.input_parameters[result.get('ParameterKey')] = result['ParameterValue']
+            self.input_parameters[result.get(
+                'ParameterKey')] = result['ParameterValue']
 
     def parse_version_config(self, version_config):
         ert = version_config.get('ert')

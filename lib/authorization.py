@@ -15,8 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import util
 import re
+from lib import settings, util
+from lib import util
+import functools
+import requests
 
 
 def header_value(my_settings: settings.Settings):
@@ -31,7 +34,7 @@ def header_value(my_settings: settings.Settings):
             check_refresh_succeeded
         )
 
-        if Success:
+        if success:
             authHeaderValue = "Bearer {}".format(access_token)
     else:
         # it isn't a refresh token. It could be a legacy token... or just plain
@@ -54,7 +57,7 @@ def refresh_token_grant(refresh_token: str):
     print(response)
     if response.status_code < 300:
         try:
-            access_token = r.json()["access_token"]
+            access_token = response.json()["access_token"]
 
         except:
             print("Could not decode access token json")
@@ -64,5 +67,5 @@ def refresh_token_grant(refresh_token: str):
 
 
 def check_refresh_succeeded(result):
-    access_token, success = result
+    _, success = result
     return success
