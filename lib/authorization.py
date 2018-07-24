@@ -17,7 +17,6 @@
 
 import util
 import re
-import settings
 
 
 def header_value(my_settings: settings.Settings):
@@ -59,7 +58,7 @@ def refresh_token_grant(refresh_token: str):
 
         except:
             print("Could not decode access token json")
-            return nil, False
+            return None, False
 
     return access_token, response.status_code < 300
 
