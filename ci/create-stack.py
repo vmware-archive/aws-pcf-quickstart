@@ -30,7 +30,8 @@ import yaml
 def select_random_region():
     with open("./templates/supported_regions.yml") as f:
         region_list = yaml.load(f).get('supported_regions')
-        region_list.remove("us-west-1")  # our prod-ish stuff is in west-1, don't use that
+        # our prod-ish stuff is in west-1, don't use that
+        region_list.remove("us-west-1")
 
     secure_random = random.SystemRandom()
     region = secure_random.choice(region_list)
@@ -40,7 +41,8 @@ def select_random_region():
 
 
 def describe_stack_status(cloudformation_client, stack_id):
-    describe_response = cloudformation_client.describe_stacks(StackName=stack_id)
+    describe_response = cloudformation_client.describe_stacks(
+        StackName=stack_id)
     stack = describe_response.get("Stacks")[0]
 
     return stack.get('StackStatus')
@@ -55,7 +57,8 @@ def create_stack(template_path: str, aws_region: str):
     aws_access_key_id = os.environ['AWS_ACCESS_KEY_ID']
     aws_secret_access_key = os.environ['AWS_SECRET_ACCESS_KEY']
 
-    sslcertificatearn = os.environ[aws_region.upper().replace('-', '_') + '_SSLCERTIFICATEARN']
+    sslcertificatearn = os.environ[aws_region.upper().replace(
+        '-', '_') + '_SSLCERTIFICATEARN']
 
     parameters = [
         {"ParameterKey": "OpsManagerIngress", "ParameterValue": "0.0.0.0/0"},
@@ -71,7 +74,8 @@ def create_stack(template_path: str, aws_region: str):
         {"ParameterKey": "ForwardLogOutput", "ParameterValue": "true"},
         {"ParameterKey": "DeploymentSize", "ParameterValue": "Starter"},
         {"ParameterKey": "SkipSSLValidation", "ParameterValue": "true"},
-        {"ParameterKey": "QSS3BucketName", "ParameterValue": "aws-1click-pcf-quickstart-templates"},
+        {"ParameterKey": "QSS3BucketName",
+            "ParameterValue": "aws-1click-pcf-quickstart-templates"},
         {"ParameterKey": "AcceptEULA", "ParameterValue": "Yes"},
     ]
 
@@ -83,7 +87,8 @@ def create_stack(template_path: str, aws_region: str):
     with open(template_path, 'r') as template_file:
         template = template_file.read()
 
-        stack_name = "pcf-int-{}".format(int(datetime.datetime.now().timestamp()))
+        stack_name = "pcf-int-{}".format(
+            int(datetime.datetime.now().timestamp()))
         create_response = client.create_stack(
             StackName=stack_name,
             TemplateBody=template,
@@ -91,7 +96,7 @@ def create_stack(template_path: str, aws_region: str):
             Capabilities=[
                 'CAPABILITY_IAM',
             ],
-            # DisableRollback=True, # for debug purposes
+            DisableRollback=True,  # for debug purposes
         )
         stack_id = create_response.get("StackId")
         print("Created stack: {}".format(stack_id))
