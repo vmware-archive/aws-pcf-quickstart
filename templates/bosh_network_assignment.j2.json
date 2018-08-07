@@ -1,4 +1,0 @@
-{
-  "singleton_availability_zone": "{{singleton_availability_zone}}",
-  "network": "pcf-management-network"
-}

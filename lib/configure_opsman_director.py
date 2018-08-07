@@ -22,12 +22,11 @@ import os
 from os.path import expanduser
 from settings import Settings
 import util
+import tempfile
 
 
 def configure_opsman_director(my_settings: Settings):
     keyname, keybytes = generate_ssh_keypair(my_settings)
-
-    director_config = '{"ntp_servers_string": "0.amazon.pool.ntp.org,1.amazon.pool.ntp.org,2.amazon.pool.ntp.org,3.amazon.pool.ntp.org"}'
 
     template_ctx = {
         "zones": my_settings.zones,
@@ -53,38 +52,16 @@ def configure_opsman_director(my_settings: Settings):
         "az3": my_settings.pcf_pcfavailabilityzone3,
         "singleton_availability_zone": my_settings.pcf_pcfavailabilityzone1
     }
-    with open("templates/bosh_az_config.j2.json", 'r') as f:
-        az_template = Template(f.read())
-    with open("templates/bosh_network_config.j2.json", 'r') as f:
-        network_template = Template(f.read())
-    with open("templates/bosh_iaas_config.j2.json", 'r') as f:
-        iaas_template = Template(f.read())
-    with open("templates/bosh_network_assignment.j2.json", 'r') as f:
-        network_assignment_template = Template(f.read())
+    with open("templates/director_config.j2.json", 'r') as f:
+        director_template = Template(f.read())
 
-    az_config = az_template.render(template_ctx).replace("\n", "")
-    network_config = network_template.render(template_ctx).replace("\n", "")
-    network_assignment_config = network_assignment_template.render(template_ctx).replace("\n", "")
-    iaas_config = iaas_template.render(template_ctx).replace("\n", "")
+    director_config = director_template.render(template_ctx)
+    with tempfile.NamedTemporaryFile() as f:
+        f.write(director_config)
 
-    commands = []
-    commands.append("{om_with_auth} configure-bosh --iaas-configuration '{iaas_config}'".format(
-        om_with_auth=om_manager.get_om_with_auth(my_settings), iaas_config=iaas_config
-    ))
-    commands.append("{om_with_auth} configure-bosh --director-configuration '{director_config}'".format(
-        om_with_auth=om_manager.get_om_with_auth(my_settings), director_config=director_config
-    ))
-    commands.append("{om_with_auth} configure-bosh --az-configuration '{az_config}'".format(
-        om_with_auth=om_manager.get_om_with_auth(my_settings), az_config=az_config
-    ))
-    commands.append("{om_with_auth} configure-bosh --networks-configuration '{network_config}'".format(
-        om_with_auth=om_manager.get_om_with_auth(my_settings), network_config=network_config
-    ))
-    commands.append("{om_with_auth} configure-bosh --network-assignment '{network_assignment}'".format(
-        om_with_auth=om_manager.get_om_with_auth(my_settings), network_assignment=network_assignment_config
-    ))
-    out = err = ""
-    for cmd in commands:
+        cmd = "{om_with_auth} configure-director --config '{director_config}'".format(
+            om_with_auth=om_manager.get_om_with_auth(my_settings), director_config=director_config
+        )
         out, err, exit_code = util.run_command(cmd)
         if out != "":
             print(out)
