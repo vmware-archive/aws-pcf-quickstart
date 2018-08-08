@@ -41,30 +41,50 @@ class TestOmManager(unittest.TestCase):
         p = Mock(Popen)
         mock_popen.return_value = p
         p.returncode = 0
-        p.communicate.return_value = self.to_bytes("out: foo"), self.to_bytes("error: bar")
+        p.communicate.return_value = self.to_bytes(
+            "out: foo"), self.to_bytes("error: bar")
         om_manager.config_opsman_auth(self.settings)
         mock_popen.assert_called_with(
-            "om -k --target https://cf.example.com configure-authentication --username 'admin' --password 'monkey-123' --decryption-passphrase 'monkey-123'",
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
+            ["om",
+             "-k",
+             "--target", "https://cf.example.com",
+             "configure-authentication",
+             "--username", "admin",
+             "--password", "monkey-123",
+             "--decryption-passphrase", "monkey-123"],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
 
     @patch('om_manager.get_om_with_auth')
     @patch('util.run_command')
     def test_curl_get(self, mock_run_command, mock_get_om_with_auth):
-        mock_get_om_with_auth.return_value = "om plus some auth"
+        mock_get_om_with_auth.return_value = ["om", "plus", "some", "auth"]
         om_manager.curl_get(self.settings, "/api/foo")
 
-        mock_run_command.assert_called_with("om plus some auth curl --path /api/foo")
+        mock_run_command.assert_called_with(
+            ["om",
+             "plus", "some", "auth",
+             "curl",
+             "--path", "/api/foo"])
 
     @patch('om_manager.get_om_with_auth')
     @patch('util.run_command')
     def test_curl_payload(self, mock_run_command, mock_get_om_with_auth):
-        mock_get_om_with_auth.return_value = "om -k plus some auth"
+        mock_get_om_with_auth.return_value = [
+            "om", "-k", "plus", "some", "auth"
+        ]
 
-        om_manager.curl_payload(self.settings, "/api/foo", '{"foo": "bar"}', "PUT")
+        om_manager.curl_payload(
+            self.settings, "/api/foo", '{"foo": "bar"}', "PUT")
 
         mock_run_command.assert_called_with(
-            "om -k plus some auth curl --path /api/foo --request PUT --data '{\"foo\": \"bar\"}'"
+            ["om",
+             "-k",
+             "plus", "some", "auth",
+             "curl",
+             "--path", "/api/foo",
+             "--request", "PUT",
+             "--data", '{\"foo\": \"bar\"}']
         )
 
     @patch('util.run_command')
@@ -81,13 +101,15 @@ class TestOmManager(unittest.TestCase):
     @patch('time.sleep')
     @patch('builtins.print')
     def test_retries(self, mock_print, mock_sleep, mock_popen):
-        errors = ["out: i/o timeout", "connection refused", "yo, no opsman for you"]
+        errors = ["out: i/o timeout",
+                  "connection refused", "yo, no opsman for you"]
         p = Mock(Popen)
         mock_popen.return_value = p
         p.returncode = 1
         for recoverable_error in errors:
             mock_popen.reset_mock()
-            p.communicate.return_value = self.to_bytes(recoverable_error), self.to_bytes("error: bar")
+            p.communicate.return_value = self.to_bytes(
+                recoverable_error), self.to_bytes("error: bar")
             om_manager.config_opsman_auth(self.settings)
 
             self.assertEqual(mock_popen.call_count, 6)
@@ -100,7 +122,8 @@ class TestOmManager(unittest.TestCase):
         mock_popen.return_value = p
         p.returncode = 1
         mock_popen.reset_mock()
-        p.communicate.return_value = self.to_bytes("out: i/o timeout"), self.to_bytes("error: bar")
+        p.communicate.return_value = self.to_bytes(
+            "out: i/o timeout"), self.to_bytes("error: bar")
         om_manager.config_opsman_auth(self.settings)
 
         self.assertEqual(mock_sleep.call_count, 5)
@@ -123,7 +146,11 @@ class TestOmManager(unittest.TestCase):
         self.assertEqual(err, "bar")
 
     def test_get_om_with_auth(self):
-        expected_om_command = "om -k --target https://cf.example.com --username 'admin' --password 'monkey-123'"
+        expected_om_command = ["om",
+                               "-k",
+                               "--target", "https://cf.example.com",
+                               "--username", "admin",
+                               "--password", "monkey-123"]
         om_command = om_manager.get_om_with_auth(self.settings)
         self.assertEqual(om_command, expected_om_command)
 

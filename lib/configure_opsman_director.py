@@ -59,9 +59,10 @@ def configure_opsman_director(my_settings: Settings):
     with tempfile.NamedTemporaryFile(mode='w') as f:
         f.write(director_config)
 
-        cmd = "{om_with_auth} configure-director --config '{director_config}'".format(
-            om_with_auth=om_manager.get_om_with_auth(my_settings), director_config=f.name
-        )
+        cmd = om_manager.get_om_with_auth(my_settings) + [
+            "configure-director",
+            "--config", f.name
+        ]
         out, err, exit_code = util.run_command(cmd)
         if out != "":
             print(out)

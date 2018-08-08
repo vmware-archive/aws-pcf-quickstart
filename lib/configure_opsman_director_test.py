@@ -54,7 +54,7 @@ class TestConfigureOpsManDirector(unittest.TestCase):
     def test_fully_configures(self, mock_generate_ssh_keypair):
         mock_generate_ssh_keypair.return_value = 'my-pcf-keypair', '------blah----'
         with patch('om_manager.get_om_with_auth') as mock_util_get_om_with_auth:
-            mock_util_get_om_with_auth.return_value = "foo"
+            mock_util_get_om_with_auth.return_value = ["foo"]
             with patch('util.run_command') as mock_call:
                 mock_call.return_value = ("", "", 0)
                 result = configure_opsman_director.configure_opsman_director(
@@ -62,10 +62,6 @@ class TestConfigureOpsManDirector(unittest.TestCase):
 
                 self.assertEqual(mock_call.call_count, 1)
                 self.assertEqual(result[2], 0)
-
-                calls = mock_call.call_args_list
-                self.assertTrue(calls[0][0][0].startswith(
-                    "foo configure-director --config "))
 
     @patch('os.chmod')
     @patch('boto3.client')

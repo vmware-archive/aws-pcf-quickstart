@@ -31,11 +31,13 @@ def format_om_json_str(om_json: str):
 
 
 def config_opsman_auth(my_settings: settings.Settings):
-    cmd = "om -k --target {url} configure-authentication --username '{user}' --password '{password}' --decryption-passphrase '{password}'".format(
-        url=my_settings.opsman_url,
-        user=my_settings.opsman_user,
-        password=my_settings.pcf_opsmanageradminpassword
-    )
+    cmd = ["om",
+           "-k",
+           "--target", my_settings.opsman_url,
+           "configure-authentication",
+           "--username", my_settings.opsman_user,
+           "--password", my_settings.pcf_opsmanageradminpassword,
+           "--decryption-passphrase", my_settings.pcf_opsmanageradminpassword]
     return util.exponential_backoff_cmd(cmd)
 
 
@@ -49,52 +51,50 @@ def is_opsman_configured(my_settings: settings.Settings):
 
 
 def apply_changes(my_settings: settings.Settings):
-    cmd = "{get_om_with_auth} apply-changes".format(
-        get_om_with_auth=get_om_with_auth(my_settings)
-    )
+    cmd = get_om_with_auth(my_settings) + ["apply-changes"]
     return util.exponential_backoff_cmd(cmd)
 
 
 def curl_get(my_settings: settings.Settings, path: str):
-    cmd = "{get_om_with_auth} curl --path {path}".format(
-        get_om_with_auth=get_om_with_auth(my_settings), path=path
-    )
+    cmd = get_om_with_auth(my_settings) + ["curl",
+                                           "--path", path]
     return util.run_command(cmd)
 
 
 def curl_payload(my_settings: settings.Settings, path: str, data: str, method: str):
-    cmd = "{get_om_with_auth} curl --path {path} --request {method} --data '{data}'".format(
-        get_om_with_auth=get_om_with_auth(my_settings), path=path,
-        method=method, data=data
-    )
+    cmd = get_om_with_auth(my_settings) + ["curl",
+                                           "--path", path,
+                                           "--request", method,
+                                           "--data", data]
     return util.run_command(cmd)
 
 
 def stage_product(product_name: str, my_settings: settings.Settings):
-    cmd = "{om_with_auth} curl --path /api/v0/available_products".format(
-        om_with_auth=get_om_with_auth(my_settings)
-    )
-    p = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True)
+    # cmd = "{om_with_auth} curl --path /api/v0/available_products".format(
+    #    om_with_auth=get_om_with_auth(my_settings)
+    # )
+    cmd = get_om_with_auth(my_settings) + ["curl",
+                                           "--path", "/api/v0/available_products"]
+    p = Popen(cmd, stdout=PIPE, stderr=PIPE)
     out, err = p.communicate()
     if p.returncode != 0:
         print("Failed to query api")
         return out, err, p.returncode
 
     products = json.loads(out.decode())
-    cf_version = [x['product_version'] for x in products if x['name'] == product_name][0]
+    cf_version = [x['product_version']
+                  for x in products if x['name'] == product_name][0]
 
     # ok to call multiple times, no-op when already staged
-    cmd = "{om_with_auth} stage-product -p {product_name} -v {version}".format(
-        om_with_auth=get_om_with_auth(my_settings),
-        product_name=product_name,
-        version=cf_version
-    )
+    cmd = get_om_with_auth(my_settings) + ["stage-product",
+                                           "-p", product_name,
+                                           "-v", cf_version]
     return util.exponential_backoff_cmd(cmd)
 
 
 def get_om_with_auth(my_settings: settings.Settings):
-    return "om -k --target {url} --username '{username}' --password '{password}'".format(
-        url=my_settings.opsman_url,
-        username=my_settings.opsman_user,
-        password=my_settings.pcf_opsmanageradminpassword
-    )
+    return ["om",
+            "-k",
+            "--target", my_settings.opsman_url,
+            "--username", my_settings.opsman_user,
+            "--password", my_settings.pcf_opsmanageradminpassword]

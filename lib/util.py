@@ -18,6 +18,7 @@
 import time
 import subprocess
 import functools
+from typing import List
 
 max_retries = 5
 
@@ -44,16 +45,16 @@ def check_exit_code(result):
     return returncode == 0
 
 
-def exponential_backoff_cmd(cmd):
+def exponential_backoff_cmd(cmd: List[str]):
     return exponential_backoff(
         functools.partial(run_command, cmd),
         check_exit_code,
     )
 
 
-def run_command(cmd: str):
-    print("Running: {}".format(cmd))
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+def run_command(cmd: List[str]):
+    print("Running: {}".format(' '.join(cmd)))
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out_bytes, err_bytes = p.communicate()
     out = out_bytes.decode("utf-8").strip()
     err = err_bytes.decode("utf-8").strip()
