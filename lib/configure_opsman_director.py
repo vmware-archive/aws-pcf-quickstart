@@ -58,6 +58,7 @@ def configure_opsman_director(my_settings: Settings):
     director_config = director_template.render(template_ctx)
     with tempfile.NamedTemporaryFile(mode='w') as f:
         f.write(director_config)
+        f.flush()
 
         cmd = om_manager.get_om_with_auth(my_settings) + [
             "configure-director",
