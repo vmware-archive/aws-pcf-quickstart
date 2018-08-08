@@ -52,11 +52,11 @@ def configure_opsman_director(my_settings: Settings):
         "az3": my_settings.pcf_pcfavailabilityzone3,
         "singleton_availability_zone": my_settings.pcf_pcfavailabilityzone1
     }
-    with open("templates/director_config.j2.yaml", 'r') as f:
+    with open("templates/director_config.j2.yml", 'r') as f:
         director_template = Template(f.read())
 
     director_config = director_template.render(template_ctx)
-    with tempfile.NamedTemporaryFile() as f:
+    with tempfile.NamedTemporaryFile(mode='w') as f:
         f.write(director_config)
 
         cmd = "{om_with_auth} configure-director --config '{director_config}'".format(

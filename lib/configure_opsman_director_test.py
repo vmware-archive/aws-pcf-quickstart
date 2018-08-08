@@ -43,11 +43,12 @@ class TestConfigureOpsManDirector(unittest.TestCase):
     def test_flow(self, mock_generate_ssh_keypair):
         mock_generate_ssh_keypair.return_value = 'my-pcf-keypair', '------blah----'
         with patch('util.run_command') as mock_run_command:
-            mock_run_command.side_effect = [("", "", 0), ("", "", 0), ("", "", 1)]
-            result = configure_opsman_director.configure_opsman_director(self.settings)
+            mock_run_command.side_effect = [("", "", 1)]
+            result = configure_opsman_director.configure_opsman_director(
+                self.settings)
 
             self.assertEqual(result[2], 1)
-            self.assertEqual(mock_run_command.call_count, 3)
+            self.assertEqual(mock_run_command.call_count, 1)
 
     @patch('configure_opsman_director.generate_ssh_keypair')
     def test_fully_configures(self, mock_generate_ssh_keypair):
@@ -56,17 +57,15 @@ class TestConfigureOpsManDirector(unittest.TestCase):
             mock_util_get_om_with_auth.return_value = "foo"
             with patch('util.run_command') as mock_call:
                 mock_call.return_value = ("", "", 0)
-                result = configure_opsman_director.configure_opsman_director(self.settings)
+                result = configure_opsman_director.configure_opsman_director(
+                    self.settings)
 
-                self.assertEqual(mock_call.call_count, 5)
+                self.assertEqual(mock_call.call_count, 1)
                 self.assertEqual(result[2], 0)
 
                 calls = mock_call.call_args_list
-                self.assertTrue(calls[0][0][0].startswith("foo configure-bosh --iaas-configuration '{"))
-                self.assertTrue(calls[1][0][0].startswith("foo configure-bosh --director-configuration '{"))
-                self.assertTrue(calls[2][0][0].startswith("foo configure-bosh --az-configuration '{"))
-                self.assertTrue(calls[3][0][0].startswith("foo configure-bosh --networks-configuration '{"))
-                self.assertTrue(calls[4][0][0].startswith("foo configure-bosh --network-assignment '{"))
+                self.assertTrue(calls[0][0][0].startswith(
+                    "foo configure-director --config "))
 
     @patch('os.chmod')
     @patch('boto3.client')
@@ -82,9 +81,11 @@ class TestConfigureOpsManDirector(unittest.TestCase):
 
         my_mock_open = mock_open()
         with patch('configure_opsman_director.open', my_mock_open):
-            keyname, keybytes = configure_opsman_director.generate_ssh_keypair(self.settings)
+            keyname, keybytes = configure_opsman_director.generate_ssh_keypair(
+                self.settings)
 
-        mock_client.create_key_pair.assert_called_with(DryRun=False, KeyName=expected_key_name)
+        mock_client.create_key_pair.assert_called_with(
+            DryRun=False, KeyName=expected_key_name)
         my_mock_open.assert_called()
 
         handle = my_mock_open()
