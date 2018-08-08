@@ -51,7 +51,11 @@ with open(metadata_file_path, 'r') as metadata_ert_raw:
 
     stemcell_product_file = None
     for product_file in metadata_stemcell.get("product_files"):
-        if "for AWS" in product_file.get("name"):
+        if "aws-xen" in product_file.get("aws_object_key"):
+            # Make sure that this selection doesn't catch more than one file
+            if stemcell_product_file:
+                print("Too many files matched selection in stemcell release file list")
+                sys.exit(1)
             stemcell_product_file = product_file
     if not stemcell_product_file:
         print("Unable to find stemcell in product stemcell release file list")
