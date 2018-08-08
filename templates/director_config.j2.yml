@@ -1,7 +1,7 @@
 az-configuration:
-{% for zone in zones %}
+{% for zone in zones -%}
 - name: "{{zone}}"
-{% endfor %}
+{%- endfor %}
 
 director-configuration:
   ntp_servers_string: "0.amazon.pool.ntp.org,1.amazon.pool.ntp.org,2.amazon.pool.ntp.org,3.amazon.pool.ntp.org"
@@ -30,21 +30,21 @@ networks-configuration:
       reserved_ip_ranges: "10.0.16.0-10.0.16.4"
       dns: "169.254.169.253"
       gateway: "10.0.16.1"
-      availability_zones:
+      availability_zone_names:
       - "{{az1}}"
     - iaas_identifier: "{{pcf_management_subnet_az2}}"
       cidr: "10.0.16.16/28"
       reserved_ip_ranges: "10.0.16.16-10.0.16.20"
       dns: "169.254.169.253"
       gateway: "10.0.16.17"
-      availability_zones:
+      availability_zone_names:
       - "{{az2}}"
     - iaas_identifier: "{{pcf_management_subnet_az3}}"
       cidr: "10.0.16.32/28"
       reserved_ip_ranges: "10.0.16.32-10.0.16.36"
       dns: "169.254.169.253"
       gateway: "10.0.16.33"
-      availability_zones:
+      availability_zone_names:
       - "{{az3}}"
   - name: pcf-ert-network
     subnets:
@@ -53,21 +53,21 @@ networks-configuration:
       reserved_ip_ranges: "10.0.4.0-10.0.4.4"
       dns: "169.254.169.253"
       gateway: "10.0.4.1"
-      availability_zones:
+      availability_zone_names:
       - "{{az1}}"
     - iaas_identifier: "{{pcf_ert_subnet_az2}}"
       cidr: "10.0.5.0/24"
       reserved_ip_ranges: "10.0.5.0-10.0.5.4"
       dns: "169.254.169.253"
       gateway: "10.0.5.1"
-      availability_zones:
+      availability_zone_names:
       - "{{az2}}"
     - iaas_identifier: "{{pcf_ert_subnet_az3}}"
       cidr: "10.0.6.0/24"
       reserved_ip_ranges: "10.0.6.0-10.0.6.4"
       dns: "169.254.169.253"
       gateway: "10.0.6.1"
-      availability_zones:
+      availability_zone_names:
       - "{{az3}}"
   - name: pcf-services-network
     subnets:
@@ -76,19 +76,19 @@ networks-configuration:
       reserved_ip_ranges: "10.0.8.0-10.0.8.3"
       dns: "169.254.169.253"
       gateway: "10.0.8.1"
-      availability_zones:
+      availability_zone_names:
       - "{{az1}}"
     - iaas_identifier: "{{pcf_services_subnet_az2}}"
       cidr: "10.0.9.0/24"
       reserved_ip_ranges: "10.0.9.0-10.0.9.3"
       dns: "169.254.169.253"
       gateway: "10.0.9.1"
-      availability_zones:
+      availability_zone_names:
       - "{{az2}}"
     - iaas_identifier: "{{pcf_services_subnet_az3}}"
       cidr: "10.0.10.0/24"
       reserved_ip_ranges: "10.0.10.0-10.0.10.3"
       dns: "169.254.169.253"
       gateway: "10.0.10.1"
-      availability_zones:
+      availability_zone_names:
       - "{{az3}}"
