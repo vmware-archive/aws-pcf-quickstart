@@ -17,8 +17,10 @@ iaas-configuration:
   encrypted: false
 
 network-assignment:
-  singleton_availability_zone: "{{singleton_availability_zone}}"
-  network: pcf-management-network
+  singleton_availability_zone:
+    name: "{{singleton_availability_zone}}"
+  network:
+    name: pcf-management-network
 
 networks-configuration:
   icmp_checks_enabled: false
