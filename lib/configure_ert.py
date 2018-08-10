@@ -71,10 +71,10 @@ def configure_ert_resources(my_settings: Settings):
         ert_resource_template = Template(f.read())
     ert_resource_config = om_manager.format_om_json_str(
         ert_resource_template.render(ert_resource_ctx))
-    cmd = "{om_with_auth} configure-product -n cf -pr '{ert_resources}'".format(
-        om_with_auth=om_manager.get_om_with_auth(my_settings),
-        ert_resources=ert_resource_config
-    )
+    cmd = om_manager.get_om_with_auth(my_settings) + [
+        "configure-product",
+        "-n", "cf",
+        "-pr", ert_resource_config]
     return util.exponential_backoff_cmd(cmd)
 
 
@@ -87,10 +87,10 @@ def configure_ert_multiaz_resources(my_settings: Settings):
             template = f.read()
 
     ert_resource_config = om_manager.format_om_json_str(template)
-    cmd = "{om_with_auth} configure-product -n cf -pr '{ert_resources}'".format(
-        om_with_auth=om_manager.get_om_with_auth(my_settings),
-        ert_resources=ert_resource_config
-    )
+    cmd = om_manager.get_om_with_auth(my_settings) + [
+        "configure-product",
+        "-n", "cf",
+        "-pr", ert_resource_config]
     return util.exponential_backoff_cmd(cmd)
 
 
@@ -122,10 +122,10 @@ def configure_ert_config(my_settings: Settings):
         ert_template = Template(f.read())
     ert_config = om_manager.format_om_json_str(
         ert_template.render(ert_config_template_ctx))
-    cmd = "{om_with_auth} configure-product -n cf -p '{ert_config}'".format(
-        om_with_auth=om_manager.get_om_with_auth(my_settings),
-        ert_config=ert_config
-    )
+    cmd = om_manager.get_om_with_auth(my_settings) + [
+        "configure-product",
+        "-n", "cf",
+        "-p", ert_config]
     return util.exponential_backoff_cmd(cmd)
 
 
@@ -138,22 +138,20 @@ def configure_tile_az(my_settings: Settings, tile_name: str):
         az_template = Template(f.read())
     az_config = om_manager.format_om_json_str(
         az_template.render(az_template_ctx))
-    cmd = "{om_with_auth} configure-product -n {tile_name} -pn '{az_config}'".format(
-        om_with_auth=om_manager.get_om_with_auth(my_settings),
-        tile_name=tile_name,
-        az_config=az_config
-    )
+    cmd = om_manager.get_om_with_auth(my_settings) + [
+        "configure-product",
+        "-n", tile_name,
+        "-pn", az_config]
 
     return util.exponential_backoff_cmd(cmd)
 
 
 def create_required_databases(my_settings: Settings):
-    cmd = "mysql -h {hostname} --user={username} --port={port} --password={password} < templates/required_dbs.sql".format(
-        hostname=my_settings.pcf_rdsaddress,
-        username=my_settings.pcf_rdsusername,
-        port=my_settings.pcf_rdsport,
-        password=my_settings.pcf_rdspassword
-    )
+    cmd = ["mysql",
+           "-h", my_settings.pcf_rdsaddress,
+           "--user", my_settings.pcf_rdsusername,
+           "--port", my_settings.pcf_rdsport,
+           "--password", my_settings.pcf_rdspassword]
 
     return util.exponential_backoff_cmd(cmd)
 

@@ -46,11 +46,12 @@ class TestDeleteEverything(unittest.TestCase):
         mock_backoff.return_value = "", "", 0
         mock_is_opsman_configured.return_value = True
 
-        mock_auth.return_value = "om-with-auth-for-realz"
+        mock_auth.return_value = ["om-with-auth-for-realz"]
 
         delete_everything.delete_everything(self.settings)
 
-        mock_backoff.assert_called_with("om-with-auth-for-realz delete-installation")
+        mock_backoff.assert_called_with(
+            ["om-with-auth-for-realz", "delete-installation"])
         mock_delete_keypair.assert_called()
 
     @patch('delete_everything.delete_keypair')
@@ -93,7 +94,8 @@ class TestDeleteEverything(unittest.TestCase):
         mock_backoff.return_value = "", "", 0
         mock_is_opsman_configured.return_value = True
 
-        out, err, return_code = delete_everything.delete_everything(self.settings)
+        out, err, return_code = delete_everything.delete_everything(
+            self.settings)
 
         self.assertEqual(return_code, 0)
         self.assertEqual(mock_expire_bucket.call_count, 5)
@@ -111,7 +113,8 @@ class TestDeleteEverything(unittest.TestCase):
 
         delete_everything.expire_bucket(self.settings, "bucket-rsc")
 
-        self.assertEqual(mock_client.put_bucket_lifecycle_configuration.call_count, 1)
+        self.assertEqual(
+            mock_client.put_bucket_lifecycle_configuration.call_count, 1)
 
     @patch('delete_everything.delete_keypair')
     @patch('om_manager.is_opsman_configured')

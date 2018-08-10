@@ -29,9 +29,9 @@ def upload_stemcell(my_settings: settings.Settings, path: str):
     for stemcell in os.listdir(path):
         if stemcell.endswith(".tgz"):
             print("uploading stemcell {0}".format(stemcell))
-            cmd = "{om_with_auth} upload-stemcell -s '{path}'".format(
-                om_with_auth=om_manager.get_om_with_auth(my_settings), path=os.path.join(path, stemcell)
-            )
+            cmd = om_manager.get_om_with_auth(my_settings) + [
+                "upload-stemcell",
+                "-s", os.path.join(path, stemcell)]
             out, err, exit_code = util.exponential_backoff_cmd(cmd)
             if exit_code != 0:
                 return out, err, exit_code
@@ -44,9 +44,10 @@ def upload_assets(my_settings: settings.Settings, path: str):
         if tile.endswith(".pivotal"):
             print("uploading product {0}".format(tile))
 
-            cmd = "{om_with_auth} -r 3600 upload-product -p '{path}'".format(
-                om_with_auth=om_manager.get_om_with_auth(my_settings), path=os.path.join(path, tile))
-
+            cmd = om_manager.get_om_with_auth(my_settings) + [
+                "-r", "3600",
+                "upload-product",
+                "-p", os.path.join(path, tile)]
             out, err, exit_code = util.exponential_backoff_cmd(cmd)
             if exit_code != 0:
                 return out, err, exit_code
@@ -55,7 +56,9 @@ def upload_assets(my_settings: settings.Settings, path: str):
 
 
 def download_assets(my_settings: settings.Settings, path: str):
-    cmd = "pivnet login --api-token={token}".format(token=my_settings.pcf_input_pivnettoken)
+    cmd = ["pivnet",
+           "login",
+           "--api-token", my_settings.pcf_input_pivnettoken]
     util.exponential_backoff_cmd(cmd)
 
     out, err, exit_code = do_pivnet_download(
@@ -77,9 +80,12 @@ def download_assets(my_settings: settings.Settings, path: str):
 
 
 def do_pivnet_download(slug: str, version: str, tile_glob: str, sha256: str, path: str):
-    cmd = "pivnet download-product-files -p {slug} -r {version} -g '{glob}' -d '{dir}'".format(
-        slug=slug, version=version, glob=tile_glob, dir=path
-    )
+    cmd = ["pivnet",
+           "download-product-files",
+           "-p", slug,
+           "-r", version,
+           "-g", tile_glob,
+           "-d", path]
     out, err, exit_code = util.exponential_backoff_cmd(cmd)
     if exit_code != 0:
         return out, err, exit_code

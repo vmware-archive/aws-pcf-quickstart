@@ -24,9 +24,8 @@ from settings import Settings
 
 def delete_everything(my_settings: Settings):
     if my_settings.resources_created and om_manager.is_opsman_configured(my_settings):
-        cmd = "{om_with_auth} delete-installation".format(
-            om_with_auth=om_manager.get_om_with_auth(my_settings)
-        )
+        cmd = om_manager.get_om_with_auth(my_settings) + [
+            "delete-installation"]
         # delete blocks on apply-changes, but if other apply changes in progress, doesn't queue up its own
         util.exponential_backoff_cmd(cmd)
         out, err, return_code = util.exponential_backoff_cmd(cmd)
@@ -52,7 +51,8 @@ def delete_everything(my_settings: Settings):
 
 
 def delete_keypair(my_settings: Settings):
-    ec2_client = boto3.client(service_name='ec2', region_name=my_settings.region)
+    ec2_client = boto3.client(
+        service_name='ec2', region_name=my_settings.region)
     ec2_client.delete_key_pair(
         KeyName=my_settings.get_pcf_keypair_name(), DryRun=False
     )
