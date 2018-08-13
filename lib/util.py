@@ -47,16 +47,16 @@ def check_exit_code(result):
 
 def exponential_backoff_cmd(cmd: List[str], stdin=None):
     return exponential_backoff(
-        functools.partial(run_command, cmd),
+        functools.partial(run_command, cmd, stdin),
         check_exit_code,
     )
 
 
-def run_command(cmd: List[str], stdin=None):
+def run_command(cmd: List[str], stdinput=None):
     print("Running: {}".format(' '.join(cmd)))
     p = subprocess.Popen(
         cmd,
-        stdin=stdin, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdin=stdinput, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out_bytes, err_bytes = p.communicate()
     out = out_bytes.decode("utf-8").strip()
     err = err_bytes.decode("utf-8").strip()

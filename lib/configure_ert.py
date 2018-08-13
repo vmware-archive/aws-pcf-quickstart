@@ -150,7 +150,7 @@ def create_required_databases(my_settings: Settings):
     cmd = ["mysql",
            "-h", my_settings.pcf_rdsaddress,
            "--user={}".format(my_settings.pcf_rdsusername),
-           "--port", my_settings.pcf_rdsport,
+           "--port={}".format(my_settings.pcf_rdsport),
            "--password={}".format(my_settings.pcf_rdspassword)]
 
     out = ""
