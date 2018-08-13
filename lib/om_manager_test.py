@@ -52,7 +52,7 @@ class TestOmManager(unittest.TestCase):
              "--username", "admin",
              "--password", "monkey-123",
              "--decryption-passphrase", "monkey-123"],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
 
     @patch('om_manager.get_om_with_auth')

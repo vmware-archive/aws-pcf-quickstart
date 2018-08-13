@@ -153,7 +153,12 @@ def create_required_databases(my_settings: Settings):
            "--port", my_settings.pcf_rdsport,
            "--password={}".format(my_settings.pcf_rdspassword)]
 
-    return util.exponential_backoff_cmd(cmd)
+    out = ""
+    err = ""
+    retcode = 1
+    with open("templates/required_dbs.sql", "r") as f:
+        out, err, retcode = util.exponential_backoff_cmd(cmd, f)
+    return out, err, retcode
 
 
 def modify_vm_types(my_settings: Settings):
