@@ -24,7 +24,7 @@ with open(metadata_file_path, 'r') as metadata_ert_raw:
     stemcell_dependency = None
     for dependency in dependecies:
         dependency_release = dependency.get("Release")
-        if dependency_release.get("Product").get("Name") == "Stemcells for PCF":
+        if dependency_release.get("Product").get("Name") == "Stemcells for PCF (Ubuntu Xenial)":
             stemcell_dependency = dependency_release
     if not stemcell_dependency:
         print("Unable to find stemcell in dependency list")
