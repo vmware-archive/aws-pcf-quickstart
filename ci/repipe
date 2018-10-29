@@ -1,0 +1,5 @@
+#!/bin/bash
+
+fly -t ci2@oneclick set-pipeline -c ci/pipeline-integration-test-allregion.yml -p aws-all-regions
+
+fly -t ci2@oneclick set-pipeline -c ci/pipeline-all-in-one.yml -p aws-all-in-one
