@@ -109,7 +109,7 @@ resources:
     api_token: ((pivnet_token))
     copy_metadata: true
     product_slug: elastic-runtime
-    product_version: 2\.3\.4\.*
+    product_version: 2\.3\.2\.*
 
 - name: opsman-tile
   type: pivnet
