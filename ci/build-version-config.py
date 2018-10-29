@@ -30,7 +30,7 @@ with open(metadata_file_path, 'r') as metadata_ert_raw:
         print("Unable to find stemcell in dependency list")
         sys.exit(1)
 
-    stemcell_pivnet_url = "https://network.pivotal.io/api/v2/products/stemcells/releases/{}".format(
+    stemcell_pivnet_url = "https://network.pivotal.io/api/v2/products/stemcells-ubuntu-xenial/releases/{}".format(
         stemcell_dependency.get("ID")
     )
 
