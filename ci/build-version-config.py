@@ -44,6 +44,7 @@ with open(metadata_file_path, 'r') as metadata_ert_raw:
     )
     if stemcell_response.status_code != 200:
         print("Failed getting stemcell data from data")
+        print(stemcell_pivnet_url)
         print(stemcell_response)
         print(stemcell_response.status_code)
         sys.exit(1)
