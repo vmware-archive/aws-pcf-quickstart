@@ -53,7 +53,7 @@ def accept_ert_eula(my_settings: settings.Settings):
 
 def accept_stemcell_eula(my_settings: settings.Settings):
     response, result = util.exponential_backoff(
-        functools.partial(post_eula, my_settings, "stemcells",
+        functools.partial(post_eula, my_settings, "stemcells-ubuntu-xenial",
                           my_settings.stemcell_release_id),
         check_eula_succeeded
     )
