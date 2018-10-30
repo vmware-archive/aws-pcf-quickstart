@@ -62,7 +62,7 @@ def download_assets(my_settings: settings.Settings, path: str):
     util.exponential_backoff_cmd(cmd)
 
     out, err, exit_code = do_pivnet_download(
-        'stemcells',
+        'stemcells-ubuntu-xenial',
         my_settings.stemcell_release_version,
         '*aws*.tgz',
         my_settings.stemcell_release_sha256,
