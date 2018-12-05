@@ -35,13 +35,16 @@ class TestDownloadAndImport(unittest.TestCase):
 
     @patch('util.exponential_backoff_cmd')
     @patch('download_and_import.do_pivnet_download')
-    def test_download_asset_success(self, mock_do_pivnet_download, mock_util):
+    @patch('download_and_import.do_github_download')
+    def test_download_asset_success(self, mock_do_github_download, mock_do_pivnet_download, mock_util):
         mock_do_pivnet_download.return_value = "", "", 0
+        mock_do_github_download.return_value = "", "", 0
 
         out, err, exit_code = download_and_import.download_assets(
             self.settings, '/home/ubuntu/tiles/')
 
         self.assertEqual(mock_do_pivnet_download.call_count, 2)
+        self.assertEqual(mock_do_github_download.call_count, 1)
         self.assertEqual(exit_code, 0)
 
         self.assertEqual(
@@ -50,15 +53,34 @@ class TestDownloadAndImport(unittest.TestCase):
 
     @patch('util.exponential_backoff_cmd')
     @patch('download_and_import.do_pivnet_download')
-    def test_download_asset_failure(self, mock_do_pivnet_download, mock_util):
+    @patch('download_and_import.do_github_download')
+    def test_download_asset_pivnet_failure(self, mock_do_github_download, mock_do_pivnet_download, mock_util):
         mock_do_pivnet_download.return_value = "download failed", "", 1
+        mock_do_github_download.return_value = "", "", 0
 
         out, err, exit_code = download_and_import.download_assets(
             self.settings, '/home/ubuntu/tiles/')
 
         self.assertEqual(mock_do_pivnet_download.call_count, 1)
+        self.assertEqual(mock_do_github_download.call_count, 1)
         self.assertEqual(out, "download failed")
         self.assertEqual(exit_code, 1)
+
+    @patch('util.exponential_backoff_cmd')
+    @patch('download_and_import.do_pivnet_download')
+    @patch('download_and_import.do_github_download')
+    def test_download_asset_github_failure(self, mock_do_github_download, mock_do_pivnet_download, mock_util):
+        mock_do_pivnet_download.return_value = "", "", 0
+        mock_do_github_download.return_value = "download failed", "", 1
+
+        out, err, exit_code = download_and_import.download_assets(
+            self.settings, '/home/ubuntu/tiles/')
+
+        self.assertEqual(mock_do_github_download.call_count, 1)
+        self.assertEqual(mock_do_pivnet_download.call_count, 0)
+        self.assertEqual(out, "download failed")
+        self.assertEqual(exit_code, 1)
+
 
     @patch('util.exponential_backoff_cmd')
     @patch('download_and_import.verify_sha256')
