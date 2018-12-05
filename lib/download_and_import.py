@@ -61,6 +61,13 @@ def download_assets(my_settings: settings.Settings, path: str):
            "--api-token", my_settings.pcf_input_pivnettoken]
     util.exponential_backoff_cmd(cmd)
 
+    out, err, exit_code = do_github_download(
+        my_settings.aws_broker_release_url,
+        path
+    )
+    if exit_code != 0:
+        return out, err, exit_code
+
     out, err, exit_code = do_pivnet_download(
         'stemcells-ubuntu-xenial',
         my_settings.stemcell_release_version,
@@ -77,6 +84,18 @@ def download_assets(my_settings: settings.Settings, path: str):
         my_settings.ert_release_sha256,
         path
     )
+
+
+def do_github_download(url: str, path: str):
+    cmd = ["wget",
+           url,
+           "-P", path]
+    out, err, exit_code = util.exponential_backoff_cmd(cmd)
+    if exit_code != 0:
+        return out, err, exit_code
+    paths = glob.glob("{}/{}".format(path, "aws-service-broker-*.pivotal"))
+    if len(paths) != 1:
+        return "Issue finding tiles on disk after download", "", 1
 
 
 def do_pivnet_download(slug: str, version: str, tile_glob: str, sha256: str, path: str):

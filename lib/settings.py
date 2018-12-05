@@ -206,6 +206,10 @@ class Settings:
         return "https://opsman.{}".format(self.pcf_input_domain)
 
     @property
+    def aws_broker_release_url(self):
+        return "https://github.com/awslabs/aws-servicebroker/releases/download/v1.0.0-beta.3/aws-service-broker-1.0.0-beta.3-tile.pivotal"
+
+    @property
     def resources_created(self):
         return os.path.isfile(resource_created_file)
 
