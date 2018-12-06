@@ -71,8 +71,19 @@ def download_assets(my_settings: settings.Settings, path: str):
     out, err, exit_code = do_pivnet_download(
         'stemcells-ubuntu-xenial',
         my_settings.stemcell_release_version,
-        '*aws*.tgz',
+        '*aws*xenial*.tgz',
         my_settings.stemcell_release_sha256,
+        path
+    )
+    if exit_code != 0:
+        return out, err, exit_code
+    # get stemcell for aws service broker
+    # TODO: get from version config, when aws-service-broker tile is on pivnet
+    out, err, exit_code = do_pivnet_download(
+        'stemcells',
+        "3586.57",
+        '*aws*trusty*.tgz',
+        "4ebb2cb3f936806c547d5a432b3f8fc884cf34a1425aa9fde336d13422b0c94f",
         path
     )
     if exit_code != 0:
@@ -96,6 +107,8 @@ def do_github_download(url: str, path: str):
     paths = glob.glob("{}/{}".format(path, "aws-service-broker-*.pivotal"))
     if len(paths) != 1:
         return "Issue finding tiles on disk after download", "", 1
+
+    return "", "", 0
 
 
 def do_pivnet_download(slug: str, version: str, tile_glob: str, sha256: str, path: str):

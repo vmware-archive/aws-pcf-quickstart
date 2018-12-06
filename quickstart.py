@@ -23,7 +23,7 @@ PATH = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(1, os.path.join(PATH, 'lib'))
 
 from lib import settings, om_manager, configure_opsman_director, configure_ert, sqs, wait_condition
-from lib import util, accept_eula, download_and_import
+from lib import util, accept_eula, download_and_import, configure_aws_broker
 
 my_settings = settings.Settings()
 asset_path = '/home/ubuntu/tiles'
@@ -79,6 +79,8 @@ check_waitcondition_return_code(out, err, exit_code, 'upload_stemcell')
 
 out, err, exit_code = configure_ert.configure_ert(my_settings)
 check_waitcondition_return_code(out, err, exit_code, 'configure_ert')
+out, err, exit_code = configure_aws_broker.configure_aws_service_broker(my_settings)
+check_waitcondition_return_code(out, err, exit_code, 'configure_aws_service_broker')
 out, err, exit_code = om_manager.apply_changes(my_settings)
 check_waitcondition_return_code(out, err, exit_code, 'apply_changes')
 

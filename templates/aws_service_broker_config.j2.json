@@ -1,0 +1,25 @@
+{
+  ".properties.aws_access_key_id": {
+    "value": "{{aws_iam_access_key_id}}"
+  },
+  ".properties.aws_secret_access_key": {
+    "value": {
+      "secret": "{{aws_iam_secret_access_key}}"
+    }
+  },
+  ".properties.aws_default_region": {
+    "value": "{{aws_region}}"
+  },
+  ".properties.s3_region": {
+    "value": "{{aws_s3_region}}"
+  },
+  ".properties.tls_cert": {
+    "value": "{{cert}}"
+  },
+  ".properties.tls_key": {
+    "value": "{{key}}"
+  },
+  ".properties.insecure": {
+    "value": false
+  }
+}
