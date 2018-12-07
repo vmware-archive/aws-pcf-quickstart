@@ -43,7 +43,7 @@ def configure_aws_service_broker(my_settings: Settings):
         print("Failed to configure aws-service-broker")
         return out, err, exit_code
 
-    return ""
+    return "", "", 0
 
 
 def configure_aws_service_broker_config(my_settings: Settings):
