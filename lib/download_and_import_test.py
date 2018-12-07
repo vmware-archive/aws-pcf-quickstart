@@ -47,10 +47,9 @@ class TestDownloadAndImport(unittest.TestCase):
         self.assertEqual(mock_do_github_download.call_count, 1)
         self.assertEqual(exit_code, 0)
 
-        self.assertEqual(
-            mock_do_pivnet_download.mock_calls[0][1][0], 'stemcells-ubuntu-xenial')
-        self.assertEqual(mock_do_pivnet_download.mock_calls[0][1][?????????], 'stemcells')
-        self.assertEqual(mock_do_pivnet_download.mock_calls[1][1][0], 'cf')
+        self.assertEqual(mock_do_pivnet_download.mock_calls[0][1][0], 'stemcells-ubuntu-xenial')
+        self.assertEqual(mock_do_pivnet_download.mock_calls[1][1][0], 'stemcells')
+        self.assertEqual(mock_do_pivnet_download.mock_calls[2][1][0], 'cf')
 
     @patch('util.exponential_backoff_cmd')
     @patch('download_and_import.do_pivnet_download')
