@@ -20,6 +20,6 @@
     "value": "{{key}}"
   },
   ".properties.insecure": {
-    "value": false
+    "value": true
   }
 }
