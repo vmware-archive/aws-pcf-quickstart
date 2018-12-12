@@ -387,6 +387,10 @@ Resources:
     Type: AWS::IAM::AccessKey
     Properties:
       UserName: !GetAtt PCFBase.Outputs.PcfIamUserName
+  BrokerIamUserAccessKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !GetAtt BrokerUser.Outputs.BrokerIAMUser
   PCFDescribeStackPolicy:
     Type: AWS::IAM::Policy
     Properties:
@@ -476,6 +480,8 @@ Resources:
         "PcfElasticRuntimeS3ResourcesBucket": "${PCFBase.Outputs.PcfElasticRuntimeS3ResourcesBucket}",
         "PcfIamUserAccessKey": "${PcfIamUserAccessKey}",
         "PcfIamUserSecretAccessKey": "${PcfIamUserAccessKey.SecretAccessKey}",
+        "BrokerIamUserAccessKey": "${BrokerIamUserAccessKey}",
+        "BrokerIamUserSecretAccessKey": "${BrokerIamUserAccessKey.SecretAccessKey}",
         "PcfVmsSecurityGroupId": "${PCFBase.Outputs.PcfVmsSecurityGroup}",
         "PcfElbTcpName": "${PCFBase.Outputs.PcfElbTcpName}",
         "PcfElbSshName": "${PCFBase.Outputs.PcfElbSshName}",
@@ -659,9 +665,11 @@ Resources:
       TTL: 60
       Type: CNAME
 Outputs:
-  IAMUser:
+  BrokerIAMUser:
     Description: Username for aws service broker
     Value: !Ref BrokerUser
+  BrokerIAMSecretKey:
+    Value: !GetAtt BrokerUser.SecretAccessKey
   OpsManager:
     Description: Url For Logging into OpsManager
     Value: !Sub https://opsman.${Domain}

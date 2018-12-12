@@ -58,6 +58,14 @@ class Settings:
         return self.parameters["PcfIamUserSecretAccessKey"]
 
     @property
+    def broker_iamuseraccesskey(self):
+        return self.parameters["BrokerIamUserAccessKey"]
+
+    @property
+    def broker_iamusersecretaccesskey(self):
+        return self.parameters["BrokerIamUserSecretAccessKey"]
+
+    @property
     def pcf_vpc(self):
         return self.parameters["PcfVpc"]
 

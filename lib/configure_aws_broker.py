@@ -51,11 +51,9 @@ def configure_aws_service_broker_config(my_settings: Settings):
     aws_config_template_ctx = {
         "aws_region": my_settings.region,
         "aws_service_bucket": my_settings.pcf_elasticruntimes3buildpacksbucket,
-        "aws_s3_prefix": "",
-        "aws_s3_suffix": "",
         "aws_s3_region": my_settings.region,
-        "aws_iam_access_key_id": my_settings.pcf_iamuseraccesskey,
-        "aws_iam_secret_access_key": my_settings.pcf_iamusersecretaccesskey,
+        "aws_iam_access_key_id": my_settings.broker_iamuseraccesskey,
+        "aws_iam_secret_access_key": my_settings.broker_iamusersecretaccesskey,
         "pcf_skipsslvalidation": my_settings.pcf_input_skipsslvalidation,
         "cert": cert.replace("\n", "\\n"),
         "key": key.replace("\n", "\\n")
