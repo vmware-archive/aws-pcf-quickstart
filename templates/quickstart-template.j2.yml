@@ -328,6 +328,7 @@ Resources:
         RDSUsername: !Ref RdsUsername
         RDSPassword: !Ref RdsPassword
         ERTCertificateARN: !Ref SSLCertificateARN
+        BrokerIAMUserName: !Ref BrokerUser
       TemplateURL: !Sub https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/cloud-formation.template
   CustomResourceSQSQueue:
     Type: AWS::SQS::Queue
