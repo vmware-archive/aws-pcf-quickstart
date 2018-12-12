@@ -390,7 +390,7 @@ Resources:
   BrokerIamUserAccessKey:
     Type: AWS::IAM::AccessKey
     Properties:
-      UserName: !GetAtt BrokerUser.Outputs.BrokerIAMUserName
+      UserName: !GetAtt PCFBase.Outputs.BrokerIAMUserName
   PCFDescribeStackPolicy:
     Type: AWS::IAM::Policy
     Properties:
@@ -668,8 +668,6 @@ Outputs:
   BrokerIAMUserName:
     Description: Username for aws service broker
     Value: !Ref BrokerUser
-  # BrokerIAMSecretKey:
-  #   Value: !GetAtt BrokerUser.SecretAccessKey
   OpsManager:
     Description: Url For Logging into OpsManager
     Value: !Sub https://opsman.${Domain}
