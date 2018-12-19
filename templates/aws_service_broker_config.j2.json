@@ -11,7 +11,7 @@
     "value": "{{aws_region}}"
   },
   ".properties.s3_region": {
-    "value": "{{aws_s3_region}}"
+    "value": "us-east-1"
   },
   ".properties.tls_cert": {
     "value": "{{cert}}"
