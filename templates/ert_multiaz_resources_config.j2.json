@@ -1,7 +1,6 @@
 {
   "cloud_controller": {"instances": 2},
   "cloud_controller_worker": {"instances": 2},
-  "consul_server": {"instances": 3},
   "diego_brain": {"instances": 2},
   "diego_cell": {"instances": 3},
   "diego_database": {"instances": 3},

@@ -109,7 +109,16 @@ resources:
     api_token: ((pivnet_token))
     copy_metadata: true
     product_slug: elastic-runtime
-    product_version: 2\.3\.2\.*
+    product_version: 2\.4\.1\.*
+
+- name: aws-broker-tile
+  type: github-release
+  source:
+    owner: awslabs
+    repository: aws-servicebroker
+    access_token: ((github_access_token))
+    pre_release: true
+    version: v1.0.0-beta.3
 
 - name: opsman-tile
   type: pivnet
@@ -117,7 +126,7 @@ resources:
     api_token: ((pivnet_token))
     copy_metadata: true
     product_slug: ops-manager
-    product_version: 2\.3\.4\.*
+    product_version: 2\.4\.1\.*
 
 - name: packer-result
   type: s3
@@ -179,7 +188,7 @@ resources:
     owner: pivotal-cf
     repository: om
     access_token: ((github_access_token))
-    version: v0.0.24
+    version: v0.42.0
 
 - name: version
   type: semver
@@ -412,6 +421,11 @@ jobs:
     trigger: true
     params:
       globs: []
+  - get: aws-broker-tile
+    trigger: true
+    params:
+      globs:
+        - aws-service-broker-*-tile.pivotal
   - task: build-release
     config:
       platform: linux
@@ -425,6 +439,7 @@ jobs:
       - name: om-release
       - name: quickstart-repo
       - name: ert-tile
+      - name: aws-broker-tile
       outputs:
       - name: output
       params:
