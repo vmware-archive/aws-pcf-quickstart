@@ -25,6 +25,14 @@ resource_types:
 
 
 resources:
+- name: quickstart-ci-image
+  type: docker-image
+  source:
+    email: ((docker-hub-email))
+    username: ((docker-hub-username))
+    password: ((docker-hub-password))
+    repository: cfplatformeng/quickstart-ci
+
 - name: ubuntu-ami
   type: ami
   check_every: 1h
@@ -241,6 +249,14 @@ jobs:
 #             #   ((slack_hook))
 #             exit 1
 #           fi
+- name: build-quickstart-ci
+  public: true
+  serial: true
+  plan:
+  - get: quickstart-repo
+  - put: quickstart-ci-image
+    params:
+      build: ci
 
 - name: unit-test
   plan:
