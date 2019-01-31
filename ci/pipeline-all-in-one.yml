@@ -256,7 +256,7 @@ jobs:
   - get: quickstart-repo
   - put: quickstart-ci-image
     params:
-      build: ci
+      build: quickstart-repo/ci/docker
 
 - name: unit-test
   plan:
