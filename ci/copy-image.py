@@ -60,7 +60,7 @@ def main(argv):
         destination_regions = yaml.load(opsman_mapping_file)
 
     for destination_region in destination_regions:
-        if destination_region.startswith("us-gov"):
+        if destination_region.startswith(("us-gov", "cn-north")):
             continue
         if source_region == destination_region:
             continue
