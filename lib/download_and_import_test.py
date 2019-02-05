@@ -49,7 +49,7 @@ class TestDownloadAndImport(unittest.TestCase):
 
         self.assertEqual(mock_do_pivnet_download.mock_calls[0][1][0], 'stemcells-ubuntu-xenial')
         self.assertEqual(mock_do_pivnet_download.mock_calls[1][1][0], 'stemcells')
-        self.assertEqual(mock_do_pivnet_download.mock_calls[2][1][0], 'srt')
+        self.assertEqual(mock_do_pivnet_download.mock_calls[2][1][0], 'cf')
 
     @patch('util.exponential_backoff_cmd')
     @patch('download_and_import.do_pivnet_download')
@@ -87,14 +87,14 @@ class TestDownloadAndImport(unittest.TestCase):
     @patch('glob.glob')
     def test_do_pivnet_download_success(self, mock_os_listdir, mock_verify_sha256, mock_util):
         mock_util.return_value = "", "", 0
-        mock_os_listdir.return_value = ['/home/ubuntu/tiles/srt-1.9.0.pivotal']
+        mock_os_listdir.return_value = ['/home/ubuntu/tiles/cf-1.9.0.pivotal']
         mock_verify_sha256.return_value = 0
 
         download_and_import.do_pivnet_download(
-            'srt', '1.9.0', 'srt*.pivotal', 'xyz123', '/home/ubuntu/tiles/')
+            'cf', '1.9.0', 'cf*.pivotal', 'xyz123', '/home/ubuntu/tiles/')
 
         mock_verify_sha256.assert_called_with(
-            '/home/ubuntu/tiles/srt-1.9.0.pivotal', 'xyz123')
+            '/home/ubuntu/tiles/cf-1.9.0.pivotal', 'xyz123')
 
     def test_verify_sha256_match(self):
         with tempfile.TemporaryDirectory() as temp_dir:
