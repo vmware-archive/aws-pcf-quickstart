@@ -14,7 +14,7 @@ with open(metadata_file_path, 'r') as metadata_ert_raw:
     ert_product_files = metadata_ert.get("ProductFiles")
     ert_tile_product_file = None
     for product_file in ert_product_files:
-        if product_file.get("File") == "Small Footprint PAS":
+        if product_file.get("File") == "Pivotal Application Service":
             ert_tile_product_file = product_file
     if not ert_tile_product_file:
         print("Unable to find ert tile in product ert release file list")
