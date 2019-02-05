@@ -49,7 +49,7 @@ class TestDownloadAndImport(unittest.TestCase):
 
         self.assertEqual(mock_do_pivnet_download.mock_calls[0][1][0], 'stemcells-ubuntu-xenial')
         self.assertEqual(mock_do_pivnet_download.mock_calls[1][1][0], 'stemcells')
-        self.assertEqual(mock_do_pivnet_download.mock_calls[2][1][0], 'cf')
+        self.assertEqual(mock_do_pivnet_download.mock_calls[2][1][0], 'srt')
 
     @patch('util.exponential_backoff_cmd')
     @patch('download_and_import.do_pivnet_download')
@@ -91,7 +91,7 @@ class TestDownloadAndImport(unittest.TestCase):
         mock_verify_sha256.return_value = 0
 
         download_and_import.do_pivnet_download(
-            'cf', '1.9.0', 'srt*.pivotal', 'xyz123', '/home/ubuntu/tiles/')
+            'srt', '1.9.0', 'srt*.pivotal', 'xyz123', '/home/ubuntu/tiles/')
 
         mock_verify_sha256.assert_called_with(
             '/home/ubuntu/tiles/srt-1.9.0.pivotal', 'xyz123')
