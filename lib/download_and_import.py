@@ -89,9 +89,9 @@ def download_assets(my_settings: settings.Settings, path: str):
     if exit_code != 0:
         return out, err, exit_code
     return do_pivnet_download(
-        'srt',
+        'cf',
         my_settings.ert_release_version,
-        'srt*.pivotal',
+        'cf*.pivotal',
         my_settings.ert_release_sha256,
         path
     )
