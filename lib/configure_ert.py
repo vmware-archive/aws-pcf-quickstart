@@ -67,8 +67,13 @@ def configure_ert_resources(my_settings: Settings):
         "pcf_elb_ssh_name": my_settings.pcf_pcfelbsshname,
         "pcf_elb_web_name": my_settings.pcf_pcfelbwebname,
     }
-    with open("templates/ert_resources_config.j2.json", 'r') as f:
-        ert_resource_template = Template(f.read())
+    if my_settings.pcf_pcfdeploymentsize == "SmallFootPrint":
+        with open("templates/ert_resources_smallfootprint_config.j2.json", 'r') as f:
+            ert_resource_template = Template(f.read())
+    else:
+        with open("templates/ert_resources_config.j2.json", 'r') as f:
+            ert_resource_template = Template(f.read())
+
     ert_resource_config = om_manager.format_om_json_str(
         ert_resource_template.render(ert_resource_ctx))
     cmd = om_manager.get_om_with_auth(my_settings) + [
@@ -79,7 +84,10 @@ def configure_ert_resources(my_settings: Settings):
 
 
 def configure_ert_multiaz_resources(my_settings: Settings):
-    if my_settings.pcf_pcfdeploymentsize == "Multi-AZ":
+    if my_settings.pcf_pcfdeploymentsize == "SmallFootPrint":
+        with open("templates/ert_smallfootprint_resources_config.j2.json", 'r') as f:
+            template = f.read()
+    elif my_settings.pcf_pcfdeploymentsize == "Multi-AZ":
         with open("templates/ert_multiaz_resources_config.j2.json", 'r') as f:
             template = f.read()
     else:

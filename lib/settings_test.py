@@ -59,7 +59,7 @@ param_json_doc = """
   "PcfAvailabilityZone2": "canada-1b",
   "PcfAvailabilityZone3": "canada-1c",
   "PcfOpsManagerAdminPassword": "monkey123",
-  "PcfDeploymentSize": "Starter"
+  "PcfDeploymentSize": "SmallFootPrint"
 }
 """
 
@@ -106,6 +106,12 @@ class TestSettings(unittest.TestCase):
     "sha256": "70070bf22231d9971c97b8deb8c4cd5ba990d24101e5398d0ccc70778060dbea",
     "version": "1.10.8",
     "id": 5334
+  },
+  "smallfootprint": {
+    "id": 259105,
+    "version": "2.4.1",
+    "releaseDate": "2018-12-26",
+    "sha256": "9756289d1b4f7c9ad565755395cad98dce77917432221ea6c789719696521887"
   }
 }
 """
@@ -155,7 +161,7 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(self.settings.pcf_pcfavailabilityzone1, "canada-1a")
         self.assertEqual(self.settings.pcf_pcfavailabilityzone2, "canada-1b")
         self.assertEqual(self.settings.pcf_pcfavailabilityzone3, "canada-1c")
-        self.assertEqual(self.settings.pcf_pcfdeploymentsize, "Starter")
+        self.assertEqual(self.settings.pcf_pcfdeploymentsize, "SmallFootPrint")
 
     def test_default_values(self):
         self.assertEqual(self.settings.opsman_user, 'admin')

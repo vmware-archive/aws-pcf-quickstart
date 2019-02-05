@@ -88,11 +88,20 @@ def download_assets(my_settings: settings.Settings, path: str):
     )
     if exit_code != 0:
         return out, err, exit_code
+
+    if my_settings.pcf_pcfdeploymentsize == "SmallFootPrint":
+        version = my_settings.srt_release_version
+        glob = "srt*.pivotal"
+        sha256 = my_settings.srt_release_sha256
+    else:
+        version = my_settings.ert_release_version
+        glob = "cf*.pivotal"
+        sha256 = my_settings.ert_release_sha256
     return do_pivnet_download(
         'cf',
-        my_settings.ert_release_version,
-        'cf*.pivotal',
-        my_settings.ert_release_sha256,
+        version,
+        glob,
+        sha256,
         path
     )
 

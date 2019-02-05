@@ -148,6 +148,7 @@ Parameters:
   DeploymentSize:
     Type: String
     AllowedValues:
+    - SmallFootPrint
     - Starter
     - Multi-AZ
     Description: Select the initial deployment size. Starter creates a single instance for most job VMs.

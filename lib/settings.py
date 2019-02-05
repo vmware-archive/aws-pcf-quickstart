@@ -261,11 +261,16 @@ class Settings:
 
     def parse_version_config(self, version_config):
         ert = version_config.get('ert')
+        srt = version_config.get('smallfootprint')
         stemcell = version_config.get('stemcell')
 
         self.ert_release_id = ert.get('id')
         self.ert_release_version = ert.get('version')
         self.ert_release_sha256 = ert.get('sha256')
+
+        self.srt_release_id = srt.get('id')
+        self.srt_release_version = srt.get('version')
+        self.srt_release_sha256 = srt.get('sha256')
 
         self.stemcell_release_id = stemcell.get('id')
         self.stemcell_release_version = stemcell.get('version')
