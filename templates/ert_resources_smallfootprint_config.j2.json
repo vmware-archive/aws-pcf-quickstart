@@ -1,4 +1,5 @@
 {
   "router": {"elb_names": ["{{pcf_elb_web_name}}"]},
-  "tcp_router": {"elb_names": ["{{pcf_elb_tcp_name}}"]}
+  "tcp_router": {"elb_names": ["{{pcf_elb_tcp_name}}"]},
+  "control": {"elb_names": ["{{pcf_elb_ssh_name}}"]}
 }
