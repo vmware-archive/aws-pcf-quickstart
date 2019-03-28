@@ -375,7 +375,7 @@ jobs:
         - -exc
         - |
           mkdir -p output
-          pip install PyYAML
+          pip install 'PyYAML==3.13'
           ./quickstart-repo/ci/copy-image.py
   - put: ami-mapping
     params:
@@ -416,7 +416,7 @@ jobs:
         - -exc
         - |
           pushd quickstart-repo
-          pip install jinja2 PyYAML
+          pip install jinja2 'PyYAML==3.13'
           python3 ci/instantiate-quickstart-template.py
           popd
           cp quickstart-repo/cloudformation/pivotal-cloudfoundry.template output
