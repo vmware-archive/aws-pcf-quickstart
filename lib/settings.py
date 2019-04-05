@@ -215,7 +215,7 @@ class Settings:
 
     @property
     def aws_broker_release_url(self):
-        return "https://github.com/awslabs/aws-servicebroker/releases/download/v1.0.0-beta.3/aws-service-broker-1.0.0-beta.3-tile.pivotal"
+        return "https://github.com/awslabs/aws-servicebroker/releases/download/v1.0.0-beta.4/aws-service-broker-1.0.0-beta.4-tile.pivotal"
 
     @property
     def resources_created(self):
