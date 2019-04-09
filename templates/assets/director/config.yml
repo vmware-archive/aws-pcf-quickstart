@@ -1,0 +1,139 @@
+properties-configuration:
+  director_configuration:
+    allow_legacy_agents: true
+    blobstore_type: local
+    bosh_recreate_on_next_deploy: false
+    bosh_recreate_persistent_disks_on_next_deploy: false
+    database_type: internal
+    director_worker_count: 5
+    encryption:
+      keys: []
+      providers: []
+    hm_emailer_options:
+      enabled: false
+    hm_pager_duty_options:
+      enabled: false
+    identification_tags: {}
+    keep_unreachable_vms: false
+    local_blobstore_options:
+      tls_enabled: true
+    ntp_servers_string: 0.amazon.pool.ntp.org, 1.amazon.pool.ntp.org, 2.amazon.pool.ntp.org, 3.amazon.pool.ntp.org
+    post_deploy_enabled: false
+    resurrector_enabled: false
+    retry_bosh_deploys: false
+    skip_director_drain: true
+  iaas_configuration:
+    access_key_id: ((PcfIamUserAccessKey))
+    secret_access_key: ((PcfIamUserSecretAccessKey))
+    vpc_id: ((PcfVpc))
+    security_group: ((PcfVmsSecurityGroupId))
+    key_pair_name: ((PCFKeyPair))
+    ssh_private_key: |
+      -----BEGIN RSA PRIVATE KEY-----
+      MIIEogIBAAKCAQEAp7wSH9MJpNfFIf3s0XLznThzsZVlTJJKoab4udu8DkVLzuax
+      jhZvEczLmInHxEF/IPAUjtnnm4xDZqc/+j9AZiITiB1VgzkTZHsX0VBf0i4M2wEz
+      mB2XgN7tlBjcEGRZcBjRxBR/nFpR8hEokJ52wcB4cv0HmILb4LmE+dEeIza01lvh
+      qHZnb2R/5u4e4vU08PhDuPMNZ+HH8FJkM2afMHSFh4gSIM5lWQTaANsVeLBA5CcO
+      HpmZcY77dP9I/+3G/YBpr0GlWWIdjrfA0ZlxhrlOblPvCXo71eFdBKfpMrZcVr04
+      yWK/R+6M8Gv7V5r0TVVI5iNulGZ8VO+4O9rAYwIDAQABAoIBADx3Lq1sPTjAU58a
+      U2l5n9pYRFSK/3Zn8iFt+JG/ZX5beqV+QhlveuCWy/oUCQB1f+eWxEJuyPAo0w9J
+      UWXbsVJgDFxv/qiMRbJeMUrSR4iT8yxrtXarjDb3pftSLtp14kvnlo6xuQLbCFlT
+      2CSyCytzP7hsAHX5DlxnZElOGigk9gUMWuILWzZ2vOiaTrAYuzla3RLGPrgbDCge
+      ZuZ35PoAJzgn6DPFbONP4tZfBpmxfj9JS48NW8jo+nTZuBKzESBHsXiQAdo72lwi
+      ihtPBsmas//1EW3rSmKMoKL98vSbswewxqcFX7HjwYFSlqGqmbCS8j/0/bajiIo6
+      t2hn3eECgYEA0uj3c/0WKz2QeLvx14tGfYBKQkUmgYjIqpp7LtR3PD3I5a/YBUAM
+      xpiQCpaZMmhmbjnVv9u938N14aiRDA7eSFPILy2aR/slKotOO5SZZM7WsKqv6zmP
+      hM3xzGljxbKK8R+nzZdti6754Um7yhOQGmS5fajTCrwJZKwgCRc+rZMCgYEAy5gh
+      eT+vdEXU/QWRBWEo0BoWpOJuT7TRkpbysDV6l21+rKLv0O/Shydjw3tbp71cD31z
+      Zbpm1uFPu1fa8gcqFpGcjl/JQVJuGEdEp2JUJYwq5YNOhpHwJr2nsBQMaOjvgrbU
+      xH8kZ/nKwK7TNv7JgaMI4bFVDZV9/Q9GBFhQ4/ECgYBvFqQX5MtDdUbeQOguBr7X
+      JbZ3V2LjwX8oVPvi+6feBBEH4enfQhA4nmzoFtCUO2cQUcgjKQPGk3ZIqHfVqRMt
+      d2uuZc+ocEDwOrW3LhrpfQSZwx2rwQK2CZ99cllJ7TO/s1O4NzVM6JnXLvYJhupU
+      7I7DACRAuDAeZYbuIt8xnwKBgEBVaTZsJmAidOQjLyk5A3GG3OLrXho3tAWTR0rh
+      C0TwZ5fbwNYQAkGM89xgjZzanE2UwbNCjJ6YAd7cKyZRlz4ccxEWOX03s+xeENan
+      npliymdN77FcSjujsGpWW3mHKa/vYBpbZsCoUSZD2CBHsJsTTooqxAqP04j0m5Zh
+      5eWxAoGASYklDn3xIrdpYIgD4Y1IBm15OPdl9Xq3mrdujKI8pVsfvAh5i0+3NRS8
+      woDjOGkQgamgi9MCNlTbQJPb4jlYqmtJK39+dtQqgD8t8uicSLJwcMud9uM2WplP
+      Y16bYc9f3SzjDwV3GeDcQar5N8Gpc5xtuRKYaC13jzaNgAHLJq8=
+      -----END RSA PRIVATE KEY-----
+
+    region: ((Region))
+    encrypted: false
+network-assignment:
+  network:
+    name: pcf-management-network
+  other_availability_zones: []
+  singleton_availability_zone:
+    name: eu-central-1a
+networks-configuration:
+  icmp_checks_enabled: false
+  networks:
+  - name: pcf-management-network
+    subnets:
+    - iaas_identifier: ((PcfManagementSubnetAZ1))
+      cidr: 10.0.16.0/28
+      dns: 169.254.169.253
+      gateway: 10.0.16.1
+      reserved_ip_ranges: 10.0.16.0-10.0.16.4
+      availability_zone_names:
+      - ((PcfAvailabilityZone1))
+    - iaas_identifier: ((PcfManagementSubnetAZ2))
+      cidr: 10.0.16.16/28
+      dns: 169.254.169.253
+      gateway: 10.0.16.17
+      reserved_ip_ranges: 10.0.16.16-10.0.16.20
+      availability_zone_names:
+      - ((PcfAvailabilityZone2))
+    - iaas_identifier: ((PcfManagementSubnetAZ3))
+      cidr: 10.0.16.32/28
+      dns: 169.254.169.253
+      gateway: 10.0.16.33
+      reserved_ip_ranges: 10.0.16.32-10.0.16.36
+      availability_zone_names:
+      - ((PcfAvailabilityZone3))
+  - name: pcf-ert-network
+    subnets:
+    - iaas_identifier: ((PcfERTSubnetAZ1))
+      cidr: 10.0.4.0/24
+      dns: 169.254.169.253
+      gateway: 10.0.4.1
+      reserved_ip_ranges: 10.0.4.0-10.0.4.4
+      availability_zone_names:
+      - ((PcfAvailabilityZone1))
+    - iaas_identifier: ((PcfERTSubnetAZ2))
+      cidr: 10.0.5.0/24
+      dns: 169.254.169.253
+      gateway: 10.0.5.1
+      reserved_ip_ranges: 10.0.5.0-10.0.5.4
+      availability_zone_names:
+      - ((PcfAvailabilityZone2))
+    - iaas_identifier: ((PcfERTSubnetAZ3))
+      cidr: 10.0.6.0/24
+      dns: 169.254.169.253
+      gateway: 10.0.6.1
+      reserved_ip_ranges: 10.0.6.0-10.0.6.4
+      availability_zone_names:
+      - ((PcfAvailabilityZone3))
+  - name: pcf-services-network
+    subnets:
+    - iaas_identifier: ((PcfServicesSubnetAZ1))
+      cidr: 10.0.8.0/24
+      dns: 169.254.169.253
+      gateway: 10.0.8.1
+      reserved_ip_ranges: 10.0.8.0-10.0.8.3
+      availability_zone_names:
+      - ((PcfAvailabilityZone1))
+    - iaas_identifier: ((PcfServicesSubnetAZ2))
+      cidr: 10.0.9.0/24
+      dns: 169.254.169.253
+      gateway: 10.0.9.1
+      reserved_ip_ranges: 10.0.9.0-10.0.9.3
+      availability_zone_names:
+      - ((PcfAvailabilityZone2))
+    - iaas_identifier: ((PcfServicesSubnetAZ3))
+      cidr: 10.0.10.0/24
+      dns: 169.254.169.253
+      gateway: 10.0.10.1
+      reserved_ip_ranges: 10.0.10.0-10.0.10.3
+      availability_zone_names:
+      - ((PcfAvailabilityZone3))

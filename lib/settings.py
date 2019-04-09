@@ -21,8 +21,12 @@ import os
 import boto3
 
 metadata_file = "/var/local/cloudformation/stack-meta.json"
+{"StackName":"pcf-int-1553858164","StackId":"arn:aws:cloudformation:eu-central-1:363025084753:stack/pcf-int-1553858164/0b3d2190-5214-11e9-bfc1-021298c8e4cc","Region":"eu-central-1"}
+
 version_config_file_path = "/var/local/version_config.json"
-resource_created_file = "/home/ubuntu/quickstart/state/resource_created"
+
+
+resource_created_file = "/home/ubuntu/quickstart/state/resource_created" << empty
 
 
 class Settings:

@@ -1,0 +1,31 @@
+network-assignment:
+  network:
+    name: pcf-net
+networks-configuration:
+  icmp_checks_enabled: false
+  networks:
+  - name: pcf-net
+    subnets:
+    - cidr: 10.0.0.0/24
+      dns: 168.63.129.16
+      gateway: 10.0.0.1
+      iaas_identifier: pcf-net/pcf
+      reserved_ip_ranges: 10.0.0.0-10.0.0.9
+properties-configuration:
+  director_configuration:
+    max_threads: 5
+    ntp_servers_string: us.pool.ntp.org
+    resurrector_enabled: true
+    retry_bosh_deploys: true
+  iaas_configuration:
+    bosh_storage_account_name: bosh_storage_account_name_test
+    client_id: client_id_test
+    client_secret: client_secret_test
+    cloud_storage_type: managed_disks
+    default_security_group: opsmgr-nsg
+    resource_group_name: resource_group_name_test
+    ssh_private_key: opsman_ssh_key_private_key_test
+    ssh_public_key: opsman_ssh_key_public_key_test
+    storage_account_type: Premium_LRS
+    subscription_id: subscription_id_test
+    tenant_id: tenant_id_test

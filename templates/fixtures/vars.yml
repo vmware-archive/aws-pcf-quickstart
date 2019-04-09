@@ -1,0 +1,20 @@
+{
+  "client_id": "client_id_test",
+  "client_secret": "client_secret_test",
+  "subscription_id": "subscription_id_test",
+  "tenant_id": "tenant_id_test",
+  "resource_group_name": "resource_group_name_test",
+  "location": "location_test",
+  "bosh_storage_account_name": "bosh_storage_account_name_test",
+  "opsman_fqdn": "opsman_fqdn_test",
+  "opsman_password": "opsman_password_test",
+  "pivnet_api_token": "pivnet_api_token_test",
+  "domain": "domain_test",
+  "default_security_group": "default_security_group_test",
+  "lb_ip": "lb_ip_test",
+  "web_lb_name": "web_lb_name_test",
+  "sqlserver_admin_login": "sqlserver_admin_login_test",
+  "sqlserver_admin_password": "sqlserver_admin_password_test",
+  "sqlserver_dbname": "sqlserver_dbname_test",
+  "sqlserver_fqdn": "sqlserver_fqdn_test"
+}
