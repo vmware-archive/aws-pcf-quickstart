@@ -1,31 +1,147 @@
+az-configuration:
+- name: availability_zone1_test
+- name: availability_zone2_test
+- name: availability_zone3_test
+properties-configuration:
+  director_configuration:
+    allow_legacy_agents: true
+    blobstore_type: s3
+    s3_blobstore_options:
+      endpoint: https://s3.region_test.amazonaws.com
+      bucket_name: opsman_bucket_test
+      access_key:  client_id_test
+      secret_key: client_secret_test
+      signature_version: "4"
+      region: region_test
+    bosh_recreate_on_next_deploy: false
+    bosh_recreate_persistent_disks_on_next_deploy: false
+    database_type: internal
+    director_worker_count: 5
+    encryption:
+      keys: []
+      providers: []
+    hm_emailer_options:
+      enabled: false
+    hm_pager_duty_options:
+      enabled: false
+    identification_tags: {}
+    keep_unreachable_vms: false
+    ntp_servers_string: 0.amazon.pool.ntp.org, 1.amazon.pool.ntp.org, 2.amazon.pool.ntp.org, 3.amazon.pool.ntp.org
+    post_deploy_enabled: false
+    resurrector_enabled: false
+    retry_bosh_deploys: false
+    skip_director_drain: true
+  iaas_configuration:
+    access_key_id: client_id_test
+    secret_access_key: client_secret_test
+    vpc_id: vpc_test
+    security_group: security_group_test
+    key_pair_name: test-key
+    ssh_private_key: |
+      -----BEGIN RSA PRIVATE KEY-----
+      MIIEpAIBAAKCAQEAn/GiDLFCB+dkencNOjD4TZNCwVrw5c3KFdXfRyax6gMLM9eV
+      uGzzp3E03w+C8ko0lS8G1bHlL+dntHyl4+SsxDpBG/qAVXERKMij3tj2vQXQeTnY
+      5SkndhkKN5x2B7C+IjqR3jKdEJuQnZVoi0t77xGUvXy8SPfs3gJEyPDDmY45sJNH
+      6j2sdzbvb5se8J2SEUn7kKiqWcwayLB/fXlOqtvNSG36Je8i9yf59p6bvwqrzLWh
+      8n4H2Z4aAa6iy0LZey9Ge+YUbE2ICV6ZEPow13CO6TG1Svp5m1t68xYTI4bnbJei
+      LWm0JWMgui80UxRnmlo/VYvewJIPdOkoWkJ5cQIDAQABAoIBAHw6uwout8HZ2TJB
+      u/Vhycq/QY9bKlbj0z3Ig4cJKBFB0favUSwQ++MnS9ChhKzaNCNXhnB+nyvpCaSn
+      WFY87G/xa1bm57z1eEV8KcPSMzs4A+fUpYHAyFSzODtffFGW1udRJLE4EMSwf8/W
+      F4Bx3c4fkq7m7nuijckWbATC9LoUAqYCBLI9UwS1qtjSZeKNEWRHlu/shPAmQcCD
+      HNxb678NmaGPUSwCH8Pn72DkpTvexuC6SW+E0v03Ik4uAKM5mQi7/gq37rj09/x/
+      PIhXrkHuzN3m+zCOBET8e3XBWbEHzA44gtNa5aNKP+c9Y5+5PiP1Eplp9HSGOzP2
+      L8TKcAECgYEAybTSiRoycEhnO5QUBfzpIYwPy5vd/whZSzLjYKz/c3a76FE6AqtF
+      CkGOASKaROSE65D+8zQajXmWFZHZgFZkXId0mlPA1MEZNkTNyUrm9tTwcoHIo3/R
+      yRa/BZ26Z0jmIWrryV2bUKcdyFfVQXiSdukETJrnawuqQ7z2byTedwECgYEAyv8L
+      LbmJybQgUUIU1gyUUYiv/VXDC7GhZD5f8fjNDvGh1GddJucSYfGtKrp/sbaMeecb
+      ZBYr5zI4T1MelOEONB4vciwCDq9nwMeKtL/DLeQzCjW7pzFKVJ6y4ErttMiudRjb
+      okasDz5cV7pZsV48xQdHOE4j5ZwokV/HnWCR8nECgYEAgO1FjUDjcIW3Bov16IXp
+      9flytzBfy33opXpXgBnUBlekcDBLJh2XOaEBRZR6iwKOO4woigeJ2VgYKJ1bKv8N
+      k185ltNl9BehJ+D+sGViD++36Vkvh+JRk3kojExvM0mTX1TadZGRjxHipYYO15Rb
+      +gmjJ9vzg6anJDkKQ6yLTgECgYAUopR6U3AERwE6AWOo1qKFH0X0lLE9ERN84zJR
+      oJ8Hs9xlgRRhDgA6YJzfyRGN+SaShcGtDOvtlpdOyP5E2BPfjGn6SyryXzZGzIH3
+      Gb83fQkLMqceuc36iB9a2YMMa5IAaUR6XIDFE+vDJzhS5Wd8B99fg+H2R0eAb6IV
+      B2oOoQKBgQCE20zI+ZaS8EO38ns9YUnqHwiK2KHfpXaWaIekpYPzwXOc0ln9phc9
+      HVyz/mOR3Z5tvohkb6tPQk/Wl1QJBgqTDFbxsdeP0NUik6UIXo7XwiaL2lrhpz6I
+      26RO1q6s5OLd19yWfmaLLulok/vU7RlX3sdVGLwDjJxJHMew8nRNNA==
+      -----END RSA PRIVATE KEY-----
+    region: region_test
+    encrypted: false
 network-assignment:
   network:
-    name: pcf-net
+    name: pcf-management-network
+  other_availability_zones: []
+  singleton_availability_zone:
+    name: availability_zone1_test
 networks-configuration:
   icmp_checks_enabled: false
   networks:
-  - name: pcf-net
+  - name: pcf-management-network
     subnets:
-    - cidr: 10.0.0.0/24
-      dns: 168.63.129.16
-      gateway: 10.0.0.1
-      iaas_identifier: pcf-net/pcf
-      reserved_ip_ranges: 10.0.0.0-10.0.0.9
-properties-configuration:
-  director_configuration:
-    max_threads: 5
-    ntp_servers_string: us.pool.ntp.org
-    resurrector_enabled: true
-    retry_bosh_deploys: true
-  iaas_configuration:
-    bosh_storage_account_name: bosh_storage_account_name_test
-    client_id: client_id_test
-    client_secret: client_secret_test
-    cloud_storage_type: managed_disks
-    default_security_group: opsmgr-nsg
-    resource_group_name: resource_group_name_test
-    ssh_private_key: opsman_ssh_key_private_key_test
-    ssh_public_key: opsman_ssh_key_public_key_test
-    storage_account_type: Premium_LRS
-    subscription_id: subscription_id_test
-    tenant_id: tenant_id_test
+    - iaas_identifier: mgm_subnet1_test
+      cidr: 10.0.16.0/28
+      dns: 169.254.169.253
+      gateway: 10.0.16.1
+      reserved_ip_ranges: 10.0.16.0-10.0.16.4
+      availability_zone_names:
+      - availability_zone1_test
+    - iaas_identifier: mgm_subnet2_test
+      cidr: 10.0.16.16/28
+      dns: 169.254.169.253
+      gateway: 10.0.16.17
+      reserved_ip_ranges: 10.0.16.16-10.0.16.20
+      availability_zone_names:
+      - availability_zone2_test
+    - iaas_identifier: mgm_subnet3_test
+      cidr: 10.0.16.32/28
+      dns: 169.254.169.253
+      gateway: 10.0.16.33
+      reserved_ip_ranges: 10.0.16.32-10.0.16.36
+      availability_zone_names:
+      - availability_zone3_test
+  - name: pcf-ert-network
+    subnets:
+    - iaas_identifier: ert_subnet1_test
+      cidr: 10.0.4.0/24
+      dns: 169.254.169.253
+      gateway: 10.0.4.1
+      reserved_ip_ranges: 10.0.4.0-10.0.4.4
+      availability_zone_names:
+      - availability_zone1_test
+    - iaas_identifier: ert_subnet2_test
+      cidr: 10.0.5.0/24
+      dns: 169.254.169.253
+      gateway: 10.0.5.1
+      reserved_ip_ranges: 10.0.5.0-10.0.5.4
+      availability_zone_names:
+      - availability_zone2_test
+    - iaas_identifier: ert_subnet3_test
+      cidr: 10.0.6.0/24
+      dns: 169.254.169.253
+      gateway: 10.0.6.1
+      reserved_ip_ranges: 10.0.6.0-10.0.6.4
+      availability_zone_names:
+      - availability_zone3_test
+  - name: pcf-services-network
+    subnets:
+    - iaas_identifier: service_subnet1_test
+      cidr: 10.0.8.0/24
+      dns: 169.254.169.253
+      gateway: 10.0.8.1
+      reserved_ip_ranges: 10.0.8.0-10.0.8.3
+      availability_zone_names:
+      - availability_zone1_test
+    - iaas_identifier: service_subnet2_test
+      cidr: 10.0.9.0/24
+      dns: 169.254.169.253
+      gateway: 10.0.9.1
+      reserved_ip_ranges: 10.0.9.0-10.0.9.3
+      availability_zone_names:
+      - availability_zone2_test
+    - iaas_identifier: service_subnet3_test
+      cidr: 10.0.10.0/24
+      dns: 169.254.169.253
+      gateway: 10.0.10.1
+      reserved_ip_ranges: 10.0.10.0-10.0.10.3
+      availability_zone_names:
+      - availability_zone3_test
