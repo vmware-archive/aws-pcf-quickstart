@@ -20,7 +20,7 @@ RUN mkdir -p /root/go/bin
 ENV PATH $PATH:/usr/local/go/bin:$GOPATH/bin
 RUN go get github.com/onsi/ginkgo
 RUN go install github.com/onsi/ginkgo/...
-RUN go get github.com/golang/lint/golint
+RUN go get -u golang.org/x/lint/golint
 
 # Cleanup
 RUN rm -rf /tmp/docker-build
