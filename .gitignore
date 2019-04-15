@@ -1,7 +1,6 @@
 .idea
 
 *.pyc
-vendor
 *_dev.sh
 env
 bin
