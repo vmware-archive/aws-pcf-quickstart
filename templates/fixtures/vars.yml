@@ -47,6 +47,8 @@
   "PcfServicesSubnetAZ2": "service_subnet2_test",
   "PcfServicesSubnetAZ3": "service_subnet3_test",
   "PcfVmsSecurityGroupId": "security_group_test",
-  "PcfVpc": "vpc_test"
+  "PcfVpc": "vpc_test",
+  "BrokerIamUserAccessKey": "broker_key_test",
+  "BrokerIamUserSecretAccessKey": "broker_secret_key_test"
 
 }
