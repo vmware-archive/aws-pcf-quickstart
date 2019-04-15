@@ -1,10 +1,18 @@
 package tiler
 
-func (c *Tiler) Delete() error {
-	err := c.client.ConfigureAuthentication()
-	if err != nil {
-		return err
-	}
+import (
+	"context"
 
-	return c.client.DeleteInstallation()
+	"github.com/starkandwayne/om-tiler/steps"
+)
+
+func (t *Tiler) Delete(ctx context.Context) error {
+	s := []steps.Step{
+		t.stepPollTillOnline(),
+		t.stepConfigureAuthentication(),
+		t.stepDeleteInstallation(),
+	}
+	s = append(s, t.callbacks[DeleteCallback]...)
+
+	return steps.Run(ctx, s)
 }

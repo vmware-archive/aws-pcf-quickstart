@@ -117,6 +117,7 @@ type PivnetFile struct {
 	Slug    string `yaml:"product_slug" validate:"required"`
 	Version string `yaml:"release_version" validate:"required"`
 	Glob    string `yaml:"file_glob" validate:"required"`
+	Url     string `yaml:"download_url"`
 }
 
 func mergeVars(target map[string]interface{}, source map[string]interface{}) {

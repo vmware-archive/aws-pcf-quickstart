@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"context"
 	"log"
 
 	"github.com/cf-platform-eng/aws-pcf-quickstart/config"
@@ -49,15 +50,12 @@ func (cmd *BuildCommand) run(c *kingpin.ParseContext) error {
 		return err
 	}
 
-	t, err := tiler.NewTiler(om, mover, cmd.logger)
-	if err != nil {
-		return err
-	}
+	t := tiler.NewTiler(om, mover, cmd.logger)
 
 	pattern, err := templates.GetPattern(cfg.Raw, cmd.varsStore, true)
 	if err != nil {
 		return err
 	}
 
-	return t.Build(pattern, cmd.skipApplyChanges)
+	return t.Build(context.Background(), pattern, cmd.skipApplyChanges)
 }
