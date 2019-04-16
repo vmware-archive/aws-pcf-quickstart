@@ -6,13 +6,10 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/google/uuid"
-
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudformation"
 	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/aws/aws-sdk-go/service/ssm"
 )
 
@@ -60,43 +57,6 @@ func (c *Client) GetStackInputs() (map[string]interface{}, error) {
 		}
 	}
 	return out, nil
-}
-
-func (c *Client) SignalResource(ctx context.Context, resourceId string, success bool) error {
-	status := "success"
-	if !success {
-		status = "failure"
-	}
-	id := uuid.New().String()
-	service := cloudformation.New(c.session)
-	request := cloudformation.SignalResourceInput{
-		LogicalResourceId: &resourceId,
-		StackName:         &c.stackName,
-		Status:            &status,
-		UniqueId:          &id,
-	}
-	_, err := service.SignalResourceWithContext(ctx, &request)
-	return err
-}
-
-func (c *Client) ReceiveMessage(ctx context.Context, queueUrl string) error {
-	service := sqs.New(c.session)
-	all := "All"
-	id := uuid.New().String()
-	var max int64 = 10
-	var visibility int64 = 1
-	request := sqs.ReceiveMessageInput{
-		AttributeNames:        []*string{&all},
-		MessageAttributeNames: []*string{&all},
-
-		QueueUrl:                &queueUrl,
-		ReceiveRequestAttemptId: &id,
-		MaxNumberOfMessages:     &max,
-		VisibilityTimeout:       &visibility,
-	}
-	_, err := service.ReceiveMessageWithContext(ctx, &request)
-	// TODO return repsonse
-	return err
 }
 
 func (c *Client) GetRawSSMParameters() (map[string]interface{}, error) {
