@@ -228,7 +228,7 @@ Mappings:
     {{ami_mapping | indent}}
 Resources:
   ResourceGroup:
-    Type: AWS::Inspector::ResourceGroup
+    Type: AWS::Inspector::CreateResourceGroup
     Properties:
       ResourceGroupTags:
         - Key: aws:cloudformation:stack-name
