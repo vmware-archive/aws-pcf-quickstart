@@ -228,11 +228,11 @@ Mappings:
     {{ami_mapping | indent}}
 Resources:
   ResourceGroup:
-    Type: "AWS::Inspector::ResourceGroup"
+    Type: AWS::Inspector::ResourceGroup
     Properties:
       ResourceGroupTags:
-        - Key: stackname
-          Value: ${AWS::StackName}
+        - Key: aws:cloudformation:stack-name
+          Value: !Sub ${AWS::StackName}
   PCFBase:
     Type: AWS::CloudFormation::Stack
     Properties:
