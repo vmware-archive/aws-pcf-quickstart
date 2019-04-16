@@ -232,7 +232,7 @@ Resources:
     Properties:
       ResourceGroupTags:
         - Key: "${AWS::StackName}"
-          Value: "${AWS::StackId}"
+          Value: "${AWS::StackName}"
   PCFBase:
     Type: AWS::CloudFormation::Stack
     Properties:
