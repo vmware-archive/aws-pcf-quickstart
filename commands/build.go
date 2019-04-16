@@ -33,7 +33,7 @@ func (cmd *BuildCommand) register(app *kingpin.Application) {
 }
 
 func (cmd *BuildCommand) run(c *kingpin.ParseContext) error {
-	cfg, err := config.LoadConfig(cmd.metadataFile)
+	cfg, err := config.LoadConfig(cmd.metadataFile, cmd.logger)
 	if err != nil {
 		return err
 	}

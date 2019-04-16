@@ -4,11 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/cloudformation"
-	"github.com/aws/aws-sdk-go/service/ssm"
+	"github.com/cf-platform-eng/aws-pcf-quickstart/aws"
 	"github.com/starkandwayne/om-tiler/opsman"
 	"github.com/starkandwayne/om-tiler/pivnet"
 )
@@ -18,6 +16,7 @@ type Config struct {
 	Raw    map[string]interface{}
 	Opsman opsman.Config
 	Pivnet pivnet.Config
+	Aws    aws.Config
 }
 
 type MetaData struct {
@@ -40,7 +39,7 @@ const (
 	MetadataFile = "/var/local/cloudformation/stack-meta.json"
 )
 
-func LoadConfig(metadataFile string) (*Config, error) {
+func LoadConfig(metadataFile string, logger *log.Logger) (*Config, error) {
 	if metadataFile == "" {
 		metadataFile = MetadataFile
 	}
@@ -59,7 +58,18 @@ func LoadConfig(metadataFile string) (*Config, error) {
 		return nil, err
 	}
 
-	parameters, err := getRawSSMParameters(md)
+	awsConfig := aws.Config{
+		StackID:   md.StackID,
+		StackName: md.StackName,
+		Region:    md.Region,
+	}
+
+	ac, err := aws.NewClient(awsConfig, logger)
+	if err != nil {
+		return nil, err
+	}
+
+	parameters, err := ac.GetRawSSMParameters()
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +77,7 @@ func LoadConfig(metadataFile string) (*Config, error) {
 		raw[k] = v
 	}
 
-	inputs, err := getStackInputs(md)
+	inputs, err := ac.GetStackInputs()
 	if err != nil {
 		return nil, err
 	}
@@ -94,57 +104,9 @@ func LoadConfig(metadataFile string) (*Config, error) {
 			SkipSSLVerification:  c.SkipSSLValidation == "true",
 		},
 		Pivnet: GetPivnetConfig(c.PivnetToken),
+		Aws:    awsConfig,
 		Raw:    raw,
 	}, nil
-}
-
-func getStackInputs(md MetaData) (map[string]interface{}, error) {
-	session, err := session.NewSession(&aws.Config{
-		Region: aws.String(md.Region)},
-	)
-	if err != nil {
-		return nil, err
-	}
-	service := cloudformation.New(session)
-	request := cloudformation.DescribeStacksInput{StackName: &md.StackID}
-	response, err := service.DescribeStacks(&request)
-	if err != nil {
-		return nil, err
-	}
-	out := make(map[string]interface{})
-	for _, stack := range response.Stacks {
-		for _, parameter := range stack.Parameters {
-			out[*parameter.ParameterKey] = *parameter.ParameterValue
-		}
-	}
-
-	return out, nil
-}
-
-func getRawSSMParameters(md MetaData) (map[string]interface{}, error) {
-	withDecryption := false
-	name := fmt.Sprintf("%s.SSMParameterJSON", md.StackName)
-
-	// session, err := session.NewSession(aws.NewConfig())
-	session, err := session.NewSession(&aws.Config{
-		Region: aws.String(md.Region)},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	service := ssm.New(session)
-	request := ssm.GetParameterInput{Name: &name, WithDecryption: &withDecryption}
-	response, err := service.GetParameter(&request)
-	if err != nil {
-		return nil, err
-	}
-	out := make(map[string]interface{})
-	err = json.Unmarshal([]byte(*response.Parameter.Value), &out)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func GetPivnetConfig(token string) pivnet.Config {

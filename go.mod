@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	github.com/aws/aws-sdk-go v1.17.12
+	github.com/google/uuid v1.1.1
 	github.com/onsi/ginkgo v1.7.0
 	github.com/onsi/gomega v1.4.3
 	github.com/shurcooL/httpfs v0.0.0-20181222201310-74dc9339e414 // indirect
@@ -11,6 +12,7 @@ require (
 	github.com/starkandwayne/om-tiler v0.0.0-20190415123844-4a98c354d8f1
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	gopkg.in/yaml.v2 v2.2.2
+	launchpad.net/goamz v0.0.0-20140813150539-000000000049 // indirect
 )
 
 replace (
