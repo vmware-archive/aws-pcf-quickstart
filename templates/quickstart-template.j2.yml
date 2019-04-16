@@ -227,12 +227,12 @@ Mappings:
   AMIMapping:
     {{ami_mapping | indent}}
 Resources:
-  ResourceGroup:
-    Type: AWS::Inspector::CreateResourceGroup
-    Properties:
-      ResourceGroupTags:
-        - Key: aws:cloudformation:stack-name
-          Value: !Sub ${AWS::StackName}
+  # ResourceGroup:
+  #   Type: AWS::Inspector::CreateResourceGroup
+  #   Properties:
+  #     ResourceGroupTags:
+  #       - Key: aws:cloudformation:stack-name
+  #         Value: !Sub ${AWS::StackName}
   PCFBase:
     Type: AWS::CloudFormation::Stack
     Properties:
