@@ -231,8 +231,8 @@ Resources:
     Type: "AWS::Inspector::ResourceGroup"
     Properties:
       ResourceGroupTags:
-        - Key: "${AWS::StackName}"
-          Value: "${AWS::StackName}"
+        - Key: ${AWS::StackName}
+          Value: ${AWS::StackName}
   PCFBase:
     Type: AWS::CloudFormation::Stack
     Properties:
