@@ -140,7 +140,7 @@ tiles:
     download_url: "https://github.com/awslabs/aws-servicebroker/releases/download/v1.0.0/aws-service-broker-1.0.0-tile.pivotal"
   stemcell:
     product_slug: stemcells-ubuntu-xenial
-    release_version: "170.38"
+    release_version: "250.25"
     file_glob: "*aws*.tgz"
   manifest: tiles/aws-service-broker/product.yml
   ops_files:
