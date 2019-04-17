@@ -528,12 +528,10 @@ Resources:
                 echo "${PCFBase.Outputs.PcfOpsManPrivateIPAddress} opsman.${Domain}" >> /etc/hosts
             c_chmod_stuff:
               command: |
-                mkdir -p /home/ubuntu/quickstart/state
+                # mkdir -p /home/ubuntu/quickstart/state
                 chown -R ubuntu:ubuntu /home/ubuntu/quickstart
-            # d_copy_version_confifg_to_known_location:
-            #   command: cp /home/ubuntu/quickstart/version_config.json /var/local/version_config.json
-            # e_install_delete_daemon:
-            #   command: /home/ubuntu/quickstart/daemon/install.sh
+            d_install_delete_daemon:
+              command: /home/ubuntu/quickstart/daemon/install.sh
   BootstrapEIP:
     Type: AWS::EC2::EIP
     Properties:
