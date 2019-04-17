@@ -7,7 +7,7 @@ errand-config:
     pre-delete-state: default
 network-properties:
   network:
-    name: service_subnet1_test
+    name: pcf-services-network
   other_availability_zones:
   - name: availability_zone1_test
   singleton_availability_zone:

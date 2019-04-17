@@ -32,6 +32,7 @@
   "PcfRdsPort": "sqlserver_port_test",
   "PcfRdsUsername": "sqlserver_admin_login_test",
   "Region": "region_test",
+  "StackName": "stackname_test",
   "AdminEmail": "admin@example.org",
   "PcfAvailabilityZone1": "availability_zone1_test",
   "PcfAvailabilityZone2": "availability_zone2_test",
