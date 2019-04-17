@@ -2,6 +2,8 @@ package commands
 
 import (
 	"context"
+	"fmt"
+	"io/ioutil"
 	"log"
 
 	"github.com/cf-platform-eng/aws-pcf-quickstart/aws"
@@ -14,6 +16,7 @@ import (
 	"github.com/starkandwayne/om-tiler/tiler"
 
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
+	yaml "gopkg.in/yaml.v2"
 )
 
 type BuildCommand struct {
@@ -59,6 +62,27 @@ func (cmd *BuildCommand) run(c *kingpin.ParseContext) error {
 		return err
 	}
 	t.RegisterStep(tiler.BuildCallback, steps.Step{
+		Name: "UploadDirectorKeyPair",
+		Do: func(ctx context.Context) error {
+			raw, err := ioutil.ReadFile(cmd.varsStore)
+			if err != nil {
+				return err
+			}
+			type KeyPair struct {
+				PublicKey []byte `yaml:"public_key"`
+			}
+			type Creds struct {
+				OpsmanSSHKey KeyPair `yaml:"opsman_ssh_key"`
+			}
+			var creds Creds
+			err = yaml.Unmarshal(raw, &creds)
+			if err != nil {
+				return err
+			}
+			name := fmt.Sprintf("%s-pcf-keypair", cfg.Aws.StackName)
+			return ac.ImportKeyPair(ctx, name, creds.OpsmanSSHKey.PublicKey)
+		},
+	}, steps.Step{
 		Name:      "UpdateCustomResource",
 		DependsOn: []string{tiler.StepDeployDirector},
 		Do: func(ctx context.Context) error {
