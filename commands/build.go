@@ -4,11 +4,13 @@ import (
 	"context"
 	"log"
 
+	"github.com/cf-platform-eng/aws-pcf-quickstart/aws"
 	"github.com/cf-platform-eng/aws-pcf-quickstart/config"
 	"github.com/cf-platform-eng/aws-pcf-quickstart/templates"
 	"github.com/starkandwayne/om-tiler/mover"
 	"github.com/starkandwayne/om-tiler/opsman"
 	"github.com/starkandwayne/om-tiler/pivnet"
+	"github.com/starkandwayne/om-tiler/steps"
 	"github.com/starkandwayne/om-tiler/tiler"
 
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
@@ -52,10 +54,41 @@ func (cmd *BuildCommand) run(c *kingpin.ParseContext) error {
 
 	t := tiler.NewTiler(om, mover, cmd.logger)
 
+	ac, err := aws.NewClient(cfg.Aws, cmd.logger)
+	if err != nil {
+		return err
+	}
+	t.RegisterStep(tiler.BuildCallback, steps.Step{
+		Name:      "UpdateCustomResource",
+		DependsOn: []string{tiler.StepDeployDirector},
+		Do: func(ctx context.Context) error {
+			return ac.UpdateCustomResource(ctx, aws.UpdateCustomResourceInput{
+				Status:            aws.CRSuccess,
+				RequestType:       aws.CRCreate,
+				LogicalResourceID: cfg.MyCustomBOSH.LogicalResourceID,
+				QueueURL:          cfg.MyCustomBOSH.SQSQueueURL,
+			})
+		},
+	})
+
 	pattern, err := templates.GetPattern(cfg.Raw, cmd.varsStore, true)
 	if err != nil {
 		return err
 	}
+	ctx := context.Background()
+	err = t.Build(ctx, pattern, cmd.skipApplyChanges)
+	if err != nil {
+		ac.UpdateWaitHandle(ctx, aws.UpdateWaitHandleInput{
+			Status:    aws.WHFailure,
+			Reason:    err.Error(),
+			HandleURL: cfg.PcfWaitHandle,
+		})
+		return err
+	}
 
-	return t.Build(context.Background(), pattern, cmd.skipApplyChanges)
+	return ac.UpdateWaitHandle(ctx, aws.UpdateWaitHandleInput{
+		Status:    aws.WHSuccess,
+		Reason:    "Successfully deployed Elastic Runtime",
+		HandleURL: cfg.PcfWaitHandle,
+	})
 }

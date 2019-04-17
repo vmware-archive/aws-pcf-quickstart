@@ -11,21 +11,21 @@ import (
 )
 
 const (
-	physicalResourceID string      = "PivotalCloudFoundry"
-	Success            status      = "SUCCESS"
-	Failed                         = "FAILED"
-	Create             requestType = "Create"
-	Update                         = "Update"
-	Delete                         = "Delete"
+	physicalResourceID string        = "PivotalCloudFoundry"
+	CRSuccess          crStatus      = "SUCCESS"
+	CRFailed                         = "FAILED"
+	CRCreate           crRequestType = "Create"
+	CRUpdate                         = "Update"
+	CRDelete                         = "Delete"
 )
 
-type status string
-type requestType string
+type crStatus string
+type crRequestType string
 
 type UpdateCustomResourceInput struct {
-	RequestType       requestType
+	RequestType       crRequestType
 	LogicalResourceID string
-	Status            status
+	Status            crStatus
 	Reason            string
 	QueueURL          string
 }
@@ -64,6 +64,9 @@ func (c *Client) UpdateCustomResource(ctx context.Context, i UpdateCustomResourc
 				RequestID:          request.RequestID,
 				LogicalResourceID:  request.LogicalResourceID,
 			})
+			if err != nil {
+				return err
+			}
 			hreq, err := http.NewRequest("PUT", request.ResponseURL, bytes.NewReader(body))
 			if err != nil {
 				return err

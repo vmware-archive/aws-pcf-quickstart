@@ -13,10 +13,12 @@ import (
 
 // Config contains the infrastructure details.
 type Config struct {
-	Raw    map[string]interface{}
-	Opsman opsman.Config
-	Pivnet pivnet.Config
-	Aws    aws.Config
+	Raw           map[string]interface{}
+	Opsman        opsman.Config
+	Pivnet        pivnet.Config
+	Aws           aws.Config
+	MyCustomBOSH  CustomResource
+	PcfWaitHandle string
 }
 
 type MetaData struct {
@@ -26,10 +28,17 @@ type MetaData struct {
 }
 
 type RawConfig struct {
-	Domain            string `json:"Domain"`
-	PivnetToken       string `json:"PivnetToken"`
-	OpsmanPassword    string `json:"PcfOpsManagerAdminPassword"`
-	SkipSSLValidation string `json:"SkipSSLValidation"`
+	Domain                       string `json:"Domain"`
+	PivnetToken                  string `json:"PivnetToken"`
+	OpsmanPassword               string `json:"PcfOpsManagerAdminPassword"`
+	SkipSSLValidation            string `json:"SkipSSLValidation"`
+	PcfCustomResourceSQSQueueURL string `json:"PcfCustomResourceSQSQueueUrl"`
+	PcfWaitHandle                string `json:"PcfWaitHandle"`
+}
+
+type CustomResource struct {
+	LogicalResourceID string
+	SQSQueueURL       string
 }
 
 // Filenames for configs.
@@ -103,16 +112,21 @@ func LoadConfig(metadataFile string, logger *log.Logger) (*Config, error) {
 			DecryptionPassphrase: c.OpsmanPassword,
 			SkipSSLVerification:  c.SkipSSLValidation == "true",
 		},
-		Pivnet: GetPivnetConfig(c.PivnetToken),
-		Aws:    awsConfig,
-		Raw:    raw,
+		Pivnet:        GetPivnetConfig(c.PivnetToken),
+		Aws:           awsConfig,
+		PcfWaitHandle: c.PcfWaitHandle,
+		MyCustomBOSH: CustomResource{
+			LogicalResourceID: "MyCustomBOSH",
+			SQSQueueURL:       c.PcfCustomResourceSQSQueueURL,
+		},
+		Raw: raw,
 	}, nil
 }
 
 func GetPivnetConfig(token string) pivnet.Config {
 	return pivnet.Config{
-		Token:      token,
-		UserAgent:  "PCF-Ecosystem-AWS-client",
+		Token: token,
+		// UserAgent:  "PCF-Ecosystem-AWS-client",
 		AcceptEULA: true,
 	}
 }
