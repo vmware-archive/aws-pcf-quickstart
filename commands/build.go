@@ -62,7 +62,7 @@ func (cmd *BuildCommand) run(c *kingpin.ParseContext) error {
 		Name:      "UpdateCustomResource",
 		DependsOn: []string{tiler.StepDeployDirector},
 		Do: func(ctx context.Context) error {
-			return ac.UpdateCustomResource(ctx, aws.UpdateCustomResourceInput{
+			return ac.UpdateCustomResource(ctx, aws.CustomResourceArg{
 				Status:            aws.CRSuccess,
 				RequestType:       aws.CRCreate,
 				LogicalResourceID: cfg.MyCustomBOSH.LogicalResourceID,
