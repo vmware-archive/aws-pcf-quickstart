@@ -69,7 +69,7 @@ func (cmd *BuildCommand) run(c *kingpin.ParseContext) error {
 				return err
 			}
 			type KeyPair struct {
-				PublicKey []byte `yaml:"public_key"`
+				PublicKey string `yaml:"public_key"`
 			}
 			type Creds struct {
 				OpsmanSSHKey KeyPair `yaml:"opsman_ssh_key"`
@@ -80,7 +80,7 @@ func (cmd *BuildCommand) run(c *kingpin.ParseContext) error {
 				return err
 			}
 			name := fmt.Sprintf("%s-pcf-keypair", cfg.Aws.StackName)
-			return ac.ImportKeyPair(ctx, name, creds.OpsmanSSHKey.PublicKey)
+			return ac.ImportKeyPair(ctx, name, []byte(creds.OpsmanSSHKey.PublicKey))
 		},
 	}, steps.Step{
 		Name:      "UpdateCustomResource",
