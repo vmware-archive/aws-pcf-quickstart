@@ -14,6 +14,7 @@ type register interface {
 func Configure(logger *log.Logger, app *kingpin.Application) {
 	cmds := []register{
 		&BuildCommand{logger: logger},
+		&DaemonCommand{logger: logger},
 	}
 
 	for _, c := range cmds {
