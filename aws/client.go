@@ -32,7 +32,7 @@ func NewClient(c Config, logger *log.Logger) (*Client, error) {
 		Region: aws.String(c.Region)},
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cloud not create aws session: %v", err)
 	}
 	return &Client{
 		stackID:   c.StackID,
@@ -48,7 +48,7 @@ func (c *Client) GetStackInputs() (map[string]interface{}, error) {
 	request := cloudformation.DescribeStacksInput{StackName: &c.stackID}
 	response, err := service.DescribeStacks(&request)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cloud not get stack parameters: %v", err)
 	}
 	out := make(map[string]interface{})
 	for _, stack := range response.Stacks {
@@ -66,19 +66,24 @@ func (c *Client) GetRawSSMParameters() (map[string]interface{}, error) {
 	request := ssm.GetParameterInput{Name: &name, WithDecryption: &withDecryption}
 	response, err := service.GetParameter(&request)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not get parameters via SSM:", err)
 	}
 	out := make(map[string]interface{})
 	err = json.Unmarshal([]byte(*response.Parameter.Value), &out)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not unmarshal SSM parameters:", err)
 	}
 	return out, nil
 }
 
 func (c *Client) ImportKeyPair(ctx context.Context, name string, privateKey []byte) error {
 	service := ec2.New(c.session)
-	request := ec2.ImportKeyPairInput{KeyName: &name, PublicKeyMaterial: privateKey}
-	_, err := service.ImportKeyPairWithContext(ctx, &request)
-	return err
+	drequest := ec2.DeleteKeyPairInput{KeyName: &name}
+	service.DeleteKeyPairWithContext(ctx, &drequest)
+	irequest := ec2.ImportKeyPairInput{KeyName: &name, PublicKeyMaterial: privateKey}
+	_, err := service.ImportKeyPairWithContext(ctx, &irequest)
+	if err != nil {
+		fmt.Errorf("could not import aws ssh keypair:", err)
+	}
+	return nil
 }
