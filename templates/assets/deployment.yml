@@ -1,6 +1,8 @@
 director:
   manifest: director/config.yml
   ops_files: []
+  vars:
+    opsman_ssh_key: ((opsman_ssh_key))
 # tiles: []
 tiles:
 - name: cf
@@ -151,7 +153,7 @@ tiles:
   - tiles/aws-service-broker/resource-vars.yml
   - tiles/aws-service-broker/errand-vars.yml
   vars:
-    network_name: ((PcfServicesSubnetAZ1))
+    network_name: pcf-services-network
     singleton_availability_zone: ((PcfAvailabilityZone1))
     aws_access_key_id: ((BrokerIamUserAccessKey))
     aws_secret_access_key: ((BrokerIamUserSecretAccessKey))
@@ -159,8 +161,6 @@ tiles:
     tls_cert: ((ssl_cert.certificate))
     tls_key: ((ssl_cert.private_key))
     insecure: true
-
-
 
 variables:
 - name: opsman_ssh_key
