@@ -7,6 +7,7 @@ import (
 	"log"
 
 	"github.com/cf-platform-eng/aws-pcf-quickstart/aws"
+	"github.com/cf-platform-eng/aws-pcf-quickstart/database"
 	"github.com/starkandwayne/om-tiler/opsman"
 	"github.com/starkandwayne/om-tiler/pivnet"
 )
@@ -17,6 +18,7 @@ type Config struct {
 	Opsman        opsman.Config
 	Pivnet        pivnet.Config
 	Aws           aws.Config
+	Database      *database.Client
 	MyCustomBOSH  CustomResource
 	PcfWaitHandle string
 }
@@ -34,6 +36,10 @@ type RawConfig struct {
 	SkipSSLValidation            string `json:"SkipSSLValidation"`
 	PcfCustomResourceSQSQueueURL string `json:"PcfCustomResourceSQSQueueUrl"`
 	PcfWaitHandle                string `json:"PcfWaitHandle"`
+	PcfRdsAddress                string `json:"PcfRdsAddress"`
+	PcfRdsPort                   string `json:"PcfRdsPort"`
+	PcfRdsUsername               string `json:"PcfRdsUsername"`
+	PcfRdsPassword               string `json:"PcfRdsPassword"`
 }
 
 type CustomResource struct {
@@ -112,8 +118,14 @@ func LoadConfig(metadataFile string, logger *log.Logger) (*Config, error) {
 			DecryptionPassphrase: c.OpsmanPassword,
 			SkipSSLVerification:  c.SkipSSLValidation == "true",
 		},
-		Pivnet:        GetPivnetConfig(c.PivnetToken),
-		Aws:           awsConfig,
+		Pivnet: GetPivnetConfig(c.PivnetToken),
+		Aws:    awsConfig,
+		Database: &database.Client{
+			Address:  c.PcfRdsAddress,
+			Port:     c.PcfRdsPort,
+			Username: c.PcfRdsUsername,
+			Password: c.PcfRdsPassword,
+		},
 		PcfWaitHandle: c.PcfWaitHandle,
 		MyCustomBOSH: CustomResource{
 			LogicalResourceID: "MyCustomBOSH",

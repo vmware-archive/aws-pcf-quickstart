@@ -61,39 +61,46 @@ func (cmd *BuildCommand) run(c *kingpin.ParseContext) error {
 	if err != nil {
 		return err
 	}
-	t.RegisterStep(tiler.BuildCallback, steps.Step{
-		Name: "UploadDirectorKeyPair",
-		Do: func(ctx context.Context) error {
-			raw, err := ioutil.ReadFile(cmd.varsStore)
-			if err != nil {
-				return err
-			}
-			type KeyPair struct {
-				PublicKey string `yaml:"public_key"`
-			}
-			type Creds struct {
-				OpsmanSSHKey KeyPair `yaml:"opsman_ssh_key"`
-			}
-			var creds Creds
-			err = yaml.Unmarshal(raw, &creds)
-			if err != nil {
-				return err
-			}
-			name := fmt.Sprintf("%s-pcf-keypair", cfg.Aws.StackName)
-			return ac.ImportKeyPair(ctx, name, []byte(creds.OpsmanSSHKey.PublicKey))
+	t.RegisterStep(tiler.BuildCallback,
+		steps.Step{
+			Name: "UploadDirectorKeyPair",
+			Do: func(ctx context.Context) error {
+				raw, err := ioutil.ReadFile(cmd.varsStore)
+				if err != nil {
+					return err
+				}
+				type KeyPair struct {
+					PublicKey string `yaml:"public_key"`
+				}
+				type Creds struct {
+					OpsmanSSHKey KeyPair `yaml:"opsman_ssh_key"`
+				}
+				var creds Creds
+				err = yaml.Unmarshal(raw, &creds)
+				if err != nil {
+					return err
+				}
+				name := fmt.Sprintf("%s-pcf-keypair", cfg.Aws.StackName)
+				return ac.ImportKeyPair(ctx, name, []byte(creds.OpsmanSSHKey.PublicKey))
+			},
 		},
-	}, steps.Step{
-		Name:      "UpdateCustomResource",
-		DependsOn: []string{tiler.StepDeployDirector},
-		Do: func(ctx context.Context) error {
-			return ac.UpdateCustomResource(ctx, aws.CustomResourceArg{
-				Status:            aws.CRSuccess,
-				RequestType:       aws.CRCreate,
-				LogicalResourceID: cfg.MyCustomBOSH.LogicalResourceID,
-				QueueURL:          cfg.MyCustomBOSH.SQSQueueURL,
-			})
-		},
-	})
+		steps.Step{
+			Name: "CreateDatabases",
+			Do: func(ctx context.Context) error {
+				return cfg.Database.CreateDatabases()
+			}},
+		steps.Step{
+			Name:      "UpdateCustomResource",
+			DependsOn: []string{tiler.StepDeployDirector},
+			Do: func(ctx context.Context) error {
+				return ac.UpdateCustomResource(ctx, aws.CustomResourceArg{
+					Status:            aws.CRSuccess,
+					RequestType:       aws.CRCreate,
+					LogicalResourceID: cfg.MyCustomBOSH.LogicalResourceID,
+					QueueURL:          cfg.MyCustomBOSH.SQSQueueURL,
+				})
+			},
+		})
 
 	pattern, err := templates.GetPattern(cfg.Raw, cmd.varsStore, true)
 	if err != nil {

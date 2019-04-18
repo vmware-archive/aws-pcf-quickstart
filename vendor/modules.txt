@@ -246,10 +246,10 @@ github.com/onsi/gomega/internal/asyncassertion
 github.com/onsi/gomega/internal/testingtsupport
 github.com/onsi/gomega/matchers
 github.com/onsi/gomega/types
-github.com/onsi/gomega/gbytes
 github.com/onsi/gomega/internal/oraclematcher
 github.com/onsi/gomega/format
 github.com/onsi/gomega/matchers/support/goraph/bipartitegraph
+github.com/onsi/gomega/gbytes
 github.com/onsi/gomega/matchers/support/goraph/edge
 github.com/onsi/gomega/matchers/support/goraph/node
 github.com/onsi/gomega/matchers/support/goraph/util
@@ -292,9 +292,9 @@ github.com/shirou/gopsutil/internal/common
 github.com/starkandwayne/om-tiler/mover
 github.com/starkandwayne/om-tiler/opsman
 github.com/starkandwayne/om-tiler/pivnet
+github.com/starkandwayne/om-tiler/steps
 github.com/starkandwayne/om-tiler/tiler
 github.com/starkandwayne/om-tiler/pattern
-github.com/starkandwayne/om-tiler/steps
 # github.com/vito/go-interact v0.0.0-20171111012221-fa338ed9e9ec
 github.com/vito/go-interact/interact
 github.com/vito/go-interact/interact/terminal
