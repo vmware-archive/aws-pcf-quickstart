@@ -70,7 +70,7 @@ func NewClient(c Config, logger *log.Logger) *Client {
 }
 
 func (c *Client) DownloadFile(ctx context.Context, f pattern.PivnetFile, dir string) (file *os.File, err error) {
-	if c.acceptEULA && f.Url == "" {
+	if c.acceptEULA && f.URL == "" {
 		if err = c.AcceptEULA(ctx, f); err != nil {
 			return
 		}
@@ -152,8 +152,8 @@ func (c *Client) downloadFile(ctx context.Context, f pattern.PivnetFile, dir str
 		}
 	}()
 
-	if f.Url != "" {
-		file, err = downloadDirectFile(ctx, f.Url, dir)
+	if f.URL != "" {
+		file, err = downloadDirectFile(ctx, f.URL, dir)
 		return
 	}
 	return c.downloadPivnetFile(ctx, f, dir)
@@ -171,7 +171,7 @@ func (c *Client) downloadPivnetFile(ctx context.Context, f pattern.PivnetFile, d
 		return nil, err
 	}
 
-	return file, c.client(ctx).ProductFiles.DownloadForRelease(file, f.Slug, release.ID, productFile.ID, os.Stdout)
+	return file, c.client(ctx).ProductFiles.DownloadForRelease(file, f.Slug, release.ID, productFile.ID, ioutil.Discard)
 }
 
 func downloadDirectFile(ctx context.Context, url string, dir string) (file *os.File, err error) {

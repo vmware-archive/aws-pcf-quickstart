@@ -8,7 +8,7 @@ require (
 	github.com/google/uuid v1.1.1
 	github.com/onsi/ginkgo v1.7.0
 	github.com/onsi/gomega v1.4.3
-	github.com/starkandwayne/om-tiler v0.0.0-20190415123844-4a98c354d8f1
+	github.com/starkandwayne/om-tiler v0.0.0-20190418094446-1743c5b57675
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	gopkg.in/yaml.v2 v2.2.2
 )
