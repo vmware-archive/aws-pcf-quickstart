@@ -9,14 +9,23 @@ import (
 )
 
 const (
-	StepWaitOpsmanOnline        string = "WaitOpsmanOnline"
-	StepConfigureAuthentication        = "ConfigureAuthentication"
-	StepConfigureDirector              = "ConfigureDirector"
-	StepDeployDirector                 = "DeployDirector"
-	StepUploadFiles                    = "UploadFiles"
-	StepConfigureTiles                 = "ConfigureTiles"
-	StepApplyChanges                   = "ApplyChanges"
-	StepDeleteInstallation             = "DeleteInstallation"
+	// StepWaitOpsmanOnline invoked [Build, Delete] when OpsMan API is available
+	StepWaitOpsmanOnline string = "WaitOpsmanOnline"
+	// StepConfigureAuthentication invoked [Build, Delete] when Authentication has been configured
+	StepConfigureAuthentication = "ConfigureAuthentication"
+	// StepConfigureDirector invoked [Build] when Director has been configured
+	StepConfigureDirector = "ConfigureDirector"
+	// StepDeployDirector invoked [Build] when Director has been deployed
+	StepDeployDirector = "DeployDirector"
+	// StepUploadFiles invoked [Build] when all PivnetFiles have been uploaded
+	StepUploadFiles = "UploadFiles"
+	// StepConfigureTiles invoked [Build] when all Tiles have ben configured
+	StepConfigureTiles = "ConfigureTiles"
+	// StepApplyChanges invoked [Build] when all Tiles have been deployed
+	StepApplyChanges = "ApplyChanges"
+	// StepDeleteInstallation invoked [Delete] when all Tiles have been deleted
+	StepDeleteInstallation = "DeleteInstallation"
+	retry                  = 5
 )
 
 func stepUploadFilesName(tile pattern.Tile) string {
@@ -41,6 +50,7 @@ func (t *Tiler) stepConfigureAuthentication() steps.Step {
 		Name:      StepConfigureAuthentication,
 		DependsOn: []string{StepWaitOpsmanOnline},
 		Do:        t.client.ConfigureAuthentication,
+		Retry:     retry,
 	}
 }
 
@@ -51,6 +61,7 @@ func (t *Tiler) stepConfigureDirector(d pattern.Director) steps.Step {
 		Do: func(ctx context.Context) error {
 			return t.doConfigureDirector(ctx, d)
 		},
+		Retry: retry,
 	}
 }
 
@@ -72,6 +83,7 @@ func (t *Tiler) stepUploadFiles(tiles []pattern.Tile) (out []steps.Step) {
 			Do: func(ctx context.Context) error {
 				return t.doUploadFiles(ctx, tile)
 			},
+			Retry: retry,
 		})
 	}
 	return append(out, steps.Step{
@@ -91,6 +103,7 @@ func (t *Tiler) stepConfigureTiles(tiles []pattern.Tile) (out []steps.Step) {
 			Do: func(ctx context.Context) error {
 				return t.doConfigureTile(ctx, tile)
 			},
+			Retry: retry,
 		})
 	}
 	return append(out, steps.Step{
