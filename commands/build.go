@@ -100,6 +100,7 @@ func (cmd *BuildCommand) run(c *kingpin.ParseContext) error {
 					QueueURL:          cfg.MyCustomBOSH.SQSQueueURL,
 				})
 			},
+			Retry: 5,
 		})
 
 	pattern, err := templates.GetPattern(cfg, cmd.varsStore, true)

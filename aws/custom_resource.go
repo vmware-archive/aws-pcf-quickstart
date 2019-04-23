@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/google/uuid"
@@ -83,28 +84,51 @@ func (c *Client) CustomResourceRequests(ctx context.Context, i CustomResourceArg
 	id := uuid.New().String()
 	var max int64 = 10
 	var visibility int64 = 1
+	var waitTimeSeconds int64 = 20
 	request := sqs.ReceiveMessageInput{
 		QueueUrl:                &i.QueueURL,
 		ReceiveRequestAttemptId: &id,
 		MaxNumberOfMessages:     &max,
 		VisibilityTimeout:       &visibility,
+		WaitTimeSeconds:         &waitTimeSeconds,
 	}
-	response, err := service.ReceiveMessageWithContext(ctx, &request)
-	if err != nil {
-		return nil, err
-	}
-	c.logger(ctx).Printf("received %d SQS message(s)", len(response.Messages))
+
 	var requests []CustomResourceRequest
-	for _, msg := range response.Messages {
-		var req CustomResourceRequest
-		err := json.Unmarshal([]byte(*msg.Body), &req)
+	var response sqs.ReceiveMessageOutput
+	for attempt := 1; attempt <= 5; attempt++ {
+		response, err := service.ReceiveMessageWithContext(ctx, &request)
 		if err != nil {
 			return nil, err
 		}
-		if req.LogicalResourceID == i.LogicalResourceID &&
-			req.RequestType == string(i.RequestType) {
-			requests = append(requests, req)
+		for _, msg := range response.Messages {
+			type Msg struct {
+				Message string
+			}
+			var message Msg
+			err := json.Unmarshal([]byte(*msg.Body), &message)
+			if err != nil {
+				return nil, err
+			}
+			var req CustomResourceRequest
+			err = json.Unmarshal([]byte(message.Message), &req)
+			if err != nil {
+				return nil, err
+			}
+
+			if req.LogicalResourceID == i.LogicalResourceID &&
+				req.RequestType == string(i.RequestType) {
+				requests = append(requests, req)
+			}
+		}
+		if len(requests) == 0 {
+			c.logger(ctx).Printf("retrying: 0 messages of %d matched %s/%s",
+				len(response.Messages), i.RequestType, i.LogicalResourceID)
+			time.Sleep(time.Second * 5)
+		} else {
+			break
 		}
 	}
+	c.logger(ctx).Printf("received %d messages(s) of which %d matched %s/%s",
+		len(response.Messages), len(requests), i.RequestType, i.LogicalResourceID)
 	return &requests, nil
 }
