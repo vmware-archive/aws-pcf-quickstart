@@ -11,6 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/cloudformation"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ssm"
+	"github.com/starkandwayne/om-tiler/steps"
 )
 
 type Config struct {
@@ -23,7 +24,7 @@ type Client struct {
 	stackID   string
 	stackName string
 	region    string
-	logger    *log.Logger
+	logger    func(context.Context) *log.Logger
 	session   *session.Session
 }
 
@@ -34,11 +35,15 @@ func NewClient(c Config, logger *log.Logger) (*Client, error) {
 	if err != nil {
 		return nil, fmt.Errorf("cloud not create aws session: %v", err)
 	}
+
+	log := func(ctx context.Context) *log.Logger {
+		return steps.ContextLogger(ctx, logger, "[Aws]")
+	}
 	return &Client{
 		stackID:   c.StackID,
 		stackName: c.StackName,
 		region:    c.Region,
-		logger:    logger,
+		logger:    log,
 		session:   session,
 	}, nil
 }
@@ -81,9 +86,10 @@ func (c *Client) ImportKeyPair(ctx context.Context, name string, privateKey []by
 	drequest := ec2.DeleteKeyPairInput{KeyName: &name}
 	service.DeleteKeyPairWithContext(ctx, &drequest)
 	irequest := ec2.ImportKeyPairInput{KeyName: &name, PublicKeyMaterial: privateKey}
+	c.logger(ctx).Printf("importing key pair: %s", name)
 	_, err := service.ImportKeyPairWithContext(ctx, &irequest)
 	if err != nil {
-		fmt.Errorf("could not import aws ssh keypair: %v", err)
+		fmt.Errorf("could not import aws ssh key pair: %v", err)
 	}
 	return nil
 }

@@ -38,6 +38,7 @@ func (c *Client) UpdateWaitHandle(ctx context.Context, i UpdateWaitHandleInput) 
 	if err != nil {
 		return err
 	}
+	c.logger(ctx).Printf("updating wait handle: %s", body)
 	hreq, err := http.NewRequest("PUT", i.HandleURL, bytes.NewReader(body))
 	if err != nil {
 		return err

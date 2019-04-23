@@ -65,6 +65,7 @@ func (c *Client) UpdateCustomResource(ctx context.Context, i CustomResourceArg) 
 		if err != nil {
 			return err
 		}
+		c.logger(ctx).Printf("sending SQS message %s", body)
 		hreq, err := http.NewRequest("PUT", request.ResponseURL, bytes.NewReader(body))
 		if err != nil {
 			return err
@@ -92,6 +93,7 @@ func (c *Client) CustomResourceRequests(ctx context.Context, i CustomResourceArg
 	if err != nil {
 		return nil, err
 	}
+	c.logger(ctx).Printf("received %d SQS message(s)", len(response.Messages))
 	var requests []CustomResourceRequest
 	for _, msg := range response.Messages {
 		var req CustomResourceRequest
