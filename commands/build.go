@@ -102,7 +102,7 @@ func (cmd *BuildCommand) run(c *kingpin.ParseContext) error {
 			},
 		})
 
-	pattern, err := templates.GetPattern(cfg.Raw, cmd.varsStore, true)
+	pattern, err := templates.GetPattern(cfg, cmd.varsStore, true)
 	if err != nil {
 		return err
 	}

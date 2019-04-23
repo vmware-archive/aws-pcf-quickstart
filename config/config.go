@@ -14,13 +14,14 @@ import (
 
 // Config contains the infrastructure details.
 type Config struct {
-	Raw           map[string]interface{}
-	Opsman        opsman.Config
-	Pivnet        pivnet.Config
-	Aws           aws.Config
-	Database      *database.Client
-	MyCustomBOSH  CustomResource
-	PcfWaitHandle string
+	Raw               map[string]interface{}
+	Opsman            opsman.Config
+	Pivnet            pivnet.Config
+	Aws               aws.Config
+	Database          *database.Client
+	MyCustomBOSH      CustomResource
+	PcfWaitHandle     string
+	PcfDeploymentSize string
 }
 
 type MetaData struct {
@@ -40,6 +41,7 @@ type RawConfig struct {
 	PcfRdsPort                   string `json:"PcfRdsPort"`
 	PcfRdsUsername               string `json:"PcfRdsUsername"`
 	PcfRdsPassword               string `json:"PcfRdsPassword"`
+	PcfDeploymentSize            string `json:"PcfDeploymentSize"`
 }
 
 type CustomResource struct {
@@ -126,7 +128,8 @@ func LoadConfig(metadataFile string, logger *log.Logger) (*Config, error) {
 			Username: c.PcfRdsUsername,
 			Password: c.PcfRdsPassword,
 		},
-		PcfWaitHandle: c.PcfWaitHandle,
+		PcfDeploymentSize: c.PcfDeploymentSize,
+		PcfWaitHandle:     c.PcfWaitHandle,
 		MyCustomBOSH: CustomResource{
 			LogicalResourceID: "MyCustomBOSH",
 			SQSQueueURL:       c.PcfCustomResourceSQSQueueURL,
