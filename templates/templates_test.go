@@ -66,36 +66,36 @@ var _ = Describe("GetPattern", func() {
 
 	Context("when small-footprint is enabled", func() {
 		BeforeEach(func() {
-			varsFile = "vars.yml"
+			varsFile = "vars-small.yml"
 			varsStore = "creds.yml"
 			smallFootPrint = true
 		})
 		It("renders tile configs", func() {
 			director, err := pattern.Director.ToTemplate().Evaluate(true)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(director).To(MatchYAML(readFixture("bosh-smallfootprint.yml")))
+			Expect(director).To(MatchYAML(readFixture("bosh/small.yml")))
 			for _, tile := range pattern.Tiles {
 				template, err := tile.ToTemplate().Evaluate(true)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(template).To(MatchYAML(readFixture(fmt.Sprintf("%s.yml", tile.Name))))
+				Expect(template).To(MatchYAML(readFixture(fmt.Sprintf("%s/small.yml", tile.Name))))
 			}
 		})
 	})
-	// Context("when small-footprint is Disabled", func() {
-	// 	BeforeEach(func() {
-	// 		varsFile = "vars.yml"
-	// 		varsStore = "creds.yml"
-	// 		smallFootPrint = false
-	// 	})
-	// 	It("renders tile configs", func() {
-	// 		director, err := pattern.Director.ToTemplate().Evaluate(true)
-	// 		Expect(err).ToNot(HaveOccurred())
-	// 		Expect(director).To(MatchYAML(readFixture("bosh-full.yml")))
-	// 		for _, tile := range pattern.Tiles {
-	// 			template, err := tile.ToTemplate().Evaluate(true)
-	// 			Expect(err).ToNot(HaveOccurred())
-	// 			Expect(template).To(MatchYAML(readFixture(fmt.Sprintf("%s.yml", tile.Name))))
-	// 		}
-	// 	})
-	// })
+	Context("when small-footprint is Disabled", func() {
+		BeforeEach(func() {
+			varsFile = "vars.yml"
+			varsStore = "creds.yml"
+			smallFootPrint = false
+		})
+		It("renders tile configs", func() {
+			director, err := pattern.Director.ToTemplate().Evaluate(true)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(director).To(MatchYAML(readFixture("bosh/full.yml")))
+			for _, tile := range pattern.Tiles {
+				template, err := tile.ToTemplate().Evaluate(true)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(template).To(MatchYAML(readFixture(fmt.Sprintf("%s/full.yml", tile.Name))))
+			}
+		})
+	})
 })

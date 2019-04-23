@@ -69,7 +69,6 @@ tiles:
     system_blobstore/external/encryption: false
     system_blobstore/external/iam_instance_profile_authentication: false
     system_blobstore/external/versioning: true
-
     system_database/external/host: ((PcfRdsAddress))
     system_database/external/port: ((PcfRdsPort))
     system_database/external/account_password: ((PcfRdsPassword))
@@ -133,34 +132,34 @@ tiles:
       /40NawZfTUU=
       -----END CERTIFICATE-----
 
-- name: aws-service-broker
-  version: 1.0.0
-  product:
-    product_slug: aws-service-broker
-    release_version: 1.0.0
-    file_glob: "aws-service-broker*.pivotal"
-    download_url: "https://github.com/awslabs/aws-servicebroker/releases/download/v1.0.0/aws-service-broker-1.0.0-tile.pivotal"
-  stemcell:
-    product_slug: stemcells-ubuntu-xenial
-    release_version: "250.25"
-    file_glob: "*aws*.tgz"
-  manifest: tiles/aws-service-broker/product.yml
-  ops_files:
-  - tiles/aws-service-broker/optional/add-tls_key.yml
-  - tiles/aws-service-broker/optional/add-tls_cert.yml
-  vars_files:
-  - tiles/aws-service-broker/product-default-vars.yml
-  - tiles/aws-service-broker/resource-vars.yml
-  - tiles/aws-service-broker/errand-vars.yml
-  vars:
-    network_name: pcf-services-network
-    singleton_availability_zone: ((PcfAvailabilityZone1))
-    aws_access_key_id: ((BrokerIamUserAccessKey))
-    aws_secret_access_key: ((BrokerIamUserSecretAccessKey))
-    aws_default_region: ((Region))
-    tls_cert: ((ssl_cert.certificate))
-    tls_key: ((ssl_cert.private_key))
-    insecure: true
+# - name: aws-service-broker
+#   version: 1.0.2
+#   product:
+#     product_slug: aws-service-broker
+#     release_version: 1.0.2
+#     file_glob: "aws-service-broker*.pivotal"
+#     download_url: "https://github.com/ramonskie/bosh-deployment-1/releases/download/1.0.1/aws-service-broker-1.0.2.pivotal"
+#   stemcell:
+#     product_slug: stemcells-ubuntu-xenial
+#     release_version: "250.25"
+#     file_glob: "*aws*.tgz"
+#   manifest: tiles/aws-service-broker/product.yml
+#   ops_files:
+#   - tiles/aws-service-broker/optional/add-tls_key.yml
+#   - tiles/aws-service-broker/optional/add-tls_cert.yml
+#   vars_files:
+#   - tiles/aws-service-broker/product-default-vars.yml
+#   - tiles/aws-service-broker/resource-vars.yml
+#   - tiles/aws-service-broker/errand-vars.yml
+#   vars:
+#     network_name: pcf-services-network
+#     singleton_availability_zone: ((PcfAvailabilityZone1))
+#     aws_access_key_id: ((BrokerIamUserAccessKey))
+#     aws_secret_access_key: ((BrokerIamUserSecretAccessKey))
+#     aws_default_region: ((Region))
+#     tls_cert: ((ssl_cert.certificate))
+#     tls_key: ((ssl_cert.private_key))
+#     insecure: true
 
 variables:
 - name: opsman_ssh_key

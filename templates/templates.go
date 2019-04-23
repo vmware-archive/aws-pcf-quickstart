@@ -15,6 +15,7 @@ func GetPattern(cfg *config.Config, varsStore string, expectAllKeys bool) (patte
 	return pattern.NewPattern(pattern.Template{
 		Store:    Templates,
 		Manifest: "deployment.yml",
+		OpsFiles: opsFiles,
 		Vars:     cfg.Raw,
 	}, varsStore, expectAllKeys)
 }
