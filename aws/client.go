@@ -66,12 +66,12 @@ func (c *Client) GetRawSSMParameters() (map[string]interface{}, error) {
 	request := ssm.GetParameterInput{Name: &name, WithDecryption: &withDecryption}
 	response, err := service.GetParameter(&request)
 	if err != nil {
-		return nil, fmt.Errorf("could not get parameters via SSM:", err)
+		return nil, fmt.Errorf("could not get parameters via SSM: %v", err)
 	}
 	out := make(map[string]interface{})
 	err = json.Unmarshal([]byte(*response.Parameter.Value), &out)
 	if err != nil {
-		return nil, fmt.Errorf("could not unmarshal SSM parameters:", err)
+		return nil, fmt.Errorf("could not unmarshal SSM parameters: %v", err)
 	}
 	return out, nil
 }
@@ -83,7 +83,7 @@ func (c *Client) ImportKeyPair(ctx context.Context, name string, privateKey []by
 	irequest := ec2.ImportKeyPairInput{KeyName: &name, PublicKeyMaterial: privateKey}
 	_, err := service.ImportKeyPairWithContext(ctx, &irequest)
 	if err != nil {
-		fmt.Errorf("could not import aws ssh keypair:", err)
+		fmt.Errorf("could not import aws ssh keypair: %v", err)
 	}
 	return nil
 }
