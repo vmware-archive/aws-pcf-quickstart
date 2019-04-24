@@ -1,9 +1,10 @@
-- type: replace
-  path: /resource-configuration?/compilation?
-  value:
-    instances: 4
-    instance_type:
-      id: large.cpu
+# TODO: default is already 4 and large cpu 4xcpu 7.5gb - do we need more?
+# - type: replace
+#   path: /resource-configuration?/compilation?
+#   value:
+#     instances: 4
+#     instance_type:
+#       id: large.cpu
 
 # - type: replace
 #   path: /properties-configuration/director_configuration/database_type
