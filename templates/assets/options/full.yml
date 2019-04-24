@@ -15,7 +15,7 @@
       file_glob: "cf*.pivotal"
     stemcell:
       product_slug: stemcells-ubuntu-xenial
-      release_version: "170.38"
+      release_version: "170.30"
       file_glob: "*google*.tgz"
     manifest: tiles/ert/product.yml
     ops_files:
