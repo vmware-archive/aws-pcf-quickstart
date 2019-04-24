@@ -118,8 +118,3 @@ networks-configuration:
       reserved_ip_ranges: 10.0.10.0-10.0.10.3
       availability_zone_names:
       - availability_zone3_test
-resource-configuration:
-  compilation:
-    instance_type:
-      id: large.cpu
-    instances: 4
