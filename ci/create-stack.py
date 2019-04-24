@@ -72,7 +72,7 @@ def create_stack(template_path: str, aws_region: str):
         {"ParameterKey": "OpsManagerAdminPassword", "ParameterValue": password},
         {"ParameterKey": "PCFKeyPair", "ParameterValue": pcfkeypair},
         {"ParameterKey": "ForwardLogOutput", "ParameterValue": "true"},
-        {"ParameterKey": "DeploymentSize", "ParameterValue": "SmallFootPrint"},
+        {"ParameterKey": "DeploymentSize", "ParameterValue": "Multi-AZ"},
         {"ParameterKey": "SkipSSLValidation", "ParameterValue": "true"},
         {"ParameterKey": "QSS3BucketName",
             "ParameterValue": "aws-1click-pcf-quickstart-templates"},
