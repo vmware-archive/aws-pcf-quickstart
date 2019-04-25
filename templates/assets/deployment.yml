@@ -133,10 +133,10 @@ tiles:
       -----END CERTIFICATE-----
 
 - name: aws-service-broker
-  version: 1.0..0-beta.3
+  version: 1.0.0-beta.3
   product:
     product_slug: aws-service-broker
-    release_version: 1.0..0-beta.3
+    release_version: 1.0.0-beta.3
     file_glob: "aws-service-broker*.pivotal"
     download_url: "https://github.com/awslabs/aws-servicebroker/releases/download/v1.0.0-beta.3/aws-service-broker-1.0.0-beta.3-tile.pivotal"
   stemcell:
