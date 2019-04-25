@@ -1,7 +1,6 @@
 package templates_test
 
 import (
-	"fmt"
 	"io/ioutil"
 	"path/filepath"
 	"runtime"
@@ -25,33 +24,14 @@ func fixturePath(f string) string {
 	return filepath.Join(fixturesDir(), f)
 }
 
-func readFixture(f string) []byte {
+func readYAML(f string) map[string]interface{} {
 	in, err := ioutil.ReadFile(fixturePath(f))
 	Expect(err).ToNot(HaveOccurred())
-
-	return in
-}
-
-func readYAML(f string) map[string]interface{} {
 	out := make(map[string]interface{})
-	err := yaml.Unmarshal(readFixture(f), out)
+	err = yaml.Unmarshal(in, out)
 	Expect(err).ToNot(HaveOccurred())
 
 	return out
-}
-
-func directorMatchesFixture(director ompattern.Director, suffix string) {
-	template, err := director.ToTemplate().Evaluate(true)
-	Expect(err).ToNot(HaveOccurred())
-	Expect(template).To(MatchYAML(readFixture(fmt.Sprintf("bosh/%s.yml", suffix))))
-}
-
-func tilesMatchFixtures(tiles []ompattern.Tile, suffix string) {
-	for _, tile := range tiles {
-		template, err := tile.ToTemplate().Evaluate(true)
-		Expect(err).ToNot(HaveOccurred())
-		Expect(template).To(MatchYAML(readFixture(fmt.Sprintf("%s/%s.yml", tile.Name, suffix))))
-	}
 }
 
 var _ = Describe("GetPattern", func() {
@@ -85,8 +65,11 @@ var _ = Describe("GetPattern", func() {
 			smallFootPrint = true
 		})
 		It("renders tile configs", func() {
-			directorMatchesFixture(pattern.Director, "small")
-			tilesMatchFixtures(pattern.Tiles, "small")
+			pattern.MatchesFixtures(ompattern.Fixtures{
+				Dir:            fixturesDir(),
+				DirectorSuffix: "small",
+				TilesSuffix:    "small",
+			})
 		})
 	})
 	Context("when small-footprint is Disabled", func() {
@@ -96,8 +79,11 @@ var _ = Describe("GetPattern", func() {
 			smallFootPrint = false
 		})
 		It("renders tile configs", func() {
-			directorMatchesFixture(pattern.Director, "full")
-			tilesMatchFixtures(pattern.Tiles, "full")
+			pattern.MatchesFixtures(ompattern.Fixtures{
+				Dir:            fixturesDir(),
+				DirectorSuffix: "full",
+				TilesSuffix:    "full",
+			})
 		})
 	})
 })

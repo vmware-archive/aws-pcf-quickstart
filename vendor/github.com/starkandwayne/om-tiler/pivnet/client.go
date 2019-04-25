@@ -42,7 +42,7 @@ type Client struct {
 	filter     func(context.Context) *filter.Filter
 }
 
-// EULA contains text of a Pivnet End User Lisence Agreemnet
+// EULA contains text of a Pivnet End User License Agreement
 type EULA struct {
 	Name    string
 	Content string

@@ -290,7 +290,7 @@ github.com/pkg/errors
 # github.com/shirou/gopsutil v2.18.12+incompatible
 github.com/shirou/gopsutil/disk
 github.com/shirou/gopsutil/internal/common
-# github.com/starkandwayne/om-tiler v0.0.0-20190423102053-ff381ba2c46c
+# github.com/starkandwayne/om-tiler v0.0.0-20190425101201-21f3f302aa7c
 github.com/starkandwayne/om-tiler/steps
 github.com/starkandwayne/om-tiler/mover
 github.com/starkandwayne/om-tiler/opsman

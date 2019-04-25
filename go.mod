@@ -10,7 +10,7 @@ require (
 	github.com/onsi/gomega v1.4.3
 	github.com/shurcooL/httpfs v0.0.0-20181222201310-74dc9339e414 // indirect
 	github.com/shurcooL/vfsgen v0.0.0-20181202132449-6a9ea43bcacd // indirect
-	github.com/starkandwayne/om-tiler v0.0.0-20190423102053-ff381ba2c46c
+	github.com/starkandwayne/om-tiler v0.0.0-20190425101201-21f3f302aa7c
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	gopkg.in/yaml.v2 v2.2.2
 )
