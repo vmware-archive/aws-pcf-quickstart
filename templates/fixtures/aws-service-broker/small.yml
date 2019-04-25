@@ -19,7 +19,7 @@ product-properties:
   .properties.aws_default_region:
     value: region_test
   .properties.aws_sb_enable_global_access_to_plans:
-    value: false
+    value: true
   .properties.aws_secret_access_key:
     value:
       secret: broker_secret_key_test
