@@ -40,6 +40,20 @@ func readYAML(f string) map[string]interface{} {
 	return out
 }
 
+func directorMatchesFixture(director ompattern.Director, suffix string) {
+	template, err := director.ToTemplate().Evaluate(true)
+	Expect(err).ToNot(HaveOccurred())
+	Expect(template).To(MatchYAML(readFixture(fmt.Sprintf("bosh/%s.yml", suffix))))
+}
+
+func tilesMatchFixtures(tiles []ompattern.Tile, suffix string) {
+	for _, tile := range tiles {
+		template, err := tile.ToTemplate().Evaluate(true)
+		Expect(err).ToNot(HaveOccurred())
+		Expect(template).To(MatchYAML(readFixture(fmt.Sprintf("%s/%s.yml", tile.Name, suffix))))
+	}
+}
+
 var _ = Describe("GetPattern", func() {
 	var (
 		pattern        ompattern.Pattern
@@ -71,14 +85,8 @@ var _ = Describe("GetPattern", func() {
 			smallFootPrint = true
 		})
 		It("renders tile configs", func() {
-			director, err := pattern.Director.ToTemplate().Evaluate(true)
-			Expect(err).ToNot(HaveOccurred())
-			Expect(director).To(MatchYAML(readFixture("bosh/small.yml")))
-			for _, tile := range pattern.Tiles {
-				template, err := tile.ToTemplate().Evaluate(true)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(template).To(MatchYAML(readFixture(fmt.Sprintf("%s/small.yml", tile.Name))))
-			}
+			directorMatchesFixture(pattern.Director, "small")
+			tilesMatchFixtures(pattern.Tiles, "small")
 		})
 	})
 	Context("when small-footprint is Disabled", func() {
@@ -88,14 +96,8 @@ var _ = Describe("GetPattern", func() {
 			smallFootPrint = false
 		})
 		It("renders tile configs", func() {
-			director, err := pattern.Director.ToTemplate().Evaluate(true)
-			Expect(err).ToNot(HaveOccurred())
-			Expect(director).To(MatchYAML(readFixture("bosh/full.yml")))
-			for _, tile := range pattern.Tiles {
-				template, err := tile.ToTemplate().Evaluate(true)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(template).To(MatchYAML(readFixture(fmt.Sprintf("%s/full.yml", tile.Name))))
-			}
+			directorMatchesFixture(pattern.Director, "full")
+			tilesMatchFixtures(pattern.Tiles, "full")
 		})
 	})
 })
