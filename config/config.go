@@ -140,8 +140,8 @@ func LoadConfig(metadataFile string, logger *log.Logger) (*Config, error) {
 
 func GetPivnetConfig(token string) pivnet.Config {
 	return pivnet.Config{
-		Token: token,
-		// UserAgent:  "PCF-Ecosystem-AWS-client",
+		Token:      token,
+		UserAgent:  "PCF-Ecosystem-AWS-client",
 		AcceptEULA: true,
 	}
 }
