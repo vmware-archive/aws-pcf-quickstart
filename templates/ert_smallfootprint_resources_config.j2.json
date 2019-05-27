@@ -1,6 +1,0 @@
-{
-  "ha_proxy": {"instances": 0},
-  "router": {"instances": 1},
-  "tcp_router": {"instances": 1},
-  "mysql_monitor": {"instances": 0}
-}

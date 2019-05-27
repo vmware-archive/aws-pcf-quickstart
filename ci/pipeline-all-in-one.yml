@@ -215,40 +215,6 @@ resources:
 
 
 jobs:
-# - name: diff-templates
-#   plan:
-#   - get: quickstart-repo
-#   - get: ert-tile
-#     trigger: true
-#     params:
-#       globs:
-#       - '*cf-cloudformation*.json'
-#   - task: diff-templates
-#     config:
-#       platform: linux
-#       image_resource:
-#         type: docker-image
-#         source:
-#           repository: cfplatformeng/quickstart-ci
-#       inputs:
-#       - name: ert-tile
-#       - name: quickstart-repo
-#       run:
-#         path: bash
-#         args:
-#         - -exc
-#         - |
-#           set +e
-#           diff quickstart-repo/cloudformation/cf-cloudformation-base.json ert-tile/*cf-cloudformation*.json
-#           if [ $? -eq 0 ]; then
-#             echo "No diff"
-#             exit 0
-#           else
-#             # curl -X POST -H 'Content-type: application/json' \
-#             #   --data '{"channel": "#amazon", "username": "Concourse CI", "icon_emoji": ":sad_panda:", "text":"Cloud Formation base template changed <@prasad>. Action required."}' \
-#             #   ((slack_hook))
-#             exit 1
-#           fi
 - name: build-quickstart-ci
   public: true
   serial: true
@@ -277,8 +243,9 @@ jobs:
         - -exc
         - |
           pushd quickstart-repo
-          pip install -r requirements.txt
-          python -m unittest discover -v -s ./lib -p '*_test.py'
+            export GO111MODULE=on
+            export GOFLAGS=-mod=vendor
+            ginkgo -skipPackage=certification -r .
           popd
 
 - name: build-ami
@@ -448,8 +415,7 @@ jobs:
       image_resource:
         type: docker-image
         source:
-          repository: python
-          tag: "3"
+          repository: cfplatformeng/quickstart-ci
       inputs:
       - name: pivnet-release
       - name: om-release
@@ -474,11 +440,10 @@ jobs:
           chmod +x quickstart/bin/pivnet
 
           pushd quickstart
-          mkdir -p vendor
-          pip download --no-binary :all: --dest vendor -r requirements.txt
 
-          pip install requests
-          python3 ci/build-version-config.py
+          export GO111MODULE=on
+          export GOFLAGS=-mod=vendor
+          go build .
 
           popd
 
@@ -550,36 +515,36 @@ jobs:
           python ./ci/create-stack.py '../pivotal-cloudfoundry-template-alpha/pivotal-cloudfoundry.template' eu-central-1
           popd
           cp quickstart-repo/stackid output/stackid
-    on_failure:
-      aggregate:
-        # - put: slack-alert
-        #   params:
-        #     icon_emoji: ":sad_panda:"
-        #     username: Concourse CI
-        #     channel: "#amazon"
-        #     text: "Integration test failed"
-        - task: delete-buckets
-          config:
-            inputs:
-            - name: quickstart-repo
-            platform: linux
-            image_resource:
-              type: docker-image
-              source:
-                repository: python
-                tag: "3"
-            params:
-              AWS_ACCESS_KEY_ID: ((aws_admin_key_id))
-              AWS_SECRET_ACCESS_KEY: ((aws_admin_secret_access_key))
-            run:
-              path: bash
-              args:
-              - -exc
-              - |
-                pushd quickstart-repo
-                pip install boto3
-                python ./ci/delete-buckets.py
-                popd
+    # on_failure:
+    #   aggregate:
+    #     # - put: slack-alert
+    #     #   params:
+    #     #     icon_emoji: ":sad_panda:"
+    #     #     username: Concourse CI
+    #     #     channel: "#amazon"
+    #     #     text: "Integration test failed"
+    #     - task: delete-buckets
+    #       config:
+    #         inputs:
+    #         - name: quickstart-repo
+    #         platform: linux
+    #         image_resource:
+    #           type: docker-image
+    #           source:
+    #             repository: python
+    #             tag: "3"
+    #         params:
+    #           AWS_ACCESS_KEY_ID: ((aws_admin_key_id))
+    #           AWS_SECRET_ACCESS_KEY: ((aws_admin_secret_access_key))
+    #         run:
+    #           path: bash
+    #           args:
+    #           - -exc
+    #           - |
+    #             pushd quickstart-repo
+    #             pip install boto3
+    #             python ./ci/delete-buckets.py
+    #             popd
   - put: aws-pcf-concourse-state
     params:
       file: output/stackid

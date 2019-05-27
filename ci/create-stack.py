@@ -28,7 +28,7 @@ import yaml
 
 
 def select_random_region():
-    with open("./templates/supported_regions.yml") as f:
+    with open("./cloudformation/supported_regions.yml") as f:
         region_list = yaml.load(f).get('supported_regions')
         # our prod-ish stuff is in west-1, don't use that
         region_list.remove("us-west-1")

@@ -1,0 +1,122 @@
+errand-config:
+  delete-all:
+    post-deploy-state: default
+    pre-delete-state: default
+  deploy-all:
+    post-deploy-state: default
+    pre-delete-state: default
+network-properties:
+  network:
+    name: pcf-services-network
+  other_availability_zones:
+  - name: availability_zone1_test
+  singleton_availability_zone:
+    name: availability_zone1_test
+product-name: aws-service-broker
+product-properties:
+  .properties.aws_access_key_id:
+    value: broker_key_test
+  .properties.aws_default_region:
+    value: region_test
+  .properties.aws_sb_enable_global_access_to_plans:
+    value: true
+  .properties.aws_secret_access_key:
+    value:
+      secret: broker_secret_key_test
+  .properties.broker_id:
+    value: awsservicebroker
+  .properties.insecure:
+    value: true
+  .properties.prescribe:
+    value: true
+  .properties.s3_bucket:
+    value: awsservicebroker
+  .properties.s3_key:
+    value: templates/latest
+  .properties.s3_region:
+    value: us-east-1
+  .properties.table_name:
+    value: awssb
+  .properties.template_filter:
+    value: -main.yaml
+  .properties.tls_cert:
+    value: |
+      -----BEGIN CERTIFICATE-----
+      MIIE5jCCA06gAwIBAgIQAOBtWaKvaODgcUXClUWu1jANBgkqhkiG9w0BAQsFADA4
+      MQwwCgYDVQQGEwNVU0ExFjAUBgNVBAoTDUNsb3VkIEZvdW5kcnkxEDAOBgNVBAMT
+      B2RlZmF1bHQwHhcNMTkwNDExMTQ0NTU3WhcNMjAwNDEwMTQ0NTU3WjA8MQwwCgYD
+      VQQGEwNVU0ExFjAUBgNVBAoTDUNsb3VkIEZvdW5kcnkxFDASBgNVBAMMC2RvbWFp
+      bl90ZXN0MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAw47IPEdufb/n
+      F7i07XnXHSvKj72zZ6mVmGFDdq1JYzcb5lpfRToeE1zF6mMV0fwDQapcTO21Iq0g
+      mAtbNocKpgVM3o1KZdSBAn6pzEf9VrqBCh5msv98YuSYBpCwYlUlcrdvG/yVdrqS
+      JCyZNDrcx/7XcvrE/uqZFpD1LKCehnzP3ZBetC6E6gtDh2EnvdAk3qdcYXiyl8iY
+      ZMy7kjT4uo6QnPmstchhAJWtTu0qxo7AkRgKIHLT0QlBVP43A1J5P6UmReK+PFm1
+      yxSQsVrCleWVSbbYiY83C2UX4+0+TMXoDwNWdilK7+lr3a+S4uu3aNSFPtb32x5m
+      bw/W0qBWYCE6YC8Ohi5pE6a8S+6Zs6Kv4LBsiAZ0b0oUcw58FlzMA6iO7oIkFEVQ
+      DVsshLlBHRfBJaQ/hDgRNlxuorS4DNC+26fxNrM8DhqAcdv748NFIuTk1OU2+Gkq
+      p8neeUAHSCbk4JduvFKPguMsLVu0s3wunqqS3PXrjTMc1vKT5Xb1AgMBAAGjgecw
+      geQwDgYDVR0PAQH/BAQDAgWgMBMGA1UdJQQMMAoGCCsGAQUFBwMBMAwGA1UdEwEB
+      /wQCMAAwHQYDVR0OBBYEFDNlXUt3n1vHtoKBTt8QJq4h6elJMB8GA1UdIwQYMBaA
+      FN5H3Ut8aRq76VVjLhayA6yhV/MQMG8GA1UdEQRoMGaCDSouZG9tYWluX3Rlc3SC
+      ESouc3lzLmRvbWFpbl90ZXN0ghIqLmFwcHMuZG9tYWluX3Rlc3SCFSoudWFhLnN5
+      cy5kb21haW5fdGVzdIIXKi5sb2dpbi5zeXMuZG9tYWluX3Rlc3QwDQYJKoZIhvcN
+      AQELBQADggGBAEC1MI+sWt73ikg8VYuQ0+ZrsDqn1m4zH2d7a6TzIk1PnKPnv1yz
+      vz+JDD/M4qXcHERHHW4zQhoeNKfCInBfJqz/uTwQJTWabO9Ku8gnipS0XCJevZZ4
+      QO7RTKI3CbjaHHCx/+48s/3BcVyBn+ANGHzRXe/lHGe331o9FeNF4eGfbbiYFQzJ
+      OVVMX/K6doKP/ID1jkyLvNwwMQ0liewl4l9YneXcKCIvPT6eQpYlx8tK3sOhLktT
+      NAubwC0uEgoJR/qN5Mc7iEbQNJqpO/orT+YC7406Ex62v/DzYvEJU5iVlqzDzAA2
+      o8lLtj/g/G10KFIFG/WhIjghyFNIzCNj+Bmua7ZHxm3FHdmTGyl7aCGG1tz6GpFV
+      FnHGYyO07Phw12tBepPLXNbh/H6l4nIUPSnU70mPgxVjI7yMPUTVHCsW58SKVhWc
+      Hxipxx7dUJxGlxNwKDmziNVK/ss67+o1nQObDPkJh5Nt6Sz/Qd3TJi75URft1Gri
+      hahMcFcCl6DKPw==
+      -----END CERTIFICATE-----
+  .properties.tls_key:
+    value: |
+      -----BEGIN RSA PRIVATE KEY-----
+      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
+      -----END RSA PRIVATE KEY-----
+  .properties.verbosity:
+    value: 5
+resource-config:
+  delete-all:
+    instance_type:
+      id: automatic
+  deploy-all:
+    instance_type:
+      id: automatic

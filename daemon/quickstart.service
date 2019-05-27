@@ -6,7 +6,7 @@ User=ubuntu
 Environment=PYTHONUNBUFFERED=1
 Environment=PATH=/home/ubuntu/quickstart/bin:/home/ubuntu/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 WorkingDirectory=/home/ubuntu/quickstart/
-ExecStart=/home/ubuntu/quickstart/quickstart_daemon.py
+ExecStart=/home/ubuntu/quickstart/aws-pcf-quickstart daemon
 Restart=always
 RestartSec=15s
 StandardOutput=syslog
