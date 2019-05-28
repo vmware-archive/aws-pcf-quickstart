@@ -111,13 +111,13 @@ resources:
     username: ((github_user_name))
     password: ((github_access_token))
 
-- name: ert-tile
-  type: pivnet
-  source:
-    api_token: ((pivnet_token))
-    copy_metadata: true
-    product_slug: elastic-runtime
-    product_version: 2\.4\.1\.*
+# - name: ert-tile
+#   type: pivnet
+#   source:
+#     api_token: ((pivnet_token))
+#     copy_metadata: true
+#     product_slug: elastic-runtime
+#     product_version: 2\.4\.1\.*
 
 - name: aws-broker-tile
   type: github-release
@@ -134,7 +134,7 @@ resources:
     api_token: ((pivnet_token))
     copy_metadata: true
     product_slug: ops-manager
-    product_version: 2\.4\.1\.*
+    product_version: 2\.5\.4\.*
 
 - name: packer-result
   type: s3
@@ -400,10 +400,10 @@ jobs:
     trigger: true
     passed:
       - unit-test
-  - get: ert-tile
-    trigger: true
-    params:
-      globs: []
+  # - get: ert-tile
+    # trigger: true
+    # params:
+    #   globs: []
   - get: aws-broker-tile
     trigger: true
     params:
@@ -420,7 +420,7 @@ jobs:
       - name: pivnet-release
       - name: om-release
       - name: quickstart-repo
-      - name: ert-tile
+      # - name: ert-tile
       - name: aws-broker-tile
       outputs:
       - name: output

@@ -8,10 +8,10 @@
   path: /tiles/name=cf
   value:
     name: cf
-    version: 2.4.4
+    version: 2.5.4
     product:
       product_slug: elastic-runtime
-      release_version: 2.4.4
+      release_version: 2.5.4
       file_glob: "cf*.pivotal"
     stemcell:
       product_slug: stemcells-ubuntu-xenial
