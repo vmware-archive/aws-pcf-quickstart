@@ -36,7 +36,7 @@ if versioned_file_name == "":
 
 opsman_ami_mapping_file_name = ""
 for file_name in os.listdir(opsman_tile_dir):
-    if re.match(r'OpsManager.*AWS\.yml', file_name):
+    if re.match(r'ops-manager-aws.*\.yml', file_name):
         opsman_ami_mapping_file_name = file_name
 if opsman_ami_mapping_file_name == "":
     print("OpsMan AMI mapping yaml file not found")
