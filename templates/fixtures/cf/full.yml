@@ -146,7 +146,7 @@ product-properties:
   .properties.credhub_database.external.port:
     value: sqlserver_port_test
   .properties.credhub_database.external.require_tls:
-    value: false
+    value: true
   .properties.credhub_database.external.tls_ca:
     value: |
       -----BEGIN CERTIFICATE-----

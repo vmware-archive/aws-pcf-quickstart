@@ -98,7 +98,9 @@ tiles:
     uaa_database/external/port: ((PcfRdsPort))
     uaa_database/external/uaa_password: ((PcfRdsPassword))
     uaa_database/external/uaa_username: ((PcfRdsUsername))
+    stack_migration_acknowledgement: x
 
+    credhub_database/external/require_tls: true
     credhub_database/external/host: ((PcfRdsAddress))
     credhub_database/external/port: ((PcfRdsPort))
     credhub_database/external/username: ((PcfRdsUsername))

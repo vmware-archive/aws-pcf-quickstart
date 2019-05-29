@@ -52,5 +52,5 @@
   "BrokerIamUserAccessKey": "broker_key_test",
   "BrokerIamUserSecretAccessKey": "broker_secret_key_test",
   "stack_migration_acknowledgement": x,
-  "credhub_database/external/require_tls": false
+  "credhub_database/external/require_tls": true
 }
