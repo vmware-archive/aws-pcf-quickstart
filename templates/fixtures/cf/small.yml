@@ -143,8 +143,6 @@ product-properties:
       secret: sqlserver_admin_password_test
   .properties.credhub_database.external.port:
     value: sqlserver_port_test
-  .properties.credhub_database.external.require_tls:
-    value: true
   .properties.credhub_database.external.tls_ca:
     value: |
       -----BEGIN CERTIFICATE-----
