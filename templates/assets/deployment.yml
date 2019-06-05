@@ -69,15 +69,15 @@ tiles:
     system_blobstore/external/versioning: true
 
 - name: aws-service-broker
-  version: 1.0.0-beta.3
+  version: 1.0.1
   product:
     product_slug: aws-service-broker
-    release_version: 1.0.0-beta.3
+    release_version: 1.0.1
     file_glob: "aws-service-broker*.pivotal"
-    download_url: "https://github.com/awslabs/aws-servicebroker/releases/download/v1.0.0-beta.3/aws-service-broker-1.0.0-beta.3-tile.pivotal"
+    download_url: "https://github.com/awslabs/aws-servicebroker/releases/download/v1.0.1/aws-service-broker-1.0.1-tile.pivotal"
   stemcell:
-    product_slug: stemcells
-    release_version: "3586.118"
+    product_slug: stemcells-ubuntu-xenial
+    release_version: "250.56"
     file_glob: "*aws*.tgz"
   manifest: tiles/aws-service-broker/product.yml
   ops_files:
