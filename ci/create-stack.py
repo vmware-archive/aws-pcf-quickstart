@@ -56,6 +56,7 @@ def create_stack(template_path: str, aws_region: str):
     pivnettoken = os.environ['AWS_CF_PIVNETTOKEN']
     aws_access_key_id = os.environ['AWS_ACCESS_KEY_ID']
     aws_secret_access_key = os.environ['AWS_SECRET_ACCESS_KEY']
+    deploymentsize = os.environ['AWS_CF_DEPLOYMENT_SIZE']
 
     sslcertificatearn = os.environ[aws_region.upper().replace(
         '-', '_') + '_SSLCERTIFICATEARN']
@@ -72,7 +73,7 @@ def create_stack(template_path: str, aws_region: str):
         {"ParameterKey": "OpsManagerAdminPassword", "ParameterValue": password},
         {"ParameterKey": "PCFKeyPair", "ParameterValue": pcfkeypair},
         {"ParameterKey": "ForwardLogOutput", "ParameterValue": "true"},
-        {"ParameterKey": "DeploymentSize", "ParameterValue": "SmallFootPrint"},
+        {"ParameterKey": "DeploymentSize", "ParameterValue": deploymentsize},
         {"ParameterKey": "SkipSSLValidation", "ParameterValue": "true"},
         {"ParameterKey": "QSS3BucketName",
             "ParameterValue": "aws-1click-pcf-quickstart-templates"},
