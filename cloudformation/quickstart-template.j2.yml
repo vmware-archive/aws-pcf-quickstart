@@ -31,12 +31,6 @@ Metadata:
       - AdminEmail
       - OpsManagerAdminPassword
       - CompanyName
-    # - Label:
-    #     default: Amazon RDS
-    #   Parameters:
-    #   - RdsDBName
-    #   - RdsUsername
-    #   - RdsPassword
     - Label:
         default: AWS Quick Start Configuration
       Parameters:
@@ -49,12 +43,6 @@ Metadata:
     ParameterLabels:
       EnvironmentID:
         default: Environment ID
-      # RdsDBName:
-      #   default: RDS DB Name
-      # RdsUsername:
-      #   default: RDS Username
-      # RdsPassword:
-      #   default: RDS Password
       DeploymentSize:
         default: Size of the Deployment
       SkipSSLValidation:
@@ -103,20 +91,6 @@ Parameters:
     Type: String
     Description: CIDR range allowed to connect to Pivotal Ops Manager and Bootstrap
       instances
-  # RdsDBName:
-  #   Type: String
-  #   MinLength: '4'
-  #   Default: bosh
-  #   Description: Database name
-  # RdsUsername:
-  #   Type: String
-  #   Description: Database username
-  # RdsPassword:
-  #   Type: String
-  #   NoEcho: 'true'
-  #   MinLength: '8'
-  #   AllowedPattern: '[\w-_]*'
-  #   Description: Database password
   SSLCertificateARN:
     Type: String
     Description: ARN for pre-uploaded SSL certificate.
@@ -250,9 +224,6 @@ Resources:
         - opsman
         OpsManIngressCidr: !Ref OpsManagerIngress
         OpsManSSHKeyPairName: !Ref PCFKeyPair
-        # RDSDBName: !Ref RdsDBName
-        # RDSUsername: !Ref RdsUsername
-        # RDSPassword: !Ref RdsPassword
         ERTCertificateARN: !Ref SSLCertificateARN
       TemplateURL: !Sub https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/cloud-formation.template
   CustomResourceSQSQueue:
