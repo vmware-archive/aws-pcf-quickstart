@@ -62,8 +62,8 @@ def create_stack(template_path: str, aws_region: str):
 
     parameters = [
         {"ParameterKey": "OpsManagerIngress", "ParameterValue": "0.0.0.0/0"},
-        {"ParameterKey": "RdsPassword", "ParameterValue": password},
-        {"ParameterKey": "RdsUsername", "ParameterValue": "admin"},
+        # {"ParameterKey": "RdsPassword", "ParameterValue": password},
+        # {"ParameterKey": "RdsUsername", "ParameterValue": "admin"},
         {"ParameterKey": "SSLCertificateARN", "ParameterValue": sslcertificatearn},
         {"ParameterKey": "PivnetToken", "ParameterValue": pivnettoken},
         {"ParameterKey": "AdminEmail", "ParameterValue": "noreply@pivotal.io"},
