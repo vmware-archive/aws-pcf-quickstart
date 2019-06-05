@@ -18,8 +18,6 @@ product-properties:
       secret: ((aws_secret_access_key))
   .properties.broker_id:
     value: ((broker_id))
-  .properties.insecure:
-    value: ((insecure))
   .properties.prescribe:
     value: ((prescribe))
   .properties.s3_bucket:

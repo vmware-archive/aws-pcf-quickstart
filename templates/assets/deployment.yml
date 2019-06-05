@@ -80,9 +80,7 @@ tiles:
     release_version: "250.56"
     file_glob: "*aws*.tgz"
   manifest: tiles/aws-service-broker/product.yml
-  ops_files:
-  - tiles/aws-service-broker/optional/add-tls_key.yml
-  - tiles/aws-service-broker/optional/add-tls_cert.yml
+  ops_files: []
   vars_files:
   - tiles/aws-service-broker/product-default-vars.yml
   - tiles/aws-service-broker/resource-vars.yml
@@ -93,9 +91,6 @@ tiles:
     aws_access_key_id: ((BrokerIamUserAccessKey))
     aws_secret_access_key: ((BrokerIamUserSecretAccessKey))
     aws_default_region: ((Region))
-    tls_cert: ((ssl_cert.certificate))
-    tls_key: ((ssl_cert.private_key))
-    insecure: true
     aws_sb_enable_global_access_to_plans: true
 
 variables:
