@@ -22,6 +22,7 @@ type ConfigureProduct struct {
 	Options     struct {
 		ConfigFile string   `long:"config"    short:"c" description:"path to yml file containing all config fields (see docs/configure-product/README.md for format)" required:"true"`
 		VarsFile   []string `long:"vars-file" short:"l" description:"Load variables from a YAML file"`
+		Vars       []string `long:"var" short:"v"       description:"Load variable from the command line. Format: VAR=VAL"`
 		VarsEnv    []string `long:"vars-env"            description:"Load variables from environment variables (e.g.: 'MY' to load MY_var=value)"`
 		OpsFile    []string `long:"ops-file"  short:"o" description:"YAML operations file"`
 	}
@@ -199,7 +200,7 @@ func (cp *ConfigureProduct) configureProperties(cfg configureProduct, productGUI
 		case map[interface{}]interface{}:
 			v := value.(map[interface{}]interface{})
 			// This is here:
-			// * the GET /properties returns the value as a field named `selected_options`.
+			// * the GET /properties returns the value as a field named `selected_option`.
 			// * the PUT /properties expects the filed to be named `option_value`.
 			// We are future-proofing and migrating until the issue is resolved.
 			// See for more information [#163833845]
@@ -284,11 +285,13 @@ func (cp *ConfigureProduct) configureErrands(cfg configureProduct, productGUID s
 
 func (cp *ConfigureProduct) interpolateConfig(cfg configureProduct) (configureProduct, error) {
 	configContents, err := interpolate(interpolateOptions{
-		templateFile: cp.Options.ConfigFile,
-		varsFiles:    cp.Options.VarsFile,
-		environFunc:  cp.environFunc,
-		varsEnvs:     cp.Options.VarsEnv,
-		opsFiles:     cp.Options.OpsFile,
+		templateFile:  cp.Options.ConfigFile,
+		varsFiles:     cp.Options.VarsFile,
+		vars:          cp.Options.Vars,
+		environFunc:   cp.environFunc,
+		varsEnvs:      cp.Options.VarsEnv,
+		opsFiles:      cp.Options.OpsFile,
+		expectAllKeys: true,
 	}, "")
 	if err != nil {
 		return configureProduct{}, err

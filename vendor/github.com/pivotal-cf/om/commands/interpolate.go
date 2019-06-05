@@ -1,9 +1,13 @@
 package commands
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"os"
+	"regexp"
+	"strconv"
 	"strings"
 
 	boshtpl "github.com/cloudfoundry/bosh-cli/director/template"
@@ -16,20 +20,24 @@ type Interpolate struct {
 	environFunc func() []string
 	logger      logger
 	Options     struct {
-		ConfigFile string   `long:"config"    short:"c" required:"true" description:"path for file to be interpolated"`
-		Path       string   `long:"path"                                description:"Extract specified value out of the interpolated file (e.g.: /private_key). The rest of the file will not be printed."`
-		VarsEnv    []string `long:"vars-env"                            description:"Load variables from environment variables (e.g.: 'MY' to load MY_var=value)"`
-		VarsFile   []string `long:"vars-file" short:"l"                 description:"Load variables from a YAML file"`
-		OpsFile    []string `long:"ops-file"  short:"o"                 description:"YAML operations files"`
+		ConfigFile        string   `long:"config"       short:"c" description:"path for file to be interpolated"`
+		Path              string   `long:"path"                   description:"Extract specified value out of the interpolated file (e.g.: /private_key). The rest of the file will not be printed."`
+		VarsEnv           []string `long:"vars-env"               description:"Load variables from environment variables (e.g.: 'MY' to load MY_var=value)"`
+		VarsFile          []string `long:"vars-file"    short:"l" description:"Load variables from a YAML file"`
+		Vars              []string `long:"var"          short:"v" description:"Load variable from the command line. Format: VAR=VAL"`
+		OpsFile           []string `long:"ops-file"     short:"o" description:"YAML operations files"`
+		SkipMissingParams bool     `long:"skip-missing" short:"s" description:"Allow skipping missing params"`
 	}
 }
 
 type interpolateOptions struct {
-	templateFile string
-	varsEnvs     []string
-	varsFiles    []string
-	opsFiles     []string
-	environFunc  func() []string
+	templateFile  string
+	varsEnvs      []string
+	varsFiles     []string
+	vars          []string
+	opsFiles      []string
+	environFunc   func() []string
+	expectAllKeys bool
 }
 
 func NewInterpolate(environFunc func() []string, logger logger) Interpolate {
@@ -44,12 +52,51 @@ func (c Interpolate) Execute(args []string) error {
 		return fmt.Errorf("could not parse interpolate flags: %s", err)
 	}
 
+	input := os.Stdin
+	info, err := input.Stat()
+	if err != nil {
+		return fmt.Errorf("error in STDIN: %s", err)
+	}
+
+	// Bitwise AND uses stdin's file mode mask against the unix character device to
+	// determine if it's pointing to stdin's pipe
+	if info.Mode()&os.ModeCharDevice == 0 {
+		contents, err := ioutil.ReadAll(input)
+		if err != nil {
+			return fmt.Errorf("error reading STDIN: %s", err)
+		}
+
+		tempFile, err := ioutil.TempFile("", "yml")
+		if err != nil {
+			return fmt.Errorf("error generating temp file for STDIN: %s", err)
+		}
+
+		defer os.Remove(tempFile.Name())
+
+		_, err = tempFile.Write(contents)
+		if err != nil {
+			return fmt.Errorf("error writing temp file for STDIN: %s", err)
+		}
+
+		c.Options.ConfigFile = tempFile.Name()
+
+	} else if len(c.Options.ConfigFile) == 0 {
+		return fmt.Errorf("no file or STDIN input provided. Please provide a valid --config file or use a pipe to get STDIN")
+	}
+
+	expectAllKeys := true
+	if c.Options.SkipMissingParams {
+		expectAllKeys = false
+	}
+
 	bytes, err := interpolate(interpolateOptions{
-		templateFile: c.Options.ConfigFile,
-		varsFiles:    c.Options.VarsFile,
-		environFunc:  c.environFunc,
-		varsEnvs:     c.Options.VarsEnv,
-		opsFiles:     c.Options.OpsFile,
+		templateFile:  c.Options.ConfigFile,
+		varsFiles:     c.Options.VarsFile,
+		vars:          c.Options.Vars,
+		environFunc:   c.environFunc,
+		varsEnvs:      c.Options.VarsEnv,
+		opsFiles:      c.Options.OpsFile,
+		expectAllKeys: expectAllKeys,
 	}, c.Options.Path)
 	if err != nil {
 		return err
@@ -101,6 +148,15 @@ func interpolate(o interpolateOptions, pathStr string) ([]byte, error) {
 			// type "string" we call yaml.Marshal to ensure characters are escaped properly.
 			if fmt.Sprintf("%T", val) == "string" {
 				b, _ := yaml.Marshal(v) // err should never occur
+
+				// Don't double quote in the case of an integer that's being used as a string
+				// For example, without this regex, a literal string number \"500\"
+				// will get unmarshalled as '"500"'
+				re := regexp.MustCompile(`^'"\d+"'`)
+				if re.Match(b) {
+					b = bytes.ReplaceAll(b, []byte(`'`), []byte(""))
+				}
+
 				err = yaml.Unmarshal(b, &val)
 				if err != nil {
 					return []byte{}, fmt.Errorf("Could not deserialize string from environment variable %q", pieces[0])
@@ -122,6 +178,8 @@ func interpolate(o interpolateOptions, pathStr string) ([]byte, error) {
 		}
 	}
 
+	ReadCommandLineVars(o.vars, staticVars)
+
 	for _, path := range o.opsFiles {
 		var opDefs []patch.OpDefinition
 		err = readYAMLFile(path, &opDefs)
@@ -137,7 +195,7 @@ func interpolate(o interpolateOptions, pathStr string) ([]byte, error) {
 
 	evalOpts := boshtpl.EvaluateOpts{
 		UnescapedMultiline: true,
-		ExpectAllKeys:      true,
+		ExpectAllKeys:      o.expectAllKeys,
 	}
 
 	path, err := patch.NewPointerFromString(pathStr)
@@ -168,4 +226,24 @@ func readYAMLFile(path string, dataType interface{}) error {
 	}
 
 	return nil
+}
+
+func ReadCommandLineVars(vars []string, staticVars boshtpl.StaticVariables) {
+	for _, singleVar := range vars {
+		splitVar := strings.Split(singleVar, "=")
+
+		valInt, err := strconv.Atoi(splitVar[1])
+		if err == nil {
+			staticVars[splitVar[0]] = valInt
+			continue
+		}
+
+		valBool, err := strconv.ParseBool(splitVar[1])
+		if err == nil {
+			staticVars[splitVar[0]] = valBool
+			continue
+		}
+
+		staticVars[splitVar[0]] = splitVar[1]
+	}
 }

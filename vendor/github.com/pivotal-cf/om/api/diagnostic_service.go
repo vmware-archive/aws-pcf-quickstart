@@ -2,22 +2,32 @@ package api
 
 import (
 	"encoding/json"
+	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/pkg/errors"
 )
 
 type DiagnosticProduct struct {
-	Name     string `json:"name"`
-	Version  string `json:"version"`
-	Stemcell string `json:"stemcell,omitempty"`
+	Name      string     `json:"name"`
+	Version   string     `json:"version"`
+	Stemcell  string     `json:"stemcell,omitempty"`
+	Stemcells []Stemcell `json:"stemcells,omitempty"`
 }
-
 type DiagnosticReport struct {
-	InfrastructureType string `json:"infrastructure_type"`
-	Stemcells          []string
+	InfrastructureType string   `json:"infrastructure_type"`
+	Stemcells          []string `json:"stemcells,omitempty"`
 	StagedProducts     []DiagnosticProduct
 	DeployedProducts   []DiagnosticProduct
+	AvailableStemcells []Stemcell `json:"available_stemcells,omitempty"`
+	FullReport         string
+}
+
+type Stemcell struct {
+	Filename string
+	OS       string
+	Version  string
 }
 
 type DiagnosticReportUnavailable struct{}
@@ -48,7 +58,13 @@ func (a Api) GetDiagnosticReport() (DiagnosticReport, error) {
 			DeployedProducts []DiagnosticProduct `json:"deployed"`
 		} `json:"added_products"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&apiResponse); err != nil {
+
+	reportBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err := json.Unmarshal(reportBytes, &apiResponse); err != nil {
 		return DiagnosticReport{}, errors.Wrap(err, "invalid json received from server")
 	}
 
@@ -57,5 +73,7 @@ func (a Api) GetDiagnosticReport() (DiagnosticReport, error) {
 		Stemcells:          apiResponse.Stemcells,
 		StagedProducts:     apiResponse.AddedProducts.StagedProducts,
 		DeployedProducts:   apiResponse.AddedProducts.DeployedProducts,
+		AvailableStemcells: apiResponse.AvailableStemcells,
+		FullReport:         string(reportBytes),
 	}, nil
 }
