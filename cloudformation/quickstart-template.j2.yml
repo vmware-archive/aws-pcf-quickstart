@@ -103,20 +103,20 @@ Parameters:
     Type: String
     Description: CIDR range allowed to connect to Pivotal Ops Manager and Bootstrap
       instances
-  RdsDBName:
-    Type: String
-    MinLength: '4'
-    Default: bosh
-    Description: Database name
-  RdsUsername:
-    Type: String
-    Description: Database username
-  RdsPassword:
-    Type: String
-    NoEcho: 'true'
-    MinLength: '8'
-    AllowedPattern: '[\w-_]*'
-    Description: Database password
+  # RdsDBName:
+  #   Type: String
+  #   MinLength: '4'
+  #   Default: bosh
+  #   Description: Database name
+  # RdsUsername:
+  #   Type: String
+  #   Description: Database username
+  # RdsPassword:
+  #   Type: String
+  #   NoEcho: 'true'
+  #   MinLength: '8'
+  #   AllowedPattern: '[\w-_]*'
+  #   Description: Database password
   SSLCertificateARN:
     Type: String
     Description: ARN for pre-uploaded SSL certificate.
@@ -227,12 +227,6 @@ Mappings:
   AMIMapping:
     {{ami_mapping | indent}}
 Resources:
-  # ResourceGroup:
-  #   Type: AWS::Inspector::CreateResourceGroup
-  #   Properties:
-  #     ResourceGroupTags:
-  #       - Key: aws:cloudformation:stack-name
-  #         Value: !Sub ${AWS::StackName}
   PCFBase:
     Type: AWS::CloudFormation::Stack
     Properties:

@@ -23,9 +23,6 @@ tiles:
   - tiles/srt/optional/add-system_blobstore-external-access_key.yml
   - tiles/srt/optional/add-system_blobstore-external-secret_key.yml
   - tiles/srt/optional/add-system_blobstore-external-region.yml
-  - tiles/srt/features/system_database-external.yml
-  - tiles/srt/features/uaa_database-external.yml
-  - tiles/srt/features/credhub_database-external.yml
   - tiles/srt/resource/control_elb_names.yml
   - tiles/srt/resource/router_elb_names.yml
   - tiles/srt/resource/tcp_router_elb_names.yml
@@ -49,6 +46,7 @@ tiles:
     uaa/service_provider_key_credentials/certificate: ((ssl_cert.certificate))
     uaa/service_provider_key_credentials/privatekey: ((ssl_cert.private_key))
     security_acknowledgement: X
+    stack_migration_acknowledgement: x
     mysql_monitor/recipient_email: ((AdminEmail))
     control_elb_names: [((PcfElbSshName))]
     router_elb_names: [((PcfElbWebName))]
@@ -69,69 +67,6 @@ tiles:
     system_blobstore/external/encryption: false
     system_blobstore/external/iam_instance_profile_authentication: false
     system_blobstore/external/versioning: true
-    system_database/external/host: ((PcfRdsAddress))
-    system_database/external/port: ((PcfRdsPort))
-    system_database/external/account_password: ((PcfRdsPassword))
-    system_database/external/account_username: ((PcfRdsUsername))
-    system_database/external/app_usage_service_password: ((PcfRdsPassword))
-    system_database/external/app_usage_service_username: ((PcfRdsUsername))
-    system_database/external/autoscale_password: ((PcfRdsPassword))
-    system_database/external/autoscale_username: ((PcfRdsUsername))
-    system_database/external/ccdb_password: ((PcfRdsPassword))
-    system_database/external/ccdb_username: ((PcfRdsUsername))
-    system_database/external/diego_password: ((PcfRdsPassword))
-    system_database/external/diego_username: ((PcfRdsUsername))
-    system_database/external/locket_password: ((PcfRdsPassword))
-    system_database/external/locket_username: ((PcfRdsUsername))
-    system_database/external/networkpolicyserver_password: ((PcfRdsPassword))
-    system_database/external/networkpolicyserver_username: ((PcfRdsUsername))
-    system_database/external/nfsvolume_password: ((PcfRdsPassword))
-    system_database/external/nfsvolume_username: ((PcfRdsUsername))
-    system_database/external/notifications_password: ((PcfRdsPassword))
-    system_database/external/notifications_username: ((PcfRdsUsername))
-    system_database/external/routing_password: ((PcfRdsPassword))
-    system_database/external/routing_username: ((PcfRdsUsername))
-    system_database/external/silk_password: ((PcfRdsPassword))
-    system_database/external/silk_username: ((PcfRdsUsername))
-
-    uaa_database/external/host: ((PcfRdsAddress))
-    uaa_database/external/port: ((PcfRdsPort))
-    uaa_database/external/uaa_password: ((PcfRdsPassword))
-    uaa_database/external/uaa_username: ((PcfRdsUsername))
-    stack_migration_acknowledgement: x
-
-    credhub_database/external/host: ((PcfRdsAddress))
-    credhub_database/external/port: ((PcfRdsPort))
-    credhub_database/external/username: ((PcfRdsUsername))
-    credhub_database/external/password: ((PcfRdsPassword))
-    # the certificate "rds-ca-2015" wil expire Mar 5th, 2020
-    # due to pivotal's inconsistency of using the tls cert for external DB's its only required for credhub
-    # more info https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.SSL.html
-    credhub_database/external/tls_ca: |
-      -----BEGIN CERTIFICATE-----
-      MIID9DCCAtygAwIBAgIBQjANBgkqhkiG9w0BAQUFADCBijELMAkGA1UEBhMCVVMx
-      EzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0bGUxIjAgBgNVBAoM
-      GUFtYXpvbiBXZWIgU2VydmljZXMsIEluYy4xEzARBgNVBAsMCkFtYXpvbiBSRFMx
-      GzAZBgNVBAMMEkFtYXpvbiBSRFMgUm9vdCBDQTAeFw0xNTAyMDUwOTExMzFaFw0y
-      MDAzMDUwOTExMzFaMIGKMQswCQYDVQQGEwJVUzETMBEGA1UECAwKV2FzaGluZ3Rv
-      bjEQMA4GA1UEBwwHU2VhdHRsZTEiMCAGA1UECgwZQW1hem9uIFdlYiBTZXJ2aWNl
-      cywgSW5jLjETMBEGA1UECwwKQW1hem9uIFJEUzEbMBkGA1UEAwwSQW1hem9uIFJE
-      UyBSb290IENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuD8nrZ8V
-      u+VA8yVlUipCZIKPTDcOILYpUe8Tct0YeQQr0uyl018StdBsa3CjBgvwpDRq1HgF
-      Ji2N3+39+shCNspQeE6aYU+BHXhKhIIStt3r7gl/4NqYiDDMWKHxHq0nsGDFfArf
-      AOcjZdJagOMqb3fF46flc8k2E7THTm9Sz4L7RY1WdABMuurpICLFE3oHcGdapOb9
-      T53pQR+xpHW9atkcf3pf7gbO0rlKVSIoUenBlZipUlp1VZl/OD/E+TtRhDDNdI2J
-      P/DSMM3aEsq6ZQkfbz/Ilml+Lx3tJYXUDmp+ZjzMPLk/+3beT8EhrwtcG3VPpvwp
-      BIOqsqVVTvw/CwIDAQABo2MwYTAOBgNVHQ8BAf8EBAMCAQYwDwYDVR0TAQH/BAUw
-      AwEB/zAdBgNVHQ4EFgQUTgLurD72FchM7Sz1BcGPnIQISYMwHwYDVR0jBBgwFoAU
-      TgLurD72FchM7Sz1BcGPnIQISYMwDQYJKoZIhvcNAQEFBQADggEBAHZcgIio8pAm
-      MjHD5cl6wKjXxScXKtXygWH2BoDMYBJF9yfyKO2jEFxYKbHePpnXB1R04zJSWAw5
-      2EUuDI1pSBh9BA82/5PkuNlNeSTB3dXDD2PEPdzVWbSKvUB8ZdooV+2vngL0Zm4r
-      47QPyd18yPHrRIbtBtHR/6CwKevLZ394zgExqhnekYKIqqEX41xsUV0Gm6x4vpjf
-      2u6O/+YE2U+qyyxHE5Wd5oqde0oo9UUpFETJPVb6Q2cEeQib8PBAyi0i6KnF+kIV
-      A9dY7IHSubtCK/i8wxMVqfd5GtbA8mmpeJFwnDvm9rBEsHybl08qlax9syEwsUYr
-      /40NawZfTUU=
-      -----END CERTIFICATE-----
 
 - name: aws-service-broker
   version: 1.0.0-beta.3
