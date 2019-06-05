@@ -85,11 +85,6 @@ func (cmd *BuildCommand) run(c *kingpin.ParseContext) error {
 			},
 		},
 		steps.Step{
-			Name: "CreateDatabases",
-			Do: func(ctx context.Context) error {
-				return cfg.Database.CreateDatabases()
-			}},
-		steps.Step{
 			Name:      "UpdateCustomResource",
 			DependsOn: []string{tiler.StepDeployDirector},
 			Do: func(ctx context.Context) error {
