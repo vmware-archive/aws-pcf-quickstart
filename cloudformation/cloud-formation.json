@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Conditions": {
+  /* "Conditions": {
     "CreateRDS": {
       "Fn::And": [
         {
@@ -41,7 +41,7 @@
         }
       ]
     }
-  },
+  }, */
   "Description": "CloudFormation template for configuring Pivotal Cloud Foundry on AWS QS(qs-1ngltrcp5)",
   "Mappings": {
     "NATRegionToAmiMap": {
@@ -105,7 +105,7 @@
       "Type": "AWS::EC2::KeyPair::KeyName",
       "Description": "Select the SSH keypair to use for the Ops Manager VM"
     },
-    "RDSDBName": {
+    /* "RDSDBName": {
       "Type": "String",
       "AllowedPattern": "([a-zA-Z][a-zA-Z0-9]{3,}|^$)",
       "Description": "RDS database name (leave blank to skip RDS). Nust begin with a letter and contain only alphanumeric characters."
@@ -119,7 +119,7 @@
       "NoEcho": "true",
       "AllowedPattern": "(.{8,}|^$)",
       "Description": "RDS database password (leave blank to skip RDS, must be 8+ chars)"
-    },
+    }, */
     "ERTCertificateARN": {
       "Type": "String",
       "Description": "ARN for pre-uploaded certificate for the ERT"
@@ -581,7 +581,7 @@
         ]
       }
     },
-    "PcfRDSSubnetAZ1": {
+    /* "PcfRDSSubnetAZ1": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "CidrBlock": "10.0.12.0/24",
@@ -665,7 +665,7 @@
         ]
       }
     },
-    "PcfRds": {
+     "PcfRds": {
       "Type": "AWS::RDS::DBInstance",
       "Condition": "CreateRDS",
       "Properties": {
@@ -705,7 +705,7 @@
           "Ref": "PcfRdsSubnetGroup"
         }
       }
-    },
+    }, */
     "PcfServicesSubnetAZ1": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
@@ -1817,7 +1817,7 @@
         ]
       }
     },
-    "PcfRdsSubnetGroup": {
+    /* "PcfRdsSubnetGroup": {
       "Type": "AWS::RDS::DBSubnetGroup",
       "Properties": {
         "DBSubnetGroupDescription": "RDS Subnet Group",
@@ -1849,7 +1849,7 @@
           }
         ]
       }
-    },
+    }, */
     "PcfVmsSecurityGroup": {
       "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
@@ -1925,7 +1925,7 @@
         ]
       }
     },
-    "PcfRdsSecurityGroup": {
+    /* "PcfRdsSecurityGroup": {
       "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
         "GroupDescription": "RDS Security Group",
@@ -1949,7 +1949,7 @@
           }
         ]
       }
-    },
+    }, */
     "PcfNatSecurityGroup": {
       "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
@@ -2149,7 +2149,7 @@
         }
       }
     },
-    "PcfRDSSubnetAclAZ1": {
+    /* "PcfRDSSubnetAclAZ1": {
       "Type": "AWS::EC2::SubnetNetworkAclAssociation",
       "Properties": {
         "NetworkAclId": {
@@ -2181,7 +2181,7 @@
           "Ref": "PcfRDSSubnetAZ3"
         }
       }
-    },
+    }, */
     "PcfServicesSubnetAclAZ1": {
       "Type": "AWS::EC2::SubnetNetworkAclAssociation",
       "Properties": {
@@ -2562,7 +2562,7 @@
         "CidrIp": "0.0.0.0/0"
       }
     },
-    "PcfIngressRuleRds1": {
+    /* "PcfIngressRuleRds1": {
       "Type": "AWS::EC2::SecurityGroupIngress",
       "Properties": {
         "GroupId": {
@@ -2573,7 +2573,7 @@
         "ToPort": "3306",
         "CidrIp": "10.0.0.0/16"
       }
-    },
+    }, */
     "PcfIngressRuleNat1": {
       "Type": "AWS::EC2::SecurityGroupIngress",
       "Properties": {
@@ -2638,7 +2638,7 @@
         "CidrIp": "0.0.0.0/0"
       }
     },
-    "PcfEgressRuleRds1": {
+    /* "PcfEgressRuleRds1": {
       "Type": "AWS::EC2::SecurityGroupEgress",
       "Properties": {
         "GroupId": {
@@ -2647,7 +2647,7 @@
         "IpProtocol": "-1",
         "CidrIp": "10.0.0.0/16"
       }
-    },
+    }, */
     "PcfEgressRuleNat1": {
       "Type": "AWS::EC2::SecurityGroupEgress",
       "Properties": {
@@ -3171,7 +3171,7 @@
         "Ref": "PcfVmsSecurityGroup"
       }
     },
-    "PcfRdsAddress": {
+    /* "PcfRdsAddress": {
       "Condition": "CreateRDS",
       "Value": {
         "Fn::GetAtt": [
@@ -3200,7 +3200,7 @@
       "Value": {
         "Ref": "RDSDBName"
       }
-    },
+    }, */
     "PcfElbWebName": {
       "Value": {
         "Ref": "PcfElbWeb"
