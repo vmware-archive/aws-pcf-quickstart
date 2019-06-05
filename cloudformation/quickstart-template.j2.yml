@@ -381,10 +381,6 @@ Resources:
       Type: String
       Value: !Sub |
         {
-        # "PcfRdsPassword": "${RdsPassword}",
-        # "PcfRdsPort": "${PCFBase.Outputs.PcfRdsPort}",
-        # "PcfRdsAddress": "${PCFBase.Outputs.PcfRdsAddress}",
-        # "PcfRdsUsername": "${PCFBase.Outputs.PcfRdsUsername}",
         "PcfDeploymentSize": "${DeploymentSize}",
         "PcfVpc": "${PCFBase.Outputs.PcfVpc}",
         "PcfAvailabilityZone1": "${PCFBase.Outputs.PcfManagementSubnetAZ1AvailabilityZone}",
