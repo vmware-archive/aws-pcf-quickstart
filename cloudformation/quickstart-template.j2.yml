@@ -31,12 +31,12 @@ Metadata:
       - AdminEmail
       - OpsManagerAdminPassword
       - CompanyName
-    - Label:
-        default: Amazon RDS
-      Parameters:
-      - RdsDBName
-      - RdsUsername
-      - RdsPassword
+    # - Label:
+    #     default: Amazon RDS
+    #   Parameters:
+    #   - RdsDBName
+    #   - RdsUsername
+    #   - RdsPassword
     - Label:
         default: AWS Quick Start Configuration
       Parameters:
@@ -49,12 +49,12 @@ Metadata:
     ParameterLabels:
       EnvironmentID:
         default: Environment ID
-      RdsDBName:
-        default: RDS DB Name
-      RdsUsername:
-        default: RDS Username
-      RdsPassword:
-        default: RDS Password
+      # RdsDBName:
+      #   default: RDS DB Name
+      # RdsUsername:
+      #   default: RDS Username
+      # RdsPassword:
+      #   default: RDS Password
       DeploymentSize:
         default: Size of the Deployment
       SkipSSLValidation:
@@ -250,9 +250,9 @@ Resources:
         - opsman
         OpsManIngressCidr: !Ref OpsManagerIngress
         OpsManSSHKeyPairName: !Ref PCFKeyPair
-        RDSDBName: !Ref RdsDBName
-        RDSUsername: !Ref RdsUsername
-        RDSPassword: !Ref RdsPassword
+        # RDSDBName: !Ref RdsDBName
+        # RDSUsername: !Ref RdsUsername
+        # RDSPassword: !Ref RdsPassword
         ERTCertificateARN: !Ref SSLCertificateARN
       TemplateURL: !Sub https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/cloud-formation.template
   CustomResourceSQSQueue:
@@ -381,10 +381,10 @@ Resources:
       Type: String
       Value: !Sub |
         {
-        "PcfRdsPassword": "${RdsPassword}",
-        "PcfRdsPort": "${PCFBase.Outputs.PcfRdsPort}",
-        "PcfRdsAddress": "${PCFBase.Outputs.PcfRdsAddress}",
-        "PcfRdsUsername": "${PCFBase.Outputs.PcfRdsUsername}",
+        # "PcfRdsPassword": "${RdsPassword}",
+        # "PcfRdsPort": "${PCFBase.Outputs.PcfRdsPort}",
+        # "PcfRdsAddress": "${PCFBase.Outputs.PcfRdsAddress}",
+        # "PcfRdsUsername": "${PCFBase.Outputs.PcfRdsUsername}",
         "PcfDeploymentSize": "${DeploymentSize}",
         "PcfVpc": "${PCFBase.Outputs.PcfVpc}",
         "PcfAvailabilityZone1": "${PCFBase.Outputs.PcfManagementSubnetAZ1AvailabilityZone}",
