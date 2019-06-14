@@ -2,7 +2,8 @@
 platform: linux
 image_resource:
   type: docker-image
-  source: cfplatformeng/quickstart-ci
+  source:
+    repository: cfplatformeng/quickstart-ci
 inputs:
 - name: tile
 - name: quickstart-repo-ci
