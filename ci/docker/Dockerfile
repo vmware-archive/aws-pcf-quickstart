@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install unzip wget
 RUN wget -q -O - https://raw.githubusercontent.com/starkandwayne/homebrew-cf/master/public.key | apt-key add - && \
     echo "deb http://apt.starkandwayne.com stable main" | tee /etc/apt/sources.list.d/starkandwayne.list && \
     apt-get -y -qq update && \
-    apt-get -y -qq install bosh-cli
+    apt-get -y -qq install bosh-cli jq
 
 # packer
 RUN pip install mock jinja2 boto3
