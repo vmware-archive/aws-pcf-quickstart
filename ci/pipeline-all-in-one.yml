@@ -78,6 +78,16 @@ resources:
     ignore_paths:
       - ci/*.yml
 
+- name: quickstart-repo-ci
+  type: git
+  source:
+    branch: master
+    uri: https://github.com/cf-platform-eng/aws-pcf-quickstart.git
+    username: ((github_user_name))
+    password: ((github_access_token))
+    paths: [ci/*]
+    disable_ci_skip: true
+
 - name: aws-quickstart-repo
   type: git
   source:
@@ -814,11 +824,12 @@ jobs:
       resource: cf-tile
       trigger: true
       params: { globs: [] }
-    - get: aws-quickstart-repo
+    - get: quickstart-repo
+    - get: quickstart-repo-ci
     - get: quickstart-ci-image
   - task: update-tile
     image: quickstart-ci-image
-    file: ci/tasks/update-tile.yml
+    file: quickstart-repo-ci/ci/tasks/update-tile.yml
     params:
       PIVNET_TOKEN: ((pivnet-legacy-token))
       TILE_NAME: cf
@@ -836,10 +847,11 @@ jobs:
       trigger: true
       params: { globs: [] }
     - get: quickstart-repo
+    - get: quickstart-repo-ci
     - get: quickstart-ci-image
   - task: update-tile
     image: quickstart-ci-image
-    file: ci/tasks/update-tile.yml
+    file: quickstart-repo-ci/ci/tasks/update-tile.yml
     params:
       PIVNET_TOKEN: ((pivnet-legacy-token))
       TILE_NAME: cf
@@ -857,18 +869,17 @@ jobs:
 #       resource: aws-service-broker-tile
 #       trigger: true
 #       params: { globs: [] }
-#     - get: omg-src-in
-#       resource: omg-src-in
-#     - get: ci-image
-#     - get: omg-src-ci
+#     - get: quickstart-repo
+#     - get: quickstart-repo-ci
+#     - get: quickstart-ci-image
 #   - task: update-tile
-#     image: ci-image
-#     file: omg-src-ci/ci/tasks/update-tile.yml
+#     image: quickstart-ci-image
+#     file: quickstart-repo-ci/ci/tasks/update-tile.yml
 #     params:
 #       PIVNET_TOKEN: ((pivnet-legacy-token))
-#       TILE_NAME: aws-service-broker
-#       TILE_BASE_DIR: templates/assets/tiles/aws-service-broker
-  # - put: omg-src-in
-  #   params:
-  #     repository: repo-out
-  #     merge: true
+#        TILE_NAME: aws-service-broker
+#        TILE_BASE_DIR: templates/assets/tiles/aws-service-broker
+#   - put: omg-src-in
+#     params:
+#       repository: repo-out
+#       merge: true
