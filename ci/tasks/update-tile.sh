@@ -9,7 +9,7 @@ if [[ ! -z ${OPS_FILE} ]]; then
 
 fi
 
-export RECIPE="$(pwd)/repo-in/src/omg-cli/templates/assets/deployment.yml ${opsfilecommand}"
+export RECIPE="$(pwd)/repo-in/templates/assets/deployment.yml ${opsfilecommand}"
 
 
 
@@ -58,13 +58,13 @@ else
   - type: replace
     path: /tiles/name=${TILE_NAME}/stemcell/release_version
     value: ${STMECELL_VERSION}
-  ") > src/omg-cli/templates/assets/deployment.yml
+  ") > templates/assets/deployment.yml
 fi
 
 git --no-pager diff
 
 echo "Embed updated template files"
-go generate src/omg-cli/templates/templates.go
+go generate templates/templates.go
 
 git config --global user.email "ci@starkandwayne.com"
 git config --global user.name "CI Bot"
