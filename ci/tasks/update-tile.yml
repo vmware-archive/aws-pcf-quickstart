@@ -5,7 +5,7 @@ image_resource:
   source: quickstart-ci-image
 inputs:
 - name: tile
-- name: aws-quickstart-repo
+- name: quickstart-repo
   path: repo-in
 outputs:
 - name: repo-out

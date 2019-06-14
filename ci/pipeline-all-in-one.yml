@@ -835,7 +835,7 @@ jobs:
       resource: cf-tile
       trigger: true
       params: { globs: [] }
-    - get: aws-quickstart-repo
+    - get: quickstart-repo
     - get: quickstart-ci-image
   - task: update-tile
     image: quickstart-ci-image
