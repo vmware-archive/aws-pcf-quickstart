@@ -1,4 +1,25 @@
 ---
+groups:
+  - name: aws-all-in-one
+    jobs:
+      - build-ami
+      - upload-inner-template-alpha
+      - commit-and-pr-aws-quickstart-repo
+      - replicate-ami
+      - instantiate-outer-template-alpha
+      - integration-test
+      - delete-cf
+      - github-release
+      - build-quickstart-ci
+      - unit-test
+      - build-quickstart-alpha
+      - check-cf-status
+      - make_pr_to_aws
+  - name: tiles
+    jobs:
+      - update-cf-srt-tile
+      - update-cf-ert-tile
+
 resource_types:
 - name: ami
   type: docker-image
@@ -111,22 +132,21 @@ resources:
     username: ((github_user_name))
     password: ((github_access_token))
 
-# - name: ert-tile
-#   type: pivnet
-#   source:
-#     api_token: ((pivnet_token))
-#     copy_metadata: true
-#     product_slug: elastic-runtime
-#     product_version: 2\.4\.1\.*
-
-- name: aws-broker-tile
-  type: github-release
+- name: cf-tile
+  type: pivnet
   source:
-    owner: awslabs
-    repository: aws-servicebroker
-    access_token: ((github_access_token))
-    pre_release: true
-    version: v1.0.0-beta.3
+    api_token: ((pivnet-token))
+    copy_metadata: true
+    product_slug: elastic-runtime
+
+# - name: aws-service-broker-tile
+#   type: github-release
+#   source:
+#     owner: awslabs
+#     repository: aws-servicebroker
+#     access_token: ((github_access_token))
+#     pre_release: true
+#     version: v1.0.0-beta.3
 
 - name: opsman-tile
   type: pivnet
@@ -404,11 +424,11 @@ jobs:
     # trigger: true
     # params:
     #   globs: []
-  - get: aws-broker-tile
-    trigger: true
-    params:
-      globs:
-        - aws-service-broker-*-tile.pivotal
+  # - get: aws-broker-tile
+  #   trigger: true
+  #   params:
+  #     globs:
+  #       - aws-service-broker-*-tile.pivotal
   - task: build-release
     config:
       platform: linux
@@ -421,7 +441,7 @@ jobs:
       - name: om-release
       - name: quickstart-repo
       # - name: ert-tile
-      - name: aws-broker-tile
+      # - name: aws-broker-tile
       outputs:
       - name: output
       params:
@@ -517,7 +537,7 @@ jobs:
           popd
           cp quickstart-repo/stackid output/stackid
     # on_failure:
-    #   aggregate:
+    #   in_parallel:
     #     # - put: slack-alert
     #     #   params:
     #     #     icon_emoji: ":sad_panda:"
@@ -621,7 +641,7 @@ jobs:
           python ./ci/delete-stack.py
           popd
     ensure:
-      aggregate:
+      in_parallel:
         - task: delete-buckets
           config:
             inputs:
@@ -786,3 +806,69 @@ jobs:
         - |
           pip install requests
           python3 quickstart-repo/ci/github-pullrequest.py
+
+- name: update-cf-srt-tile
+  plan:
+  - in_parallel:
+    - get: tile
+      resource: cf-tile
+      trigger: true
+      params: { globs: [] }
+    - get: aws-quickstart-repo
+    - get: quickstart-ci-image
+  - task: update-tile
+    image: quickstart-ci-image
+    file: ci/tasks/update-tile.yml
+    params:
+      PIVNET_TOKEN: ((pivnet-legacy-token))
+      TILE_NAME: cf
+      TILE_BASE_DIR: templates/assets/tiles/srt
+  # - put: omg-src-in
+  #   params:
+  #     repository: repo-out
+  #     merge: true
+
+- name: update-cf-ert-tile
+  plan:
+  - in_parallel:
+    - get: tile
+      resource: cf-tile
+      trigger: true
+      params: { globs: [] }
+    - get: aws-quickstart-repo
+    - get: quickstart-ci-image
+  - task: update-tile
+    image: quickstart-ci-image
+    file: ci/tasks/update-tile.yml
+    params:
+      PIVNET_TOKEN: ((pivnet-legacy-token))
+      TILE_NAME: cf
+      TILE_BASE_DIR: templates/assets/tiles/ert
+      OPS_FILE: templates/assets/options/full.yml
+  # - put: omg-src-in
+  #   params:
+  #     repository: repo-out
+  #     merge: true
+
+# - name: update-aws-service-broker-tile
+#   plan:
+#   - in_parallel:
+#     - get: tile
+#       resource: aws-service-broker-tile
+#       trigger: true
+#       params: { globs: [] }
+#     - get: omg-src-in
+#       resource: omg-src-in
+#     - get: ci-image
+#     - get: omg-src-ci
+#   - task: update-tile
+#     image: ci-image
+#     file: omg-src-ci/ci/tasks/update-tile.yml
+#     params:
+#       PIVNET_TOKEN: ((pivnet-legacy-token))
+#       TILE_NAME: aws-service-broker
+#       TILE_BASE_DIR: templates/assets/tiles/aws-service-broker
+  # - put: omg-src-in
+  #   params:
+  #     repository: repo-out
+  #     merge: true
