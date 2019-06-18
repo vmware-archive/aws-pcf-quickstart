@@ -17,8 +17,7 @@ groups:
       - make_pr_to_aws
   - name: tiles
     jobs:
-      - update-cf-srt-tile
-      - update-cf-ert-tile
+      - update-cf-tile
 
 resource_types:
 - name: ami
@@ -817,7 +816,7 @@ jobs:
           pip install requests
           python3 quickstart-repo/ci/github-pullrequest.py
 
-- name: update-cf-srt-tile
+- name: update-cf-tile
   plan:
   - in_parallel:
     - get: tile
@@ -834,21 +833,6 @@ jobs:
       PIVNET_TOKEN: ((pivnet-legacy-token))
       TILE_NAME: cf
       TILE_BASE_DIR: templates/assets/tiles/srt
-  # - put: omg-src-in
-  #   params:
-  #     repository: repo-out
-  #     merge: true
-
-- name: update-cf-ert-tile
-  plan:
-  - in_parallel:
-    - get: tile
-      resource: cf-tile
-      trigger: true
-      params: { globs: [] }
-    - get: quickstart-repo
-    - get: quickstart-repo-ci
-    - get: quickstart-ci-image
   - task: update-tile
     image: quickstart-ci-image
     file: quickstart-repo-ci/ci/tasks/update-tile.yml
@@ -857,9 +841,9 @@ jobs:
       TILE_NAME: cf
       TILE_BASE_DIR: templates/assets/tiles/ert
       OPS_FILE: templates/assets/options/full.yml
-  # - put: omg-src-in
+  # - put: quickstart-repo
   #   params:
-  #     repository: repo-out
+  #     repository: repo
   #     merge: true
 
 # - name: update-aws-service-broker-tile
@@ -879,7 +863,7 @@ jobs:
 #       PIVNET_TOKEN: ((pivnet-legacy-token))
 #        TILE_NAME: aws-service-broker
 #        TILE_BASE_DIR: templates/assets/tiles/aws-service-broker
-#   - put: omg-src-in
+#   - put: quickstart-repo
 #     params:
-#       repository: repo-out
+#       repository: repo
 #       merge: true
