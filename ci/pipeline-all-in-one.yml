@@ -826,14 +826,14 @@ jobs:
     - get: quickstart-repo
     - get: quickstart-repo-ci
     - get: quickstart-ci-image
-  - task: update-tile
+  - task: update-srt-tile
     image: quickstart-ci-image
     file: quickstart-repo-ci/ci/tasks/update-tile.yml
     params:
       PIVNET_TOKEN: ((pivnet-legacy-token))
       TILE_NAME: cf
       TILE_BASE_DIR: templates/assets/tiles/srt
-  - task: update-tile
+  - task: update-ert-tile
     image: quickstart-ci-image
     file: quickstart-repo-ci/ci/tasks/update-tile.yml
     params:
@@ -841,10 +841,10 @@ jobs:
       TILE_NAME: cf
       TILE_BASE_DIR: templates/assets/tiles/ert
       OPS_FILE: templates/assets/options/full.yml
-  # - put: quickstart-repo
-  #   params:
-  #     repository: repo
-  #     merge: true
+  - put: quickstart-repo
+    params:
+      repository: repo
+      merge: true
 
 # - name: update-aws-service-broker-tile
 #   plan:

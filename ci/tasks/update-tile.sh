@@ -45,7 +45,7 @@ if [[ ! -z ${OPS_FILE} ]]; then
   - type: replace
     path: /path=~1tiles~1name=${TILE_NAME}/value/stemcell/release_version
     value: ${STMECELL_VERSION}
-  ") > ${OPS_FILE}
+  ") > ${OPS_FILE}.tmp
   mv ${OPS_FILE}{.tmp,}
 else
   bosh int ${RECIPE} -o <(echo -e "
@@ -58,8 +58,8 @@ else
   - type: replace
     path: /tiles/name=${TILE_NAME}/stemcell/release_version
     value: ${STMECELL_VERSION}
-  ") > templates/assets/deployment.yml
-  mv src/omg-cli/templates/assets/deployment.yml{.tmp,}
+  ") > templates/assets/deployment.yml.tmp
+  mv templates/assets/deployment.yml{.tmp,}
 fi
 
 git --no-pager diff
