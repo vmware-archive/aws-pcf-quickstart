@@ -823,7 +823,8 @@ jobs:
       resource: cf-tile
       trigger: true
       params: { globs: [] }
-    - get: quickstart-repo
+    - get: repo
+      resource: quickstart-repo
     - get: quickstart-repo-ci
     - get: quickstart-ci-image
   - task: update-srt-tile
