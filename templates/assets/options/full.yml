@@ -49,7 +49,6 @@
       - ((PcfElbWebName))
       security_acknowledgement: X
       singleton_availability_zone: ((PcfAvailabilityZone1))
-      stack_migration_acknowledgement: x
       system_blobstore/external/access_key: ((PcfIamUserAccessKey))
       system_blobstore/external/buildpacks_bucket: ((PcfElasticRuntimeS3BuildpacksBucket))
       system_blobstore/external/droplets_bucket: ((PcfElasticRuntimeS3DropletsBucket))
