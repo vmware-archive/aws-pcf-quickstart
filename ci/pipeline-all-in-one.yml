@@ -607,7 +607,8 @@ jobs:
         args:
         - -exc
         - |
-          mv om-release/om-linux /usr/local/bin/om
+          version=$(cat om-release/version)
+          mv om-release/om-linux-${version} /usr/local/bin/om
           chmod +x /usr/local/bin/om
           pushd quickstart-repo
           pip install -r requirements.txt
