@@ -462,7 +462,8 @@ jobs:
           mkdir -p quickstart
           mkdir -p quickstart/bin
           cp -r quickstart-repo/* quickstart
-          cp om-release/om-linux quickstart/bin/om
+          version=$(cat om-release/version)
+          cp om-release/om-linux-${version} quickstart/bin/om
           chmod +x quickstart/bin/om
           cp pivnet-release/pivnet-linux* quickstart/bin/pivnet
           chmod +x quickstart/bin/pivnet
