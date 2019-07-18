@@ -9,6 +9,9 @@ import (
 
 func GetPattern(cfg *config.Config, varsStore string, expectAllKeys bool) (pattern.Pattern, error) {
 	var opsFiles []string
+	if cfg.PcfDeploymentSize == "Starter" {
+		opsFiles = append(opsFiles, "options/starter.yml")
+	}
 	if cfg.PcfDeploymentSize == "Multi-AZ" {
 		opsFiles = append(opsFiles, "options/full.yml")
 	}
