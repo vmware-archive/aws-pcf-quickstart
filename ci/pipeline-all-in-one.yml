@@ -843,6 +843,14 @@ jobs:
       TILE_NAME: cf
       TILE_BASE_DIR: templates/assets/tiles/ert
       OPS_FILE: templates/assets/options/full.yml
+  - task: update-ert-starter-tile
+    image: quickstart-ci-image
+    file: quickstart-repo-ci/ci/tasks/update-tile.yml
+    params:
+      PIVNET_TOKEN: ((pivnet-legacy-token))
+      TILE_NAME: cf
+      TILE_BASE_DIR: templates/assets/tiles/ert
+      OPS_FILE: templates/assets/options/starter.yml      
   - put: quickstart-repo
     params:
       repository: repo
