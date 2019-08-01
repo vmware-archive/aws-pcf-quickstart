@@ -19,33 +19,48 @@
     product:
       file_glob: cf*.pivotal
       product_slug: elastic-runtime
-      release_version: 2.6.2
+      release_version: 2.6.3
     stemcell:
       file_glob: '*aws*.tgz'
       product_slug: stemcells-ubuntu-xenial
-      release_version: 315.64
+      release_version: 315.72
     vars:
+      clock_global_instances: 1
       cloud_controller/apps_domain: apps.((Domain))
       cloud_controller/system_domain: sys.((Domain))
+      cloud_controller_instances: 1
+      cloud_controller_worker_instances: 1
+      credhub_instances: 1
       credhub_key_encryption_passwords_0/key: ((credhub_encryption_key))
       credhub_key_encryption_passwords_0/name: Default_Key
       credhub_key_encryption_passwords_0/primary: true
       diego_brain_elb_names:
       - ((PcfElbSshName))
+      diego_brain_instances: 1
+      diego_cell_instances: 3
+      diego_database_instances: 1
+      doppler_instances: 1
       gorouter_ssl_ciphers: ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384
       ha_proxy/skip_cert_verify: true
       haproxy_forward_tls/enable/backend_ca: ((default_ca.ca)))
       haproxy_ssl_ciphers: ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384
+      loggregator_trafficcontroller_instances: 1
+      mysql_instances: 1
       mysql_monitor/recipient_email: ((AdminEmail))
       mysql_monitor_instances: 0
+      mysql_proxy_instances: 1
+      nats_instances: 1
       network_name: pcf-ert-network
       networking_poe_ssl_certs_0/certificate: ((ssl_cert.certificate))
       networking_poe_ssl_certs_0/name: Certificate
       networking_poe_ssl_certs_0/privatekey: ((ssl_cert.private_key))
       router_elb_names:
       - ((PcfElbWebName))
+      router_instances: 1
       security_acknowledgement: X
       singleton_availability_zone: ((PcfAvailabilityZone1))
+      syslog_adapter_instances: 1
+      syslog_scheduler_instances: 1
       system_blobstore/external/access_key: ((PcfIamUserAccessKey))
       system_blobstore/external/buildpacks_bucket: ((PcfElasticRuntimeS3BuildpacksBucket))
       system_blobstore/external/droplets_bucket: ((PcfElasticRuntimeS3DropletsBucket))
@@ -60,28 +75,13 @@
       system_blobstore/external/versioning: true
       tcp_router_elb_names:
       - ((PcfElbTcpName))
+      tcp_router_instances: 1
       tcp_routing/enable/reservable_ports: 1024-65535
       uaa/service_provider_key_credentials/certificate: ((ssl_cert.certificate))
       uaa/service_provider_key_credentials/privatekey: ((ssl_cert.private_key))
-      clock_global_instances: 1
-      cloud_controller_instances: 1
-      cloud_controller_worker_instances: 1
-      credhub_instances: 1
-      diego_brain_instances: 1
-      diego_cell_instances: 3
-      diego_database_instances: 1
-      doppler_instances: 1
-      loggregator_trafficcontroller_instances: 1
-      nats_instances: 1
-      router_instances: 1
-      syslog_adapter_instances: 1
-      syslog_scheduler_instances: 1
-      tcp_router_instances: 1
       uaa_instances: 1
-      mysql_instances: 1
-      mysql_proxy_instances: 1
     vars_files:
     - tiles/ert/product-default-vars.yml
     - tiles/ert/resource-vars.yml
     - tiles/ert/errand-vars.yml
-    version: 2.6.2
+    version: 2.6.3
