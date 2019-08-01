@@ -20,11 +20,11 @@
     product:
       file_glob: cf*.pivotal
       product_slug: elastic-runtime
-      release_version: 2.6.2
+      release_version: 2.6.3
     stemcell:
       file_glob: '*aws*.tgz'
       product_slug: stemcells-ubuntu-xenial
-      release_version: 315.64
+      release_version: 315.72
     vars:
       az2_name: ((PcfAvailabilityZone2))
       az3_name: ((PcfAvailabilityZone3))
@@ -70,4 +70,4 @@
     - tiles/ert/product-default-vars.yml
     - tiles/ert/resource-vars.yml
     - tiles/ert/errand-vars.yml
-    version: 2.6.2
+    version: 2.6.3
