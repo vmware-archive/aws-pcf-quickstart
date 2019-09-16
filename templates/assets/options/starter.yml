@@ -23,7 +23,7 @@
     stemcell:
       file_glob: '*aws*.tgz'
       product_slug: stemcells-ubuntu-xenial
-      release_version: 315.72
+      release_version: 315.93
     vars:
       clock_global_instances: 1
       cloud_controller/apps_domain: apps.((Domain))
