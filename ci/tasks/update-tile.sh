@@ -66,6 +66,7 @@ git --no-pager diff
 
 echo "Embed updated template files"
 go generate templates/templates.go
+UPDATE_FIXTURES=true ginkgo templates
 
 git config --global user.email "ci@starkandwayne.com"
 git config --global user.name "CI Bot"
