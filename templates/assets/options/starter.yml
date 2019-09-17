@@ -19,7 +19,7 @@
     product:
       file_glob: cf*.pivotal
       product_slug: elastic-runtime
-      release_version: 2.6.4
+      release_version: 2.6.5
     stemcell:
       file_glob: '*aws*.tgz'
       product_slug: stemcells-ubuntu-xenial
@@ -84,4 +84,4 @@
     - tiles/ert/product-default-vars.yml
     - tiles/ert/resource-vars.yml
     - tiles/ert/errand-vars.yml
-    version: 2.6.4
+    version: 2.6.5
