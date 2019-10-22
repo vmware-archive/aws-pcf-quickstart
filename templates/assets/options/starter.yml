@@ -77,6 +77,7 @@
       - ((PcfElbTcpName))
       tcp_router_instances: 1
       tcp_routing/enable/reservable_ports: 1024-65535
+      tcp_routing/enable/request_timeout_in_seconds: 900
       uaa/service_provider_key_credentials/certificate: ((ssl_cert.certificate))
       uaa/service_provider_key_credentials/privatekey: ((ssl_cert.private_key))
       uaa_instances: 1
