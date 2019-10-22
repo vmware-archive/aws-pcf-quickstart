@@ -24,7 +24,7 @@
     stemcell:
       file_glob: '*aws*.tgz'
       product_slug: stemcells-ubuntu-xenial
-      release_version: 456.3
+      release_version: 456.30
     vars:
       az2_name: ((PcfAvailabilityZone2))
       az3_name: ((PcfAvailabilityZone3))
