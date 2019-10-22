@@ -19,11 +19,11 @@ tiles:
   product:
     file_glob: srt*.pivotal
     product_slug: elastic-runtime
-    release_version: 2.7.0
+    release_version: 2.7.2
   stemcell:
     file_glob: '*aws*.tgz'
     product_slug: stemcells-ubuntu-xenial
-    release_version: 456.27
+    release_version: 456.3
   vars:
     cloud_controller/apps_domain: apps.((Domain))
     cloud_controller/system_domain: sys.((Domain))
@@ -60,15 +60,15 @@ tiles:
     system_blobstore/external/versioning: true
     tcp_router_elb_names:
     - ((PcfElbTcpName))
-    tcp_routing/enable/reservable_ports: 1024-65535
     tcp_routing/enable/request_timeout_in_seconds: 900
+    tcp_routing/enable/reservable_ports: 1024-65535
     uaa/service_provider_key_credentials/certificate: ((ssl_cert.certificate))
     uaa/service_provider_key_credentials/privatekey: ((ssl_cert.private_key))
   vars_files:
   - tiles/srt/product-default-vars.yml
   - tiles/srt/resource-vars.yml
   - tiles/srt/errand-vars.yml
-  version: 2.7.0
+  version: 2.7.2
 - manifest: tiles/aws-service-broker/product.yml
   name: aws-service-broker
   ops_files: []
