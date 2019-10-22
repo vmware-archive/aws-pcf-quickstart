@@ -23,7 +23,7 @@ tiles:
   stemcell:
     file_glob: '*aws*.tgz'
     product_slug: stemcells-ubuntu-xenial
-    release_version: 456.30
+    release_version: "456.30"
   vars:
     cloud_controller/apps_domain: apps.((Domain))
     cloud_controller/system_domain: sys.((Domain))
