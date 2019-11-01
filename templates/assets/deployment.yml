@@ -16,6 +16,7 @@ tiles:
   - tiles/srt/resource/control_elb_names.yml
   - tiles/srt/resource/router_elb_names.yml
   - tiles/srt/resource/tcp_router_elb_names.yml
+  - tiles/ert/optional/add-logger_endpoint_port.yml
   product:
     file_glob: srt*.pivotal
     product_slug: elastic-runtime
@@ -64,6 +65,7 @@ tiles:
     tcp_routing/enable/reservable_ports: 1024-65535
     uaa/service_provider_key_credentials/certificate: ((ssl_cert.certificate))
     uaa/service_provider_key_credentials/privatekey: ((ssl_cert.private_key))
+    logger_endpoint_port: 4443
   vars_files:
   - tiles/srt/product-default-vars.yml
   - tiles/srt/resource-vars.yml

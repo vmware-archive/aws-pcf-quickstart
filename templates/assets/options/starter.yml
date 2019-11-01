@@ -16,6 +16,7 @@
     - tiles/ert/resource/diego_brain_elb_names.yml
     - tiles/ert/resource/router_elb_names.yml
     - tiles/ert/resource/tcp_router_elb_names.yml
+    - tiles/ert/optional/add-logger_endpoint_port.yml
     product:
       file_glob: cf*.pivotal
       product_slug: elastic-runtime
@@ -81,6 +82,7 @@
       uaa/service_provider_key_credentials/certificate: ((ssl_cert.certificate))
       uaa/service_provider_key_credentials/privatekey: ((ssl_cert.private_key))
       uaa_instances: 1
+      logger_endpoint_port: 4443
     vars_files:
     - tiles/ert/product-default-vars.yml
     - tiles/ert/resource-vars.yml
