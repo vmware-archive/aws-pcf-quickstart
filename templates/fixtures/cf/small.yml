@@ -186,6 +186,8 @@ product-properties:
     value: 200
   .properties.log_cache_max_per_source:
     value: 100000
+  .properties.logger_endpoint_port:
+    value: 4443
   .properties.metric_registrar_blacklisted_tags:
     value: deployment,job,index,id
   .properties.metric_registrar_enabled:
