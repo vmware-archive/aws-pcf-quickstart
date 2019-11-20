@@ -20,11 +20,11 @@
     product:
       file_glob: cf*.pivotal
       product_slug: elastic-runtime
-      release_version: 2.7.3
+      release_version: 2.7.4
     stemcell:
       file_glob: '*aws*.tgz'
       product_slug: stemcells-ubuntu-xenial
-      release_version: 456.51
+      release_version: 456.69
     vars:
       clock_global_instances: 1
       cloud_controller/apps_domain: apps.((Domain))
@@ -45,6 +45,7 @@
       ha_proxy/skip_cert_verify: true
       haproxy_forward_tls/enable/backend_ca: ((default_ca.ca)))
       haproxy_ssl_ciphers: ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384
+      logger_endpoint_port: 4443
       loggregator_trafficcontroller_instances: 1
       mysql_instances: 1
       mysql_monitor/recipient_email: ((AdminEmail))
@@ -82,9 +83,8 @@
       uaa/service_provider_key_credentials/certificate: ((ssl_cert.certificate))
       uaa/service_provider_key_credentials/privatekey: ((ssl_cert.private_key))
       uaa_instances: 1
-      logger_endpoint_port: 4443
     vars_files:
     - tiles/ert/product-default-vars.yml
     - tiles/ert/resource-vars.yml
     - tiles/ert/errand-vars.yml
-    version: 2.7.3
+    version: 2.7.4
