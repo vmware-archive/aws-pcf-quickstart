@@ -1,0 +1,16 @@
+---
+platform: linux
+image_resource:
+  type: docker-image
+  source:
+    repository: cfplatformeng/quickstart-ci
+inputs:
+- name: quickstart-repo
+- name: aws-quickstart-repo
+- name: quickstart-repo-ci
+- name: version
+run:
+  path: quickstart-repo-ci/ci/tasks/create-pull-request.sh
+params:
+  GITHUB_USER: replace-me
+  GITHUB_PASSWORD: replace-me
