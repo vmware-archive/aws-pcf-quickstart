@@ -790,32 +790,50 @@ jobs:
     params:
       repository: aws-quickstart-repo-updated
 
+# - name: make_pr_to_aws
+#   plan:
+#   - get: quickstart-repo
+#     passed:
+#     - commit-and-pr-aws-quickstart-repo
+#   - get: aws-quickstart-repo
+#   - get: version
+#   - task: make_pr_to_aws
+#     config:
+#       platform: linux
+#       image_resource:
+#         type: docker-image
+#         source:
+#           repository: cfplatformeng/quickstart-ci
+#       inputs:
+#       - name: quickstart-repo
+#       - name: version
+#       params:
+#         GITHUB_ACCESS_TOKEN: ((github_access_token))
+#       run:
+#         path: bash
+#         args:
+#         - -exc
+#         - |
+#           pip install requests
+#           python3 quickstart-repo/ci/github-pullrequest.py
+
 - name: make_pr_to_aws
   plan:
-  - get: quickstart-repo
-    passed:
-    - commit-and-pr-aws-quickstart-repo
-  - get: aws-quickstart-repo
-  - get: version
+  - in_parallel:
+    - get: quickstart-repo
+      passed:
+      - commit-and-pr-aws-quickstart-repo
+    - get: aws-quickstart-repo
+    - get: quickstart-repo-ci
+    - get: version
+    - get: quickstart-ci-image
   - task: make_pr_to_aws
-    config:
-      platform: linux
-      image_resource:
-        type: docker-image
-        source:
-          repository: cfplatformeng/quickstart-ci
-      inputs:
-      - name: quickstart-repo
-      - name: version
-      params:
-        GITHUB_ACCESS_TOKEN: ((github_access_token))
-      run:
-        path: bash
-        args:
-        - -exc
-        - |
-          pip install requests
-          python3 quickstart-repo/ci/github-pullrequest.py
+    image: quickstart-ci-image
+    file: quickstart-repo-ci/ci/tasks/create-pull-request.yml
+    params:
+      GITHUB_USER: ((github_user_name))
+      GITHUB_PASSWORD: ((github_access_token))
+
 
 - name: update-cf-tile
   plan:
@@ -850,7 +868,7 @@ jobs:
       PIVNET_TOKEN: ((pivnet-legacy-token))
       TILE_NAME: cf
       TILE_BASE_DIR: templates/assets/tiles/ert
-      OPS_FILE: templates/assets/options/starter.yml      
+      OPS_FILE: templates/assets/options/starter.yml
   - put: quickstart-repo
     params:
       repository: repo
