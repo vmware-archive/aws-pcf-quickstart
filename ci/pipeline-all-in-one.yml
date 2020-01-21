@@ -683,10 +683,19 @@ jobs:
   - get: aws-pcf-concourse-state
     trigger: true
     passed:
-    - integration-test
+    - check-cf-status
   - get: version
     params:
       bump: patch
+  - get: opsman-tile
+    params:
+      globs:
+        - '*.yml'
+    passed:
+    - instantiate-outer-template-alpha
+  - get: quickstart-repo
+    passed:
+    - integration-test
   - task: add-version-to-filename
     config:
       platform: linux
@@ -697,14 +706,12 @@ jobs:
       inputs:
       - name: quickstart-scripts-alpha
       - name: version
+      - name: opsman-tile
+      - name: quickstart-repo
       outputs:
       - name: output
       run:
-        path: bash
-        args:
-        - -exc
-        - |
-          cp quickstart-scripts-alpha/quickstart.tgz output/quickstart-`cat version/version`.tgz
+        path: quickstart-repo/ci/finalize-release.sh
   - put: version
     params:
       file: version/version
@@ -712,6 +719,7 @@ jobs:
     params:
       name: version/version
       tag: version/version
+      body: notes.md
       globs:
       - output/quickstart-*.tgz
 
@@ -719,7 +727,7 @@ jobs:
   plan:
   - get: quickstart-repo
     passed:
-    - integration-test
+    - github-release
   - get: aws-quickstart-repo
   - get: quickstart-scripts-alpha
     passed:

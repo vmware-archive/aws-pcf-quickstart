@@ -8,3 +8,5 @@ tmp
 
 packages/*
 !packages/.gitkeep
+
+notes.md
