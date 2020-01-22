@@ -1,5 +1,6 @@
-#!/bin/bash -e
+#!/bin/bash
 
+set -e
 set -x
 
 export GITHUB_USER=${GITHUB_USER}

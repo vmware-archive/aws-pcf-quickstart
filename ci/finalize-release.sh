@@ -1,4 +1,7 @@
-#!/bin/bash -e
+#!/bin/bash
+
+set -e
+set -x
 
 export IMAGE_VERSION=$(cat opsman-tile/version)
 

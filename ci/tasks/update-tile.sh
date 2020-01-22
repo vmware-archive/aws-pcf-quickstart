@@ -1,6 +1,6 @@
-#!/bin/bash -e
-#!/bin/bash -e
+#!/bin/bash
 
+set -e
 set -x
 
 if [[ ! -z ${OPS_FILE} ]]; then
