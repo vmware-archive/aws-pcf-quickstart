@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-export IMAGE_VERSION=$(cat opsman-image/version)
+export IMAGE_VERSION=$(cat opsman-tile/version)
 
 cp quickstart-scripts-alpha/quickstart.tgz output/quickstart-`cat version/version`.tgz
 
