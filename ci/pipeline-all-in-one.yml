@@ -719,7 +719,7 @@ jobs:
     params:
       name: version/version
       tag: version/version
-      body: notes.md
+      body: output/notes.md
       globs:
       - output/quickstart-*.tgz
 
