@@ -6,15 +6,15 @@
   path: /tiles/-
   value:
     name: p-healthwatch
-    version: 1.4.5-build.41
+    version: 1.8.1-build.1
     product:
       product_slug: p-healthwatch
-      release_version: 1.4.5
+      release_version: 1.8.1
       file_glob: "*.pivotal"
     stemcell:
       product_slug: stemcells-ubuntu-xenial
-      release_version: "170.38"
-      file_glob: "*google*.tgz"
+      release_version: "456.00"
+      file_glob: "light*aws*.tgz"
     manifest: tiles/p-healthwatch/product.yml
     ops_files:
     - tiles/p-healthwatch/features/opsman-disable.yml
