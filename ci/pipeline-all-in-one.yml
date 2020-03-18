@@ -18,6 +18,7 @@ groups:
   - name: tiles
     jobs:
       - update-cf-tile
+      - update-healthwatch-tile
 
 resource_types:
 - name: ami
@@ -147,6 +148,13 @@ resources:
     api_token: ((pivnet-token))
     copy_metadata: true
     product_slug: elastic-runtime
+
+- name: healthwatch-tile
+  type: pivnet
+  source:
+    api_token: ((pivnet-token))
+    copy_metadata: true
+    product_slug: p-healthwatch   
 
 # - name: aws-service-broker-tile
 #   type: github-release
@@ -905,3 +913,28 @@ jobs:
 #     params:
 #       repository: repo
 #       merge: true
+
+# TODO: add health-watch tile
+- name: update-healthwatch-tile
+  plan:
+  - in_parallel:
+    - get: tile
+      resource: healthwatch-tile
+      trigger: true
+      params: { globs: [] }
+    - get: repo
+      resource: quickstart-repo
+    - get: quickstart-repo-ci
+    - get: quickstart-ci-image
+  - task: update-tile
+    image: quickstart-ci-image
+    file: quickstart-repo-ci/ci/tasks/update-tile.yml
+    params:
+      PIVNET_TOKEN: ((pivnet-legacy-token))
+      TILE_NAME: p-healthwatch
+      TILE_BASE_DIR: templates/assets/tiles/p-healthwatch
+      OPS_FILE: templates/assets/options/healthwatch.yml
+  # - put: quickstart-repo
+  #   params:
+  #     repository: repo
+  #     merge: true

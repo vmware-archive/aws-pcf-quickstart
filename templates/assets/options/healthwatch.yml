@@ -1,11 +1,10 @@
-- type: replace
-  path: /director/ops_files/-
+- path: /director/ops_files/-
+  type: replace
   value: director/options/healthwatch.yml
 
-- type: replace
-  path: /tiles/-
+- path: /tiles/name=p-healthwatch?
+  type: replace
   value:
-    name: p-healthwatch
     version: 1.8.1-build.1
     product:
       product_slug: p-healthwatch
