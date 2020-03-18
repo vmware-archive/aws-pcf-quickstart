@@ -2,7 +2,7 @@
   type: replace
   value: director/options/healthwatch.yml
 
-- path: /tiles/name=p-healthwatch?
+- path: /tiles/-
   type: replace
   value:
     name: p-healthwatch
