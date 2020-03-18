@@ -5,6 +5,7 @@
 - path: /tiles/name=p-healthwatch?
   type: replace
   value:
+    name: p-healthwatch
     version: 1.8.1-build.1
     product:
       product_slug: p-healthwatch
