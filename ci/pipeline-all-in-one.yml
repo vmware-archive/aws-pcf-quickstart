@@ -934,7 +934,7 @@ jobs:
       TILE_NAME: p-healthwatch
       TILE_BASE_DIR: templates/assets/tiles/p-healthwatch
       OPS_FILE: templates/assets/options/healthwatch.yml
-  # - put: quickstart-repo
-  #   params:
-  #     repository: repo
-  #     merge: true
+  - put: quickstart-repo
+    params:
+      repository: repo
+      merge: true
