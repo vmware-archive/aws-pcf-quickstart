@@ -494,7 +494,7 @@ jobs:
 - name: integration-test
   plan:
   - get: quickstart-repo
-    trigger: false
+    trigger: true
     passed:
       - upload-inner-template-alpha
   - get: quickstart-scripts-alpha
