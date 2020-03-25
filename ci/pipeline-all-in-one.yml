@@ -497,6 +497,8 @@ jobs:
     trigger: true
     passed:
       - upload-inner-template-alpha
+      - instantiate-outer-template-alpha
+      - build-quickstart-alpha
   - get: quickstart-scripts-alpha
     trigger: false
     passed:
