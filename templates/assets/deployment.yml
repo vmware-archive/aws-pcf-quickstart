@@ -20,11 +20,11 @@ tiles:
   product:
     file_glob: srt*.pivotal
     product_slug: elastic-runtime
-    release_version: 2.8.5
+    release_version: 2.8.6
   stemcell:
-    file_glob: 'light*aws*.tgz'
+    file_glob: light*aws*.tgz
     product_slug: stemcells-ubuntu-xenial
-    release_version: 621.59
+    release_version: 621.64
   vars:
     cloud_controller/apps_domain: apps.((Domain))
     cloud_controller/system_domain: sys.((Domain))
@@ -70,7 +70,7 @@ tiles:
   - tiles/srt/product-default-vars.yml
   - tiles/srt/resource-vars.yml
   - tiles/srt/errand-vars.yml
-  version: 2.8.5
+  version: 2.8.6
 - manifest: tiles/aws-service-broker/product.yml
   name: aws-service-broker
   ops_files: []
