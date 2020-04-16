@@ -75,6 +75,7 @@
       system_blobstore/external/secret_key: ((PcfIamUserSecretAccessKey))
       system_blobstore/external/signature_version: 4
       system_blobstore/external/versioning: true
+      system_blobstore/external/path_style_s3_urls: true
       tcp_router_elb_names:
       - ((PcfElbTcpName))
       tcp_router_instances: 1
