@@ -57,6 +57,7 @@ def create_stack(template_path: str, aws_region: str):
     aws_access_key_id = os.environ['AWS_ACCESS_KEY_ID']
     aws_secret_access_key = os.environ['AWS_SECRET_ACCESS_KEY']
     deploymentsize = os.environ['AWS_CF_DEPLOYMENT_SIZE']
+    debug = os.environ['DEBUG']
 
     sslcertificatearn = os.environ[aws_region.upper().replace(
         '-', '_') + '_SSLCERTIFICATEARN']
@@ -97,7 +98,7 @@ def create_stack(template_path: str, aws_region: str):
             Capabilities=[
                 'CAPABILITY_IAM',
             ],
-            DisableRollback=False,  # for debug purposes
+            DisableRollback=debug,  # for debug purposes
         )
         stack_id = create_response.get("StackId")
         print("Created stack: {}".format(stack_id))

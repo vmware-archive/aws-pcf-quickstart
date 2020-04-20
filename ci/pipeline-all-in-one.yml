@@ -521,6 +521,7 @@ jobs:
       outputs:
       - name: output
       params:
+        DEBUG: False
         AWS_CF_DEPLOYMENT_SIZE: ((aws_cf_deploymentsize))
         AWS_CF_PASSWORD: ((aws_cf_password))
         AWS_CF_DOMAIN: ((aws_cf_domain))
