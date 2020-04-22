@@ -21,11 +21,11 @@
     product:
       file_glob: cf*.pivotal
       product_slug: elastic-runtime
-      release_version: 2.9.0
+      release_version: 2.9.1
     stemcell:
       file_glob: light*aws*.tgz
       product_slug: stemcells-ubuntu-xenial
-      release_version: 621.64
+      release_version: 621.69
     vars:
       az2_name: ((PcfAvailabilityZone2))
       az3_name: ((PcfAvailabilityZone3))
@@ -58,12 +58,12 @@
       system_blobstore/external/endpoint: https://s3.((Region)).amazonaws.com
       system_blobstore/external/iam_instance_profile_authentication: false
       system_blobstore/external/packages_bucket: ((PcfElasticRuntimeS3PackagesBucket))
+      system_blobstore/external/path_style_s3_urls: true
       system_blobstore/external/region: ((Region))
       system_blobstore/external/resources_bucket: ((PcfElasticRuntimeS3ResourcesBucket))
       system_blobstore/external/secret_key: ((PcfIamUserSecretAccessKey))
       system_blobstore/external/signature_version: 4
       system_blobstore/external/versioning: true
-      system_blobstore/external/path_style_s3_urls: true
       tcp_router_elb_names:
       - ((PcfElbTcpName))
       tcp_routing/enable/request_timeout_in_seconds: 900
@@ -74,4 +74,4 @@
     - tiles/ert/product-default-vars.yml
     - tiles/ert/resource-vars.yml
     - tiles/ert/errand-vars.yml
-    version: 2.9.0
+    version: 2.9.1
