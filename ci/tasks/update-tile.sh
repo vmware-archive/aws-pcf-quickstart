@@ -70,8 +70,7 @@ fi
 git --no-pager diff
 
 echo "Embed updated template files"
-export GOFLAGS="-mod=vendor"
-go generate templates/templates.go
+go generate -mod=vendor templates/templates.go
 UPDATE_FIXTURES=true ginkgo templates
 
 git config --global user.email "ci@starkandwayne.com"

@@ -1,6 +1,6 @@
 package templates
 
-//go:generate go run -tags=dev generate.go
+//go:generate go run -mod vendor -tags=dev generate.go
 
 import (
 	"github.com/cf-platform-eng/aws-pcf-quickstart/config"
