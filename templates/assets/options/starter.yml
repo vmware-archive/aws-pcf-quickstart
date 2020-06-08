@@ -19,7 +19,7 @@
     - tiles/ert/optional/add-logger_endpoint_port.yml
     product:
       file_glob: cf*.pivotal
-      product_slug: elastic-runime
+      product_slug: elastic-runtime
       release_version: 2.9.3
     stemcell:
       file_glob: light*aws*.tgz
