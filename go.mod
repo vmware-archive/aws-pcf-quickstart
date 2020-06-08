@@ -10,9 +10,6 @@ require (
 	github.com/google/uuid v1.1.1
 	github.com/onsi/ginkgo v1.9.0
 	github.com/onsi/gomega v1.6.0
-	github.com/pivotal-cf/kiln v0.0.0-20180329191310-9c0f5ac8553d // indirect
-	github.com/shurcooL/httpfs v0.0.0-20190527155220-6a4d4a70508b // indirect
-	github.com/shurcooL/vfsgen v0.0.0-20181202132449-6a9ea43bcacd // indirect
 	github.com/starkandwayne/om-tiler v0.0.0-20190820103743-86c0a1263e12
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	gopkg.in/yaml.v2 v2.2.2
