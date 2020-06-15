@@ -40,7 +40,6 @@ enable_smb_volume_driver: true
 enable_tls_to_internal_pxc: false
 enable_v1_firehose: true
 enable_v2_firehose: true
-experimental_dynamic_egress_enforcement: false
 garden_disk_cleanup/reserved/reserved_space_for_other_jobs_in_mb: 15360
 gorouter_ssl_ciphers: ECDHE-RSA-AES128-GCM-SHA256:TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 ha_proxy/skip_cert_verify: false
